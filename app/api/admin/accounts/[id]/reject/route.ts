@@ -26,5 +26,5 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     },
   })
 
-  return NextResponse.redirect(new URL('/admin/accounts', req.url))
+  return NextResponse.json({ success: true, message: 'Account rejected.' })
 }
