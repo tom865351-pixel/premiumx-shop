@@ -16,10 +16,9 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.findUnique({ where: { id: authUser.userId } })
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-    // 1. Create a pending TopupRequest in our database to track this transaction
-    // We generate a unique transaction ID for ZiniPay reference
-    const txId = 'ZINI-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase()
-    
+    // 1. Create a pending TopupRequest in our database
+    const txId = 'PX-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase()
+
     await prisma.topupRequest.create({
       data: {
         userId: authUser.userId,
@@ -30,41 +29,39 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    // 2. Call ZiniPay API to create a payment session
+    // 2. Call ZiniPay official API (from zinipay.com/docs)
     const apiKey = process.env.ZINIPAY_API_KEY
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-    // ZiniPay standard API payload (Adjust if their latest docs require specific field names)
-    const ziniPayload = {
-      api_key: apiKey,
-      amount: amount,
-      currency: "BDT",
-      tran_id: txId,
-      success_url: `${baseUrl}/deposit/success?tx_id=${txId}`,
-      fail_url: `${baseUrl}/deposit/fail`,
-      cancel_url: `${baseUrl}/deposit/fail`,
-      cus_email: authUser.email,
-      cus_name: user.username,
-      desc: "Wallet Top-up"
-    }
-
-    const ziniResponse = await fetch('https://api.zinipay.com/create', {
+    const ziniResponse = await fetch('https://api.zinipay.com/v1/payment/create', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ziniPayload)
+      headers: {
+        'Content-Type': 'application/json',
+        'zini-api-key': apiKey || '',
+      },
+      body: JSON.stringify({
+        amount: amount,
+        currency: 'BDT',
+        tran_id: txId,
+        success_url: `${baseUrl}/deposit/success?tx_id=${txId}`,
+        fail_url: `${baseUrl}/deposit/fail`,
+        cancel_url: `${baseUrl}/deposit/fail`,
+        customer_name: user.username,
+        customer_email: authUser.email,
+        description: 'PremiumX Wallet Top-up',
+      })
     })
 
     const ziniData = await ziniResponse.json()
-    
-    // ZiniPay returns the checkout URL (usually in payment_url, url, or checkout_url)
-    const checkoutUrl = ziniData.payment_url || ziniData.url || ziniData.checkout_url
-    
+
+    // ZiniPay returns payment_url or url in response
+    const checkoutUrl = ziniData.payment_url || ziniData.url || ziniData.checkout_url || ziniData.data?.payment_url
+
     if (checkoutUrl) {
       return NextResponse.json({ url: checkoutUrl })
     } else {
-      console.error("ZiniPay Response Error:", ziniData)
-      // Fallback: If the API endpoint is different, let the user know they need to check ZiniPay docs
-      return NextResponse.json({ error: 'Payment gateway configuration error. Check server logs.' }, { status: 500 })
+      console.error('ZiniPay Response:', JSON.stringify(ziniData))
+      return NextResponse.json({ error: 'Payment gateway error: ' + (ziniData.message || 'Unknown') }, { status: 500 })
     }
 
   } catch (err: any) {
