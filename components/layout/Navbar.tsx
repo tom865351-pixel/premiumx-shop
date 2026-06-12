@@ -155,10 +155,15 @@ export default function Navbar({ user }: NavbarProps) {
           {user ? (
             <>
               {/* Balance */}
-              <Link href="/wallet" className={styles.balanceBadge}>
-                <span className={styles.balanceIcon}>💰</span>
-                <span>{formatBalance(user.balance)}</span>
-              </Link>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Link href="/wallet" className={styles.balanceBadge}>
+                  <span className={styles.balanceIcon}>💰</span>
+                  <span>{formatBalance(user.balance)}</span>
+                </Link>
+                <Link href="/deposit" className="btn btn-blue btn-sm" style={{ padding: '6px 12px', fontSize: 13, borderRadius: 20 }}>
+                  ➕ Add Money
+                </Link>
+              </div>
 
               {/* Notifications */}
               <Link href="/notifications" className={styles.iconBtn}>
