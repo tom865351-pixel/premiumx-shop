@@ -64,7 +64,8 @@ export async function POST(req: Request) {
           userId: user.id,
           amount: -account.price,
           type: 'purchase',
-          description: `Purchased ${account.title}`
+          description: `Purchased ${account.title}`,
+          balance: user.balance - account.price
         }
       })
 
@@ -73,7 +74,8 @@ export async function POST(req: Request) {
           userId: seller.id,
           amount: account.price,
           type: 'sale',
-          description: `Sold ${account.title}`
+          description: `Sold ${account.title}`,
+          balance: seller.balance + account.price
         }
       })
 
