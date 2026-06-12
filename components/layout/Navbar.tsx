@@ -253,6 +253,7 @@ export default function Navbar({ user }: NavbarProps) {
           {user && (
             <>
               <Link href="/dashboard" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.dashboard}</Link>
+              <Link href="/deposit" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)} style={{ color: 'var(--blue)', fontWeight: 'bold' }}>➕ Add Money</Link>
               <Link href="/orders" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.orders}</Link>
               <Link href="/wallet" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.wallet}</Link>
               <button className={styles.mobileNavLink} onClick={handleLogout}>{text.logout}</button>
