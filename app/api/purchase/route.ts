@@ -79,12 +79,18 @@ export async function POST(req: Request) {
         }
       })
 
-      // 6. Create Purchase record linking buyer and account
-      const purchase = await tx.purchase.create({
+      // 6. Create Order record linking buyer and account
+      const order = await tx.order.create({
         data: {
           buyerId: user.id,
           accountId: account.id,
           amount: account.price,
+          commission: 0,
+          sellerEarning: account.price,
+          status: 'completed',
+          reportWindowEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+          deliveredAt: new Date(),
+          completedAt: new Date(),
         }
       })
 
@@ -94,7 +100,7 @@ export async function POST(req: Request) {
           userId: user.id,
           title: 'Purchase Successful',
           message: `You successfully purchased ${account.title} for ৳${account.price}`,
-          type: 'purchase'
+          type: 'success'
         }
       })
 
@@ -103,11 +109,11 @@ export async function POST(req: Request) {
           userId: seller.id,
           title: 'Account Sold',
           message: `Your account ${account.title} was sold for ৳${account.price}`,
-          type: 'sale'
+          type: 'success'
         }
       })
 
-      return purchase
+      return order
     })
 
     return NextResponse.json({ success: true, message: 'Purchase successful' })
