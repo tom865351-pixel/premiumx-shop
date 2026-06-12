@@ -371,6 +371,14 @@ img {
 .alert-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
 .alert-info { background: var(--info-bg); color: var(--info); border: 1px solid rgba(59,130,246,0.3); }
 
+/* Premium Shop Animations */
+.card {
+  position: relative;
+}
+.card:hover .card-glow {
+  opacity: 1 !important;
+}
+
 /* Loading */
 @keyframes shimmer {
   0% { background-position: -200% 0; }

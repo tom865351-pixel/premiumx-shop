@@ -10,6 +10,7 @@ const navItems = [
   { href: '/admin/orders', icon: '🛒', label: 'Orders' },
   { href: '/admin/deposits', icon: '💳', label: 'Deposits', urgent: true },
   { href: '/admin/reports', icon: '🚩', label: 'Reports', urgent: true },
+  { href: '/admin/support', icon: '🎫', label: 'Support', urgent: true },
   { href: '/admin/payments', icon: '💰', label: 'Payments' },
   { href: '/admin/withdrawals', icon: '💸', label: 'Withdrawals' },
   { href: '/admin/categories', icon: '🏷️', label: 'Categories' },

@@ -82,19 +82,86 @@ export default async function Browse({
         ) : (
           <div className="grid-4">
             {accounts.map(acc => (
-              <div key={acc.id} className="card" style={{ transition: 'transform 0.2s', ':hover': { transform: 'translateY(-4px)' } } as any}>
-                <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
-                  <div className="badge" style={{ background: `${acc.category.color}20`, color: acc.category.color, border: `1px solid ${acc.category.color}40` }}>
-                    {acc.category.icon} {acc.category.name}
+              <div 
+                key={acc.id} 
+                className="card" 
+                style={{ 
+                  transition: 'all 0.3s ease', 
+                  border: '1px solid rgba(14, 165, 233, 0.1)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  ':hover': { 
+                    transform: 'translateY(-6px)',
+                    border: '1px solid rgba(14, 165, 233, 0.5)',
+                    boxShadow: '0 8px 30px rgba(14, 165, 233, 0.15)',
+                  } 
+                } as any}
+              >
+                {/* Glow Effect Background */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-50%',
+                  left: '-50%',
+                  width: '200%',
+                  height: '200%',
+                  background: 'radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, transparent 70%)',
+                  opacity: 0,
+                  transition: 'opacity 0.3s ease',
+                  pointerEvents: 'none',
+                  zIndex: 0
+                }} className="card-glow" />
+
+                <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
+                    <div className="badge" style={{ 
+                      background: `${acc.category.color}15`, 
+                      color: acc.category.color, 
+                      border: `1px solid ${acc.category.color}40`,
+                      backdropFilter: 'blur(10px)',
+                      fontWeight: 600
+                    }}>
+                      {acc.category.icon} {acc.category.name}
+                    </div>
+                    <div className="text-gold font-mono" style={{ fontWeight: 800, fontSize: 18, textShadow: '0 0 10px rgba(234, 179, 8, 0.2)' }}>৳{acc.price}</div>
                   </div>
-                  <div className="text-gold font-mono" style={{ fontWeight: 600 }}>৳{acc.price}</div>
+                  
+                  <h3 style={{ 
+                    fontSize: 17, 
+                    marginBottom: 12, 
+                    fontWeight: 700,
+                    lineHeight: 1.4,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}>{acc.title}</h3>
+                  
+                  <div className="flex-col gap-2" style={{ marginBottom: 20, flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-secondary)' }}>
+                      <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: 6 }}>👥 {acc.followersCount?.toLocaleString() || 'N/A'} Followers</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-secondary)' }}>
+                      <span style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: 6 }}>📅 Age: {acc.accountAge || 'Unknown'}</span>
+                    </div>
+                  </div>
+                  
+                  <Link 
+                    href={`/account/${acc.id}`} 
+                    className="btn w-full text-center" 
+                    style={{ 
+                      background: 'linear-gradient(to right, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.2))',
+                      border: '1px solid rgba(14, 165, 233, 0.3)',
+                      color: '#38bdf8',
+                      fontWeight: 600,
+                      backdropFilter: 'blur(4px)'
+                    }}
+                  >
+                    View Details
+                  </Link>
                 </div>
-                <h3 style={{ fontSize: 16, marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{acc.title}</h3>
-                <div className="flex-col gap-1" style={{ marginBottom: 16 }}>
-                  <div className="text-secondary" style={{ fontSize: 13 }}>👥 {acc.followersCount?.toLocaleString() || 'N/A'} Followers</div>
-                  <div className="text-secondary" style={{ fontSize: 13 }}>📅 Age: {acc.accountAge || 'Unknown'}</div>
-                </div>
-                <Link href={`/account/${acc.id}`} className="btn btn-outline w-full text-center">View Details</Link>
               </div>
             ))}
           </div>
