@@ -30,8 +30,9 @@ export async function POST(req: NextRequest) {
     })
 
     // 2. Call ZiniPay official API (from zinipay.com/docs)
-    const apiKey = process.env.ZINIPAY_API_KEY
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Fallback to hardcoded key if Vercel environment variable is not set
+    const apiKey = process.env.ZINIPAY_API_KEY || 'cbd66b73fd096d49185439e6afcd60d13ab12e8269d5b3c0'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://premiumx-shop.vercel.app'
 
     const ziniResponse = await fetch('https://api.zinipay.com/v1/payment/create', {
       method: 'POST',
