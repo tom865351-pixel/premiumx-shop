@@ -11,19 +11,40 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const account = await prisma.account.findUnique({ where: { id: params.id } })
   if (!account) return NextResponse.json({ error: 'Account not found' }, { status: 404 })
 
-  await prisma.account.update({
-    where: { id: params.id },
-    data: { status: 'approved' },
-  })
+  await prisma.$transaction(async (tx) => {
+    // 1. Mark account as approved
+    await tx.account.update({
+      where: { id: params.id },
+      data: { status: 'approved' },
+    })
 
-  await prisma.notification.create({
-    data: {
-      userId: account.sellerId,
-      title: 'Account Listing Approved! ✅',
-      message: `Your listing "${account.title}" is now live on the marketplace.`,
-      type: 'success',
-      link: '/dashboard',
-    },
+    // 2. Add balance to seller
+    const updatedUser = await tx.user.update({
+      where: { id: account.sellerId },
+      data: { balance: { increment: account.price } }
+    })
+
+    // 3. Create Transaction Log
+    await tx.transaction.create({
+      data: {
+        userId: account.sellerId,
+        type: 'sale',
+        amount: account.price,
+        balance: updatedUser.balance,
+        description: `Payment for Approved Account: ${account.title}`,
+      }
+    })
+
+    // 4. Notify Seller
+    await tx.notification.create({
+      data: {
+        userId: account.sellerId,
+        title: 'Account Approved & Payment Received! 💰',
+        message: `Your account "${account.title}" has been approved. ৳${account.price} has been added to your balance.`,
+        type: 'success',
+        link: '/wallet',
+      },
+    })
   })
 
   return NextResponse.redirect(new URL('/admin/accounts', req.url))
