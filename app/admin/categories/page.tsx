@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import AddCategoryModal from './AddCategoryModal'
 import CategoryActions from './CategoryActions'
+import EditCategoryModal from './EditCategoryModal'
 
 export default async function AdminCategories() {
   const user = await getAuthUser()
@@ -51,7 +52,10 @@ export default async function AdminCategories() {
                     </span>
                   </td>
                   <td>
-                    <CategoryActions id={cat.id} isActive={cat.isActive} />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <EditCategoryModal category={cat} />
+                      <CategoryActions id={cat.id} isActive={cat.isActive} category={cat} />
+                    </div>
                   </td>
                 </tr>
               ))
