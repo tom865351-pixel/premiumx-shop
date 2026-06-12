@@ -91,7 +91,7 @@ export default async function Dashboard() {
                     </td>
                     <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                     <td>
-                      <Link href={`/orders/${order.id}`} className="btn btn-sm btn-outline">View details</Link>
+                      <Link href="/orders" className="btn btn-sm btn-outline">View details</Link>
                     </td>
                   </tr>
                 ))}

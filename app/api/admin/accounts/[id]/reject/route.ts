@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     data: {
       userId: account.sellerId,
       title: 'Account Listing Rejected ❌',
-      message: `Your listing "${account.title}" was rejected. Please review and resubmit.`,
+      message: `Your listing "${account.title}" was rejected by the admin. Please contact support.`,
       type: 'danger',
       link: '/dashboard',
     },

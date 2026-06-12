@@ -55,10 +55,17 @@ export default async function AdminAccounts() {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button className="btn btn-sm btn-outline">Edit</button>
                       {acc.status === 'pending' && (
-                        <button className="btn btn-sm btn-gold">Approve</button>
+                        <>
+                          <form action={`/api/admin/accounts/${acc.id}/approve`} method="POST">
+                            <button className="btn btn-sm btn-gold" type="submit">Approve</button>
+                          </form>
+                          <form action={`/api/admin/accounts/${acc.id}/reject`} method="POST">
+                            <button className="btn btn-sm btn-outline" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }} type="submit">Reject</button>
+                          </form>
+                        </>
                       )}
+                      {acc.status !== 'pending' && <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>Processed</span>}
                     </div>
                   </td>
                 </tr>
