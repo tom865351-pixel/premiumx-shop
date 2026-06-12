@@ -53,15 +53,20 @@ export async function POST(req: NextRequest) {
     })
 
     const ziniData = await ziniResponse.json()
+    console.log('ZiniPay Full Response:', JSON.stringify(ziniData))
 
     // ZiniPay returns payment_url or url in response
-    const checkoutUrl = ziniData.payment_url || ziniData.url || ziniData.checkout_url || ziniData.data?.payment_url
+    const checkoutUrl = ziniData.payment_url || ziniData.url || ziniData.checkout_url 
+      || ziniData.data?.payment_url || ziniData.data?.url
 
     if (checkoutUrl) {
       return NextResponse.json({ url: checkoutUrl })
     } else {
-      console.error('ZiniPay Response:', JSON.stringify(ziniData))
-      return NextResponse.json({ error: 'Payment gateway error: ' + (ziniData.message || 'Unknown') }, { status: 500 })
+      // Return full response for debugging
+      const errMsg = typeof ziniData.message === 'string' 
+        ? ziniData.message 
+        : JSON.stringify(ziniData)
+      return NextResponse.json({ error: 'ZiniPay Error: ' + errMsg, raw: ziniData }, { status: 500 })
     }
 
   } catch (err: any) {

@@ -67,9 +67,11 @@ export default function DepositForm() {
       })
       const data = await res.json()
 
-      if (!res.ok) throw new Error(data.error || 'Failed to initiate ZiniPay')
+      if (!res.ok) {
+        const errText = data.error || 'Failed to initiate ZiniPay'
+        throw new Error(errText)
+      }
       
-      // Redirect to ZiniPay checkout
       if (data.url) {
         window.location.href = data.url
       }
