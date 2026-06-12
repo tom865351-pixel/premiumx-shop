@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import AddCategoryModal from './AddCategoryModal'
+import CategoryActions from './CategoryActions'
 
 export default async function AdminCategories() {
   const user = await getAuthUser()
@@ -8,7 +10,7 @@ export default async function AdminCategories() {
 
   const categories = await prisma.category.findMany({
     orderBy: { sortOrder: 'asc' },
-    include: { _count: { select: { accounts: true } } }
+    include: { _count: { select: { accounts: { where: { status: 'approved' } } } } }
   })
 
   return (
@@ -18,7 +20,7 @@ export default async function AdminCategories() {
           <h1 className="page-title">Manage Categories</h1>
           <p className="page-subtitle">Configure platforms and their default selling prices.</p>
         </div>
-        <button className="btn btn-gold">Add Category</button>
+        <AddCategoryModal />
       </div>
 
       <div className="table-container card">
@@ -42,19 +44,14 @@ export default async function AdminCategories() {
                   <td style={{ fontSize: 24 }}>{cat.icon}</td>
                   <td style={{ fontWeight: 600 }}>{cat.name}</td>
                   <td className="font-mono text-gold">৳{cat.defaultPrice}</td>
-                  <td>{cat.isActive ? cat._count.accounts : 0}</td>
+                  <td>{cat._count.accounts}</td>
                   <td>
                     <span className={`badge badge-${cat.isActive ? 'success' : 'danger'}`}>
                       {cat.isActive ? 'Active' : 'Disabled'}
                     </span>
                   </td>
                   <td>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button className="btn btn-sm btn-outline">Edit</button>
-                      <button className={`btn btn-sm ${cat.isActive ? 'btn-outline' : 'btn-gold'}`} style={cat.isActive ? { borderColor: 'var(--danger)', color: 'var(--danger)' } : {}}>
-                        {cat.isActive ? 'Disable' : 'Enable'}
-                      </button>
-                    </div>
+                    <CategoryActions id={cat.id} isActive={cat.isActive} />
                   </td>
                 </tr>
               ))
