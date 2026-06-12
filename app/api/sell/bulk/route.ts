@@ -63,10 +63,10 @@ export async function POST(req: Request) {
         username: username,
         password: password,
         twoFASecret: twoFA || null,
-        price: category.defaultPrice,
+        price: (category as any).defaultPrice || 0,
         status: 'pending'
       }
-    }).filter(Boolean)
+    }).filter(Boolean) as any[]
 
     if (accountsData.length === 0) {
       return NextResponse.json({ error: 'Could not find Username and Password columns in the file' }, { status: 400 })

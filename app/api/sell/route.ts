@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         username,
         password,
         twoFASecret: twoFASecret || null,
-        price: category.defaultPrice,
+        price: (category as any).defaultPrice || 0,
         status: 'pending' // Admin needs to approve
       }
     })
