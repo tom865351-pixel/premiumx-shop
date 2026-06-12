@@ -43,7 +43,7 @@ export default async function AccountDetailsPage({ params }: { params: { id: str
                   </div>
                   <h1 style={{ fontSize: 28, marginBottom: 8, fontWeight: 800, lineHeight: 1.2 }}>{account.title}</h1>
                   <p style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ display: 'inline-block', width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(45deg, #38bdf8, #818cf8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12 }}>{account.seller.username.charAt(0).toUpperCase()}</span>
+                    <span style={{ display: 'flex', width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(45deg, #38bdf8, #818cf8)', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12 }}>{account.seller.username.charAt(0).toUpperCase()}</span>
                     Listed by @{account.seller.username}
                   </p>
                 </div>
