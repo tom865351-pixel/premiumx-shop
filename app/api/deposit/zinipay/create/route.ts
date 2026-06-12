@@ -12,6 +12,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Minimum deposit is ৳50' }, { status: 400 })
     }
 
+    // Fetch full user from DB to get the username
+    const user = await prisma.user.findUnique({ where: { id: authUser.userId } })
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
     // 1. Create a pending TopupRequest in our database to track this transaction
     // We generate a unique transaction ID for ZiniPay reference
     const txId = 'ZINI-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase()
@@ -40,7 +44,7 @@ export async function POST(req: NextRequest) {
       fail_url: `${baseUrl}/deposit/fail`,
       cancel_url: `${baseUrl}/deposit/fail`,
       cus_email: authUser.email,
-      cus_name: authUser.username,
+      cus_name: user.username,
       desc: "Wallet Top-up"
     }
 
