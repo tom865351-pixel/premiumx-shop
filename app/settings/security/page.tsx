@@ -1,10 +1,12 @@
+import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
 export default async function SecurityPage() {
   const authUser = await getAuthUser()
+  if (!authUser) redirect('/login')
   const logins = await prisma.loginHistory.findMany({
-    where: { userId: authUser!.userId },
+    where: { userId: authUser.userId },
     orderBy: { createdAt: 'desc' },
     take: 10
   })

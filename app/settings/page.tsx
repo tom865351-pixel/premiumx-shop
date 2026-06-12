@@ -1,9 +1,12 @@
+import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
 export default async function SettingsPage() {
   const authUser = await getAuthUser()
-  const user = await prisma.user.findUnique({ where: { id: authUser!.userId } })
+  if (!authUser) redirect('/login')
+  const user = await prisma.user.findUnique({ where: { id: authUser.userId } })
+  if (!user) redirect('/login')
 
   return (
     <div className="card" style={{ padding: 32 }}>
