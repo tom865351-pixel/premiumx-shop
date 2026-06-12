@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  password      String
+  role          String    @default("buyer") // buyer, seller, admin
+  balance       Float     @default(0)
+  isVerified    Boolean   @default(false)
+  isBanned      Boolean   @default(false)
+  banReason     String?
+  avatar        String?
+  telegramId    String?
+  preferredCurrency String @default("BDT")
+  preferredLanguage String @default("en")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  listings      Account[]
+  purchases     Order[]   @relation("BuyerOrders")
+  topupRequests TopupRequest[]
+  withdrawals   Withdrawal[]
+  reports       Report[]  @relation("BuyerReports")
+  notifications Notification[]
+  loginHistory  LoginHistory[]
+  transactions  Transaction[]
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  icon        String    @default("🌐")
+  color       String    @default("#9333EA")
+  description String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  fields      String    @default("[]")
+  defaultPrice Float    @default(0)
+  createdAt   DateTime  @default(now())
+
+  accounts    Account[]
+}
+
+model Account {
+  id            String    @id @default(cuid())
+  sellerId      String
+  categoryId    String
+  title         String
+  username      String
+  password      String
+  twoFASecret   String?
+  backupCodes   String?
+  recoveryEmail String?
+  recoveryPhone String?
+  accountAge    String?
+  followersCount Int?     @default(0)
+  niche         String?
+  price         Float
+  description   String?
+  screenshots   String    @default("[]")
+  extraFields   String    @default("{}")
+  status        String    @default("pending") // pending, approved, rejected, sold
+  isFeatured    Boolean   @default(false)
+  views         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  seller        User      @relation(fields: [sellerId], references: [id])
+  category      Category  @relation(fields: [categoryId], references: [id])
+  order         Order?
+  reports       Report[]
+}
+
+model Order {
+  id          String    @id @default(cuid())
+  buyerId     String
+  accountId   String    @unique
+  amount      Float
+  commission  Float     @default(0)
+  sellerEarning Float   @default(0)
+  status      String    @default("pending") // pending, completed, refunded, disputed
+  reportWindowEnd DateTime
+  deliveredAt DateTime  @default(now())
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  buyer       User      @relation("BuyerOrders", fields: [buyerId], references: [id])
+  account     Account   @relation(fields: [accountId], references: [id])
+  report      Report?
+  transaction Transaction?
+}
+
+model Report {
+  id          String    @id @default(cuid())
+  orderId     String    @unique
+  buyerId     String
+  accountId   String
+  reason      String
+  description String?
+  screenshots String    @default("[]")
+  status      String    @default("pending") // pending, approved, rejected
+  adminNote   String?
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+
+  order       Order     @relation(fields: [orderId], references: [id])
+  buyer       User      @relation("BuyerReports", fields: [buyerId], references: [id])
+  account     Account   @relation(fields: [accountId], references: [id])
+}
+
+model TopupRequest {
+  id            String    @id @default(cuid())
+  userId        String
+  amount        Float
+  method        String    // bkash, nagad, crypto
+  currency      String    @default("BDT")
+  transactionId String?
+  screenshot    String?
+  status        String    @default("pending") // pending, approved, rejected
+  adminNote     String?
+  createdAt     DateTime  @default(now())
+  processedAt   DateTime?
+
+  user          User      @relation(fields: [userId], references: [id])
+  transaction   Transaction?
+}
+
+model Withdrawal {
+  id            String    @id @default(cuid())
+  userId        String
+  amount        Float
+  method        String    // bkash, nagad, crypto
+  accountNumber String
+  status        String    @default("pending") // pending, approved, rejected
+  reference     String?
+  adminNote     String?
+  createdAt     DateTime  @default(now())
+  processedAt   DateTime?
+
+  user          User      @relation(fields: [userId], references: [id])
+  transaction   Transaction?
+}
+
+model Transaction {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String    // topup, purchase, sale, commission, refund, withdrawal
+  amount      Float
+  balance     Float     // balance after transaction
+  description String
+  orderId     String?   @unique
+  topupId     String?   @unique
+  withdrawalId String?  @unique
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id])
+  order       Order?    @relation(fields: [orderId], references: [id])
+  topup       TopupRequest? @relation(fields: [topupId], references: [id])
+  withdrawal  Withdrawal?   @relation(fields: [withdrawalId], references: [id])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String    @default("info") // info, success, warning, danger
+  isRead    Boolean   @default(false)
+  link      String?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model LoginHistory {
+  id        String    @id @default(cuid())
+  userId    String
+  ip        String?
+  userAgent String?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model SiteSetting {
+  id              String    @id @default(cuid())
+  key             String    @unique
+  value           String
+  updatedAt       DateTime  @updatedAt
+}
+
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  message     String
+  type        String    @default("info") // info, warning, success
+  target      String    @default("all") // all, buyers, sellers
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+}

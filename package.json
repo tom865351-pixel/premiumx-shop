@@ -1,0 +1,35 @@
+{
+  "name": "premiumx-shop",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:seed": "ts-node prisma/seed.ts"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "@prisma/client": "^5.16.0",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.6.3",
+    "xlsx": "^0.18.5",
+    "nodemailer": "^6.9.14",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/nodemailer": "^6.4.15",
+    "@types/uuid": "^10.0.0",
+    "prisma": "^5.16.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}

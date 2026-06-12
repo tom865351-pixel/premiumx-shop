@@ -1,0 +1,77 @@
+'use client'
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
+export default function Login() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get('email')
+    const password = formData.get('password')
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Login failed')
+      
+      router.push('/dashboard')
+      router.refresh()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div className="card card-glass" style={{ width: '100%', maxWidth: 400 }}>
+        <div style={{ textAlign: 'center', marginBottom: 30 }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <span style={{ fontFamily: 'Space Grotesk', fontSize: 24, fontWeight: 700, color: 'var(--gold)' }}>Premium</span>
+            <span style={{ fontFamily: 'Space Grotesk', fontSize: 24, fontWeight: 800, color: 'var(--purple)' }}>X</span>
+          </Link>
+          <h1 style={{ fontSize: 20, marginTop: 16 }}>Welcome Back</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Sign in to your account</p>
+        </div>
+
+        {error && <div className="alert alert-danger" style={{ marginBottom: 20 }}>{error}</div>}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="form-group">
+            <label className="form-label">Email Address</label>
+            <input type="email" name="email" required placeholder="name@example.com" />
+          </div>
+          <div className="form-group">
+            <div className="flex justify-between items-center">
+              <label className="form-label">Password</label>
+              <Link href="/forgot-password" style={{ fontSize: 12, color: 'var(--gold)' }}>Forgot?</Link>
+            </div>
+            <input type="password" name="password" required placeholder="••••••••" />
+          </div>
+          
+          <button type="submit" className="btn btn-gold w-full" disabled={loading} style={{ marginTop: 8 }}>
+            {loading ? <div className="spinner" /> : 'Sign In'}
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--text-secondary)' }}>
+          Don't have an account? <Link href="/register" className="text-gold">Sign up</Link>
+        </div>
+      </div>
+    </div>
+  )
+}
