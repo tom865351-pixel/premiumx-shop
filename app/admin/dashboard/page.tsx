@@ -5,7 +5,7 @@ import { getAuthUser } from '@/lib/auth'
 export default async function AdminDashboard() {
   const user = await getAuthUser()
   
-  if (!user || user.role !== 'admin') {
+  if (!user || (user.role !== 'admin' && user.role !== 'sub-admin' && user.role !== 'stock-manager')) {
     redirect('/login')
   }
 
@@ -28,6 +28,12 @@ export default async function AdminDashboard() {
     orderBy: { createdAt: 'desc' },
     include: { buyer: true, account: true }
   })
+
+  let categories = await prisma.category.findMany({
+    include: { _count: { select: { accounts: { where: { status: 'sold' } } } } }
+  })
+  categories.sort((a, b) => b._count.accounts - a._count.accounts)
+  const topCategories = categories.slice(0, 5)
 
   return (
     <div>
@@ -69,38 +75,63 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      <h2 style={{ fontSize: 18, marginBottom: 16 }}>Recent Orders</h2>
-      <div className="table-container card">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Buyer</th>
-              <th>Account</th>
-              <th>Amount</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentOrders.length === 0 ? (
-              <tr><td colSpan={5} className="text-center">No orders yet</td></tr>
-            ) : (
-              recentOrders.map(order => (
-                <tr key={order.id}>
-                  <td className="font-mono">#{order.id.slice(-6).toUpperCase()}</td>
-                  <td>{order.buyer.username}</td>
-                  <td>{order.account.title}</td>
-                  <td className="font-mono text-gold">৳{order.amount}</td>
-                  <td>
-                    <span className={`badge badge-${order.status === 'completed' ? 'success' : 'warning'}`}>
-                      {order.status}
-                    </span>
-                  </td>
+      <div className="grid-2" style={{ gap: 24, marginBottom: 40 }}>
+        {/* Top Selling Categories */}
+        <div className="card" style={{ padding: 24 }}>
+          <h2 style={{ fontSize: 18, marginBottom: 16 }}>🏆 Top Selling Categories</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {topCategories.map((cat, i) => (
+              <div key={cat.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--bg)', borderRadius: 8 }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <span style={{ fontSize: 24 }}>{cat.icon}</span>
+                  <div>
+                    <div style={{ fontWeight: 600 }}>{cat.name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Rank #{i + 1}</div>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold)' }}>{cat._count.accounts}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Accounts Sold</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Orders */}
+        <div className="card" style={{ padding: 24 }}>
+          <h2 style={{ fontSize: 18, marginBottom: 16 }}>Recent Orders</h2>
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Buyer</th>
+                  <th>Amount</th>
+                  <th>Status</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {recentOrders.length === 0 ? (
+                  <tr><td colSpan={4} className="text-center">No orders yet</td></tr>
+                ) : (
+                  recentOrders.map(order => (
+                    <tr key={order.id}>
+                      <td className="font-mono">#{order.id.slice(-6).toUpperCase()}</td>
+                      <td>{order.buyer.username}</td>
+                      <td className="font-mono text-gold">৳{order.amount}</td>
+                      <td>
+                        <span className={`badge badge-${order.status === 'completed' ? 'success' : 'warning'}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -189,12 +189,18 @@ export default function Navbar({ user }: NavbarProps) {
                     <Link href="/orders" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       📦 {text.orders}
                     </Link>
-                    {user.role === 'seller' && (
+                    <Link href="/referral" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
+                      🏆 Referral Program
+                    </Link>
+                    <Link href="/support" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
+                      🎫 Support Tickets
+                    </Link>
+                    {(user.role === 'seller' || user.role === 'admin') && (
                       <Link href="/sell" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                         📤 {text.sell}
                       </Link>
                     )}
-                    {user.role === 'admin' && (
+                    {(user.role === 'admin' || user.role === 'sub-admin') && (
                       <Link href="/admin/dashboard" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                         ⚙️ {text.admin}
                       </Link>

@@ -113,6 +113,25 @@ export async function POST(req: Request) {
         }
       })
 
+      // 8. Low Stock Alert for Admin
+      const remainingStock = await tx.account.count({
+        where: { categoryId: account.category.id, status: 'approved' }
+      })
+      if (remainingStock < account.category.lowStockAlert) {
+        const admins = await tx.user.findMany({ where: { role: 'admin' } })
+        await Promise.all(admins.map(admin =>
+          tx.notification.create({
+            data: {
+              userId: admin.id,
+              title: `⚠️ Low Stock Alert: ${account.category.name}`,
+              message: `Only ${remainingStock} accounts left in ${account.category.name}. Please restock.`,
+              type: 'warning',
+              link: '/admin/accounts',
+            }
+          })
+        ))
+      }
+
       return order
     })
 

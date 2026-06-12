@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import ReviewModal from './ReviewModal'
 
 export default async function OrdersPage() {
   const authUser = await getAuthUser()
@@ -12,7 +13,7 @@ export default async function OrdersPage() {
     include: {
       purchases: {
         orderBy: { createdAt: 'desc' },
-        include: { account: { include: { category: true } } }
+        include: { account: { include: { category: true } }, review: true }
       }
     }
   })
@@ -45,9 +46,16 @@ export default async function OrdersPage() {
                   {order.account.category.icon}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, alignItems: 'center' }}>
                     <h3 style={{ fontSize: 18 }}>{order.account.title}</h3>
-                    <span className="badge badge-success">Completed</span>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                      <a href={`/orders/${order.id}/receipt`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline" style={{ borderColor: 'var(--info)', color: 'var(--info)' }}>
+                        🧾 Receipt
+                      </a>
+                      {!order.review && <ReviewModal orderId={order.id} />}
+                      {order.review && <span className="badge" style={{ background: 'rgba(212,175,55,0.1)', color: 'var(--gold)' }}>⭐ {order.review.rating}/5 Rated</span>}
+                      <span className="badge badge-success">Completed</span>
+                    </div>
                   </div>
                   
                   <div className="grid-2" style={{ gap: 16, marginTop: 16 }}>

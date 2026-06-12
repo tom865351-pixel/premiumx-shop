@@ -20,6 +20,14 @@ export default async function Home() {
     include: { category: true },
   })
 
+  const reviewStats = await prisma.review.aggregate({
+    _avg: { rating: true },
+    _count: { id: true }
+  })
+  
+  const avgRating = reviewStats._avg.rating ? reviewStats._avg.rating.toFixed(1) : '5.0'
+  const totalReviews = reviewStats._count.id
+
   return (
     <main className={styles.main}>
       <Navbar user={user as any} />
@@ -29,7 +37,7 @@ export default async function Home() {
         <div className={styles.particles} />
         <div className={`container ${styles.heroInner}`}>
           <div className="badge badge-gold fade-in" style={{ animationDelay: '0.1s' }}>
-            ✨ Trusted by 8,200+ Buyers
+            ✨ {totalReviews > 0 ? `Trusted by ${totalReviews}+ Buyers (⭐ ${avgRating}/5)` : '✨ Trusted by 8,200+ Buyers'}
           </div>
           <h1 className={styles.title}>
             Buy & Sell Premium<br/>
