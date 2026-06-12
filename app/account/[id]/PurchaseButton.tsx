@@ -9,6 +9,7 @@ export default function PurchaseButton({ accountId, price, isAvailable, isLogged
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   const handlePurchase = async () => {
     setLoading(true)
@@ -27,10 +28,11 @@ export default function PurchaseButton({ accountId, price, isAvailable, isLogged
         throw new Error(data.error || 'Failed to purchase')
       }
 
-      setShowModal(false)
-      alert('Purchase successful! You can view your account details in My Orders.')
-      router.push('/orders')
-      router.refresh()
+      setSuccess(true)
+      setTimeout(() => {
+        router.push('/orders')
+        router.refresh()
+      }, 2500)
     } catch (err: any) {
       setError(err.message)
       setLoading(false)
@@ -62,30 +64,40 @@ export default function PurchaseButton({ accountId, price, isAvailable, isLogged
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="card" style={{ width: 400, padding: 32, textAlign: 'center', animation: 'fadeIn 0.2s ease' }}>
-            <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Confirm Purchase</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
-              You are about to purchase this account for <strong className="text-gold">৳{price}</strong>.
-            </p>
-            
-            {error && <div className="alert alert-danger" style={{ marginBottom: 20, textAlign: 'left' }}>⚠️ {error}</div>}
-            
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button 
-                className="btn btn-gold" 
-                onClick={handlePurchase}
-                disabled={loading}
-                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
-              >
-                {loading ? <><Spinner size={18} /> Processing...</> : '✅ Confirm Payment'}
-              </button>
-              <button 
-                className="btn btn-outline" 
-                onClick={() => { setShowModal(false); setError(''); }}
-                disabled={loading}
-              >
-                Cancel
-              </button>
-            </div>
+            {success ? (
+              <div style={{ padding: '20px 0', animation: 'fadeIn 0.5s ease' }}>
+                <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
+                <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: '#10b981' }}>Purchase Successful!</h2>
+                <p style={{ color: 'var(--text-secondary)' }}>You are being redirected to your orders to view the account details...</p>
+              </div>
+            ) : (
+              <>
+                <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Confirm Purchase</h2>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
+                  You are about to purchase this account for <strong className="text-gold">৳{price}</strong>.
+                </p>
+                
+                {error && <div className="alert alert-danger" style={{ marginBottom: 20, textAlign: 'left' }}>⚠️ {error}</div>}
+                
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button 
+                    className="btn btn-gold" 
+                    onClick={handlePurchase}
+                    disabled={loading}
+                    style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
+                  >
+                    {loading ? <><Spinner size={18} /> Processing...</> : '✅ Confirm Payment'}
+                  </button>
+                  <button 
+                    className="btn btn-outline" 
+                    onClick={() => { setShowModal(false); setError(''); }}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
