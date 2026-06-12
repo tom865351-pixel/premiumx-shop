@@ -13,12 +13,51 @@ export default function UserActions({ user }: { user: { id: string, isBanned: bo
     setLoading(false)
   }
 
+  const modifyBalance = async (action: 'add' | 'deduct') => {
+    const amount = prompt(`Enter amount to ${action}:`)
+    if (!amount || isNaN(parseFloat(amount))) return
+
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/balance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, action })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      alert(`Success! New balance: ৳${data.newBalance}`)
+      router.refresh()
+    } catch (err: any) {
+      alert(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (user.role === 'admin') {
     return <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Admin</span>
   }
 
   return (
-    <div style={{ display: 'flex', gap: 8 }}>
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <button
+        className="btn btn-sm btn-outline"
+        onClick={() => modifyBalance('add')}
+        disabled={loading}
+        title="Add Balance"
+      >
+        💰+
+      </button>
+      <button
+        className="btn btn-sm btn-outline"
+        style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
+        onClick={() => modifyBalance('deduct')}
+        disabled={loading}
+        title="Deduct Balance"
+      >
+        💰-
+      </button>
       <button
         className={`btn btn-sm ${user.isBanned ? 'btn-gold' : 'btn-outline'}`}
         style={user.isBanned ? {} : { borderColor: 'var(--danger)', color: 'var(--danger)' }}

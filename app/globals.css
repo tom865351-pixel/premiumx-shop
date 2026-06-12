@@ -666,6 +666,182 @@ img {
 @media (max-width: 768px) {
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .container { padding: 0 12px; }
+}
+
+/* ===== MOBILE BOTTOM NAVIGATION ===== */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: rgba(10, 15, 30, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(14, 165, 233, 0.15);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+}
+.mobile-bottom-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: none;
+  border: none;
+  min-width: 52px;
+  position: relative;
+}
+.mobile-nav-item .nav-icon {
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+.mobile-nav-item.active,
+.mobile-nav-item:hover {
+  color: #38bdf8;
+}
+.mobile-nav-item.active .nav-icon {
+  transform: scale(1.15);
+}
+.mobile-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  border-radius: 0 0 4px 4px;
+}
+.mobile-nav-item.nav-buy {
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+  color: var(--gold);
+  border: 1px solid rgba(212,175,55,0.2);
+}
+.mobile-nav-item.nav-buy.active,
+.mobile-nav-item.nav-buy:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.1));
+  color: var(--gold-light);
+}
+.mobile-nav-badge {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  background: var(--danger);
+  color: white;
+  font-size: 9px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav { display: block; }
+  /* Add padding so content isn't hidden behind bottom nav */
+  main { padding-bottom: 80px !important; }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* ===== MOBILE SELL CATEGORY GRID ===== */
+.sell-category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 480px) {
+  .sell-category-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+}
+.sell-category-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+.sell-category-btn:hover,
+.sell-category-btn:active {
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.05);
+  transform: translateY(-2px);
+}
+.sell-category-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.sell-category-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+/* ===== MOBILE DEPOSIT PAGE ===== */
+.deposit-method-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+.deposit-method-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+@media (max-width: 768px) {
+  .deposit-method-number { font-size: 14px; }
+}
+
+/* ===== MOBILE HERO FIXES ===== */
+@media (max-width: 768px) {
+  .hero-actions-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  .hero-actions-mobile .btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    border-radius: 14px;
+  }
 }
 
 /* Notice Board Marquee */

@@ -3,6 +3,19 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Spinner from '@/components/ui/Spinner'
 
+// Mapping of payment methods to phone numbers (replace with real numbers)
+const METHOD_NUMBERS: Record<string, string> = {
+  bkash: '01812-345678',
+  nagad: '01712-345678',
+  rocket: '01612-345678',
+}
+
+// Local state for selected payment method
+const useMethodState = () => {
+  const [selectedMethod, setMethod] = useState('')
+  return { selectedMethod, setMethod }
+}
+
 export default function DepositForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -10,7 +23,8 @@ export default function DepositForm() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [amount, setAmount] = useState('')
   const [activeTab, setActiveTab] = useState<'auto' | 'manual'>('auto')
-
+  // useMethodState provides selected method and setter for manual deposit
+  const { selectedMethod, setMethod } = useMethodState()
   const QUICK_AMOUNTS = [100, 200, 500, 1000, 2000, 5000]
 
   const handleManualSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -25,8 +39,8 @@ export default function DepositForm() {
       transactionId: formData.get('transactionId') as string,
     }
 
-    if (!body.amount || body.amount < 50) {
-      setMessage({ type: 'error', text: 'Minimum deposit amount is ৳50.' })
+    if (!body.amount || body.amount < 10) {
+      setMessage({ type: 'error', text: 'Minimum deposit amount is ৳10.' })
       setLoading(false)
       return
     }
@@ -51,8 +65,8 @@ export default function DepositForm() {
   }
 
   const handleZiniPay = async () => {
-    if (!amount || parseFloat(amount) < 50) {
-      setMessage({ type: 'error', text: 'Please enter a valid amount (min ৳50).' })
+    if (!amount || parseFloat(amount) < 10) {
+      setMessage({ type: 'error', text: 'Please enter a valid amount (min ৳10).' })
       return
     }
 
@@ -120,9 +134,9 @@ export default function DepositForm() {
         <input
           type="number"
           name="amount"
-          min="50"
+          min="10"
           required
-          placeholder="Enter amount (min ৳50)"
+          placeholder="Enter amount (min ৳10)"
           value={amount}
           onChange={e => setAmount(e.target.value)}
         />
@@ -141,12 +155,17 @@ export default function DepositForm() {
         <form onSubmit={handleManualSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="form-group">
             <label className="form-label">Payment Method *</label>
-            <select name="method" required>
+            <select name="method" required onChange={e => setMethod(e.target.value)}>
               <option value="">Select method...</option>
               <option value="bkash">bKash</option>
               <option value="nagad">Nagad</option>
               <option value="rocket">Rocket</option>
             </select>
+            {selectedMethod && (
+              <p className="form-hint" style={{ marginTop: '4px' }}>
+                Send payment to: <strong>{METHOD_NUMBERS[selectedMethod]}</strong>
+              </p>
+            )}
           </div>
 
           <div className="form-group">

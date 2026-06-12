@@ -20,7 +20,7 @@ interface NavbarProps {
 
 const t: Record<string, Record<string, string>> = {
   en: {
-    browse: 'Browse',
+    browse: 'Buy',
     sell: 'Sell Account',
     wallet: 'Wallet',
     orders: 'My Orders',
@@ -32,7 +32,7 @@ const t: Record<string, Record<string, string>> = {
     balance: 'Balance',
   },
   bn: {
-    browse: 'ব্রাউজ করুন',
+    browse: 'কিনুন',
     sell: 'অ্যাকাউন্ট বিক্রি',
     wallet: 'ওয়ালেট',
     orders: 'আমার অর্ডার',

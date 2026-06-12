@@ -94,12 +94,12 @@ export default function SellForm({ categories }: { categories: Category[] }) {
             <h2 style={{ fontSize: 20 }}>1. Select Platform</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Choose the type of account you want to sell</p>
           </div>
-          <div className="grid-3">
+          <div className="sell-category-grid">
             {categories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat)}
-                className="card"
+                className="sell-category-btn"
                 style={{
                   background: 'var(--card)',
                   border: '1px solid var(--border)',

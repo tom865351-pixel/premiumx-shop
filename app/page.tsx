@@ -74,9 +74,8 @@ export default async function Home() {
             and gaming accounts. Instant delivery guaranteed.
           </p>
           <div className={styles.actions}>
-            <Link href="/browse" className="btn btn-gold btn-lg">Browse Accounts</Link>
-            <Link href="/deposit" className="btn btn-blue btn-lg">💳 Add Balance</Link>
-            <Link href="/sell" className="btn btn-outline btn-lg">Sell Now</Link>
+            <Link href="/browse" className="btn btn-gold btn-lg">🛒 Buy Accounts</Link>
+            <Link href="/sell" className="btn btn-outline btn-lg">📤 Sell Now</Link>
           </div>
           
           <div className={styles.stats}>
