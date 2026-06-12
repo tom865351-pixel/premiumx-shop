@@ -625,22 +625,42 @@ img {
 }
 
 /* Role Themes */
+/* Role Themes */
 body.theme-admin {
-  --bg: #0d0b00;
-  border-top: 3px solid var(--gold);
+  --bg: #050505;
+  --surface: #0f0f0f;
+  --card: #141414;
+  --card-hover: #1a1a1a;
+  --border: #332a00;
+  --border-light: #4d4000;
+  --gold: #ffcc00;
+  --gold-glow: rgba(255, 204, 0, 0.2);
+  border-top: 4px solid var(--gold);
 }
+
 body.theme-sub-admin {
-  --bg: #030a12;
-  border-top: 3px solid var(--info);
+  --bg: #000814;
+  --surface: #00122a;
+  --card: #001d40;
+  --card-hover: #002855;
+  --border: #003566;
+  --border-light: #004b91;
+  --info: #00b4d8;
+  border-top: 4px solid var(--info);
 }
-body.theme-stock-manager {
-  --bg: #03120a;
-  border-top: 3px solid var(--success);
-}
+
 body.theme-seller {
-  --bg: #090312;
-  border-top: 3px solid var(--purple);
+  --bg: #0a0014;
+  --surface: #140028;
+  --card: #1f003d;
+  --card-hover: #2e005c;
+  --border: #4d0099;
+  --border-light: #7300e6;
+  --purple: #b366ff;
+  --purple-glow: rgba(179, 102, 255, 0.2);
+  border-top: 4px solid var(--purple);
 }
+
 body.theme-buyer {
-  border-top: 3px solid transparent;
+  /* Default minimal dark theme */
 }

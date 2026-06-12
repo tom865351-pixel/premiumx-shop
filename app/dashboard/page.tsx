@@ -14,7 +14,8 @@ export default async function Dashboard() {
   const dbUser = await prisma.user.findUnique({
     where: { id: user.userId },
     include: {
-      purchases: { take: 5, orderBy: { createdAt: 'desc' }, include: { account: true } }
+      purchases: { take: 5, orderBy: { createdAt: 'desc' }, include: { account: true } },
+      listings: true
     }
   })
 
@@ -56,6 +57,37 @@ export default async function Dashboard() {
             </div>
           </div>
         </div>
+
+        {dbUser.role === 'seller' && (
+          <>
+            <h2 style={{ fontSize: 18, marginBottom: 16, marginTop: 40, color: 'var(--purple)' }}>Seller Analytics</h2>
+            <div className="grid-3" style={{ marginBottom: 40 }}>
+              <div className="stat-card" style={{ borderColor: 'var(--purple)', background: 'rgba(147, 51, 234, 0.05)' }}>
+                <div className="stat-icon" style={{ background: 'var(--purple)', color: '#fff' }}>💸</div>
+                <div>
+                  <div className="stat-value text-purple">
+                    ৳{dbUser.listings.filter(l => l.status === 'sold').reduce((sum, l) => sum + l.price, 0).toLocaleString()}
+                  </div>
+                  <div className="stat-label">Total Earnings</div>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon" style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success)' }}>📦</div>
+                <div>
+                  <div className="stat-value">{dbUser.listings.filter(l => l.status === 'approved').length}</div>
+                  <div className="stat-label">Active Listings</div>
+                </div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)' }}>✅</div>
+                <div>
+                  <div className="stat-value">{dbUser.listings.filter(l => l.status === 'sold').length}</div>
+                  <div className="stat-label">Total Sold</div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         <h2 style={{ fontSize: 18, marginBottom: 16 }}>Recent Purchases</h2>
         {dbUser.purchases.length === 0 ? (
