@@ -3,7 +3,7 @@ import Navbar from '@/components/layout/Navbar'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
-export default async function DepositSuccessPage({ searchParams }: { searchParams: { tx_id?: string } }) {
+export default async function DepositSuccessPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const authUser = await getAuthUser()
   const user = authUser ? await prisma.user.findUnique({ where: { id: authUser.userId } }) : null
 
