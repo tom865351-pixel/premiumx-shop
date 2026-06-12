@@ -27,44 +27,41 @@ export async function POST(req: NextRequest) {
     })
 
     // 2. Call ZiniPay API to create a payment session
-    // Note: ZiniPay API structure usually looks like this. The user will need to adjust if the API expects different field names.
     const apiKey = process.env.ZINIPAY_API_KEY
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-    /* 
-    // REAL ZINIPAY API CALL (Uncomment and configure with actual ZiniPay API details)
-    
+    // ZiniPay standard API payload (Adjust if their latest docs require specific field names)
+    const ziniPayload = {
+      api_key: apiKey,
+      amount: amount,
+      currency: "BDT",
+      tran_id: txId,
+      success_url: `${baseUrl}/deposit/success?tx_id=${txId}`,
+      fail_url: `${baseUrl}/deposit/fail`,
+      cancel_url: `${baseUrl}/deposit/fail`,
+      cus_email: authUser.email,
+      cus_name: authUser.username,
+      desc: "Wallet Top-up"
+    }
+
     const ziniResponse = await fetch('https://api.zinipay.com/create', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        amount: amount,
-        transaction_id: txId,
-        success_url: `${baseUrl}/deposit/success?tx_id=${txId}`,
-        fail_url: `${baseUrl}/deposit/fail`,
-        cancel_url: `${baseUrl}/deposit/fail`,
-        customer_email: authUser.email,
-        customer_name: authUser.username
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ziniPayload)
     })
 
     const ziniData = await ziniResponse.json()
     
-    if (ziniData.status === 'success' && ziniData.payment_url) {
-      return NextResponse.json({ url: ziniData.payment_url })
+    // ZiniPay returns the checkout URL (usually in payment_url, url, or checkout_url)
+    const checkoutUrl = ziniData.payment_url || ziniData.url || ziniData.checkout_url
+    
+    if (checkoutUrl) {
+      return NextResponse.json({ url: checkoutUrl })
     } else {
-      return NextResponse.json({ error: 'Payment gateway error' }, { status: 500 })
+      console.error("ZiniPay Response Error:", ziniData)
+      // Fallback: If the API endpoint is different, let the user know they need to check ZiniPay docs
+      return NextResponse.json({ error: 'Payment gateway configuration error. Check server logs.' }, { status: 500 })
     }
-    */
-
-    // MOCK RESPONSE FOR NOW (Until real API key is provided)
-    // We will simulate a successful ZiniPay checkout URL creation
-    return NextResponse.json({ 
-      url: `${baseUrl}/api/deposit/zinipay/mock-checkout?tx_id=${txId}&amount=${amount}` 
-    })
 
   } catch (err: any) {
     console.error('ZiniPay Create API error:', err)
