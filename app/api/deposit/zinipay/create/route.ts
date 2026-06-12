@@ -40,15 +40,16 @@ export async function POST(req: NextRequest) {
         'zini-api-key': apiKey || '',
       },
       body: JSON.stringify({
-        amount: amount,
+        amount: Number(amount),
         currency: 'BDT',
         tran_id: txId,
+        redirect_url: `${baseUrl}/deposit/success?tx_id=${txId}`,
         success_url: `${baseUrl}/deposit/success?tx_id=${txId}`,
         fail_url: `${baseUrl}/deposit/fail`,
         cancel_url: `${baseUrl}/deposit/fail`,
-        customer_name: user.username,
-        customer_email: authUser.email,
-        description: 'PremiumX Wallet Top-up',
+        cus_name: user.username,
+        cus_email: user.email || 'customer@premiumx.shop',
+        desc: 'PremiumX Wallet Top-up',
       })
     })
 
