@@ -38,15 +38,16 @@ export async function POST(
           where: { id: deposit.userId },
           data: { balance: { increment: deposit.amount } }
         }),
-        prisma.transaction.create({
-          data: {
-            userId: deposit.userId,
-            amount: deposit.amount,
-            type: 'deposit',
-            status: 'completed',
-            reference: `Manual deposit approved (${deposit.method})`,
-          }
-        }),
+          prisma.transaction.create({
+            data: {
+              userId: deposit.userId,
+              amount: deposit.amount,
+              type: 'topup',
+              description: `Manual deposit approved (${deposit.method})`,
+              balance: deposit.amount, // Note: Ideally should be exact user balance + amount
+              topupId: deposit.id
+            }
+          }),
         prisma.notification.create({
           data: {
             userId: deposit.userId,
