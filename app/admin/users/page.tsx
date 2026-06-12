@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import UserActions from './UserActions'
 
 export default async function AdminUsers() {
   const user = await getAuthUser()
@@ -67,22 +68,7 @@ export default async function AdminUsers() {
                   </td>
                   <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>{new Date(u.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      {u.role !== 'admin' && (
-                        <form action={`/api/admin/users/${u.id}/ban`} method="POST">
-                          <button
-                            className={`btn btn-sm ${u.isBanned ? 'btn-gold' : 'btn-outline'}`}
-                            style={u.isBanned ? {} : { borderColor: 'var(--danger)', color: 'var(--danger)' }}
-                            type="submit"
-                          >
-                            {u.isBanned ? 'Unban' : 'Ban'}
-                          </button>
-                        </form>
-                      )}
-                      {u.role === 'admin' && (
-                        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Admin</span>
-                      )}
-                    </div>
+                    <UserActions user={u} />
                   </td>
                 </tr>
               ))
