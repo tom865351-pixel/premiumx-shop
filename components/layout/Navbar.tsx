@@ -70,28 +70,30 @@ export default function Navbar({ user }: NavbarProps) {
     router.refresh()
   }
 
-  const handleCurrencyChange = (c: string) => {
+  const handleCurrencyChange = async (c: string) => {
     setCurrency(c)
     localStorage.setItem('px_currency', c)
     if (user) {
-      fetch('/api/user/preferences', {
+      await fetch('/api/user/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ preferredCurrency: c }),
       })
     }
+    router.refresh()
   }
 
-  const handleLangChange = (l: string) => {
+  const handleLangChange = async (l: string) => {
     setLang(l)
     localStorage.setItem('px_lang', l)
     if (user) {
-      fetch('/api/user/preferences', {
+      await fetch('/api/user/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ preferredLanguage: l }),
       })
     }
+    router.refresh()
   }
 
   useEffect(() => {

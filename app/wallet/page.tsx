@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import TopupModal from './TopupModal'
 
 export default async function WalletPage() {
   const authUser = await getAuthUser()
@@ -35,7 +36,7 @@ export default async function WalletPage() {
               ৳{user.balance}
             </div>
             <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Available Balance</div>
-            <button className="btn btn-gold" style={{ marginTop: 24 }}>Request Topup</button>
+            <TopupModal />
           </div>
           
           <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
