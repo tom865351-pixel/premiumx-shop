@@ -186,6 +186,9 @@ export default function Navbar({ user }: NavbarProps) {
                     <Link href="/wallet" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       💰 {text.wallet}
                     </Link>
+                    <Link href="/deposit" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)} style={{ color: 'var(--gold)', fontWeight: 600 }}>
+                      💳 Add Money
+                    </Link>
                     <Link href="/orders" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       📦 {text.orders}
                     </Link>

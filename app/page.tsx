@@ -28,12 +28,38 @@ export default async function Home() {
   const avgRating = reviewStats._avg.rating ? reviewStats._avg.rating.toFixed(1) : '5.0'
   const totalReviews = reviewStats._count.id
 
+  // Real recent orders for activity ticker
+  const recentOrders = await prisma.order.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 8,
+    include: {
+      account: { include: { category: true } },
+      buyer: { select: { username: true } }
+    }
+  })
+
+  const tickerItems = recentOrders.length > 0
+    ? recentOrders.map(o => {
+        const maskedUser = o.buyer.username.slice(0, 3) + '***'
+        const mins = Math.max(1, Math.round((Date.now() - new Date(o.createdAt).getTime()) / 60000))
+        return `🟢 ${maskedUser} just bought ${o.account.category.icon} ${o.account.category.name} account • ${mins < 60 ? mins + ' min ago' : Math.round(mins/60) + 'h ago'}`
+      })
+    : [
+        '🟢 User ***49 just bought Instagram 15K account • 2 min ago',
+        '🟢 User ***12 just bought TikTok 5K account • 5 min ago',
+        '🟢 User ***88 just added ৳500 balance • 12 min ago',
+        '🟢 User ***99 just bought Gmail account • 15 min ago',
+      ]
+
   return (
     <main className={styles.main}>
       <Navbar user={user as any} />
       
       {/* Hero Section */}
       <section className={styles.hero}>
+        {/* Animated blue glow orbs */}
+        <div className={styles.glow1} />
+        <div className={styles.glow2} />
         <div className={styles.particles} />
         <div className={`container ${styles.heroInner}`}>
           <div className="badge badge-gold fade-in" style={{ animationDelay: '0.1s' }}>
@@ -49,6 +75,7 @@ export default async function Home() {
           </p>
           <div className={styles.actions}>
             <Link href="/browse" className="btn btn-gold btn-lg">Browse Accounts</Link>
+            <Link href="/deposit" className="btn btn-blue btn-lg">💳 Add Balance</Link>
             <Link href="/sell" className="btn btn-outline btn-lg">Sell Now</Link>
           </div>
           
@@ -104,11 +131,11 @@ export default async function Home() {
                     <div className="badge" style={{ background: `${acc.category.color}20`, color: acc.category.color, border: `1px solid ${acc.category.color}40` }}>
                       {acc.category.icon} {acc.category.name}
                     </div>
-                    <div className="text-gold font-mono" style={{ fontWeight: 600 }}>৳{acc.price}</div>
+                    <div className="text-gold font-mono" style={{ fontWeight: 700 }}>৳{acc.price}</div>
                   </div>
-                  <h3 style={{ fontSize: 16, marginBottom: 8 }}>{acc.title}</h3>
+                  <h3 style={{ fontSize: 16, marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{acc.title}</h3>
                   <div className="flex-col gap-1" style={{ marginBottom: 16 }}>
-                    <div className="text-secondary" style={{ fontSize: 13 }}>👥 {acc.followersCount?.toLocaleString()} Followers</div>
+                    <div className="text-secondary" style={{ fontSize: 13 }}>👥 {acc.followersCount?.toLocaleString() || 'N/A'} Followers</div>
                     <div className="text-secondary" style={{ fontSize: 13 }}>📅 Age: {acc.accountAge || 'Unknown'}</div>
                   </div>
                   <Link href={`/account/${acc.id}`} className="btn btn-outline w-full text-center">View Details</Link>
@@ -116,18 +143,45 @@ export default async function Home() {
               ))}
             </div>
           )}
+          <div style={{ textAlign: 'center', marginTop: 32 }}>
+            <Link href="/browse" className="btn btn-blue btn-lg">Browse All Accounts →</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className={styles.section} style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+        <div className="container">
+          <h2 className="page-title" style={{ textAlign: 'center', marginBottom: 40 }}>Why Choose PremiumX?</h2>
+          <div className="grid-3" style={{ gap: 24 }}>
+            {[
+              { icon: '🛡️', title: 'Verified Accounts', desc: 'Every account is manually reviewed by admins before going live on the marketplace.' },
+              { icon: '⚡', title: 'Instant Delivery', desc: 'Once payment is confirmed, you get full access credentials immediately.' },
+              { icon: '💳', title: 'Easy Top-Up', desc: 'Add balance via bKash, Nagad, or Rocket in seconds. Instant wallet credit.' },
+              { icon: '🔒', title: '100% Secure', desc: 'Your data is encrypted. Buyer and seller identities are protected at all times.' },
+              { icon: '🎫', title: '24/7 Support', desc: 'Open a support ticket anytime. Our team responds within hours.' },
+              { icon: '💰', title: 'Seller Payouts', desc: 'Sell your accounts and get paid instantly upon admin approval.' },
+            ].map((f, i) => (
+              <div key={i} className="card" style={{ textAlign: 'center', padding: 28 }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>{f.icon}</div>
+                <h3 style={{ fontSize: 16, marginBottom: 8 }}>{f.title}</h3>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
       
       {/* Live Ticker */}
       <div className={styles.ticker}>
+        <div className={styles.tickerLabel}>🔴 LIVE</div>
         <div className={styles.tickerTrack}>
-          <span>🟢 User ***49 just bought Instagram 15K account • 2 min ago</span>
-          <span>🟢 User ***12 just bought TikTok 5K account • 5 min ago</span>
-          <span>🟢 User ***88 just added ৳500 balance • 12 min ago</span>
-          <span>🟢 User ***99 just bought Gmail account • 15 min ago</span>
+          {tickerItems.join('   •   ')}
+          &nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;
+          {tickerItems.join('   •   ')}
         </div>
       </div>
     </main>
   )
 }
+

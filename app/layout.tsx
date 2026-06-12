@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 }
 
 import GlobalBanner from '@/components/layout/GlobalBanner'
+import NoticeBoard from '@/components/layout/NoticeBoard'
 
 export default async function RootLayout({
   children,
@@ -35,8 +36,10 @@ export default async function RootLayout({
       </head>
       <body className={themeClass}>
         <GlobalBanner />
+        <NoticeBoard />
         {children}
       </body>
     </html>
   )
 }
+
