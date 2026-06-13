@@ -11,15 +11,15 @@ export default async function AdminCategories() {
 
   const categories = await prisma.category.findMany({
     orderBy: { sortOrder: 'asc' },
-    include: { _count: { select: { accounts: { where: { status: 'approved' } } } } }
+    include: { _count: { select: { accounts: { where: { status: 'approved' } } } } },
   })
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Manage Categories</h1>
-          <p className="page-subtitle">Configure platforms and their default selling prices.</p>
+          <h1 className="page-title">Category Pricing Manager</h1>
+          <p className="page-subtitle">Configure platforms, default buying rates, active status, and seller price calculator values.</p>
         </div>
         <AddCategoryModal />
       </div>
@@ -28,9 +28,9 @@ export default async function AdminCategories() {
         <table className="table">
           <thead>
             <tr>
-              <th>Icon</th>
+              <th>Mark</th>
               <th>Platform Name</th>
-              <th>Default Price</th>
+              <th>Buying Rate</th>
               <th>Active Accounts</th>
               <th>Status</th>
               <th>Actions</th>
@@ -42,9 +42,15 @@ export default async function AdminCategories() {
             ) : (
               categories.map(cat => (
                 <tr key={cat.id}>
-                  <td style={{ fontSize: 24 }}>{cat.icon}</td>
-                  <td style={{ fontWeight: 600 }}>{cat.name}</td>
-                  <td className="font-mono text-gold">৳{cat.defaultPrice}</td>
+                  <td style={{ fontSize: 18, fontWeight: 900 }}>{cat.icon || cat.name.slice(0, 2).toUpperCase()}</td>
+                  <td>
+                    <div style={{ fontWeight: 800 }}>{cat.name}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>{cat.description || 'No description'}</div>
+                  </td>
+                  <td>
+                    <div className="font-mono text-gold">BDT {cat.defaultPrice.toLocaleString()}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>10 pcs: BDT {(cat.defaultPrice * 10).toLocaleString()}</div>
+                  </td>
                   <td>{cat._count.accounts}</td>
                   <td>
                     <span className={`badge badge-${cat.isActive ? 'success' : 'danger'}`}>
@@ -52,7 +58,7 @@ export default async function AdminCategories() {
                     </span>
                   </td>
                   <td>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       <EditCategoryModal category={cat} />
                       <CategoryActions id={cat.id} isActive={cat.isActive} category={cat} />
                     </div>

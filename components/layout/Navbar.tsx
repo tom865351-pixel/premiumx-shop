@@ -203,6 +203,9 @@ export default function Navbar({ user }: NavbarProps) {
                     <Link href="/support" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       Support Tickets
                     </Link>
+                    <Link href="/seller-help" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
+                      Seller Help
+                    </Link>
                     <Link href="/settings" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       Settings
                     </Link>

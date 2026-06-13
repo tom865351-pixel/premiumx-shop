@@ -58,6 +58,17 @@ export default async function Browse() {
         </div>
 
         <section className="card" style={{ marginTop: 28, padding: 24 }}>
+          <h2 style={{ fontSize: 18, marginBottom: 14 }}>Seller Price Calculator</h2>
+          <div className="grid-4" style={{ marginBottom: 22 }}>
+            {categories.slice(0, 4).map((cat) => (
+              <div key={cat.id} style={{ padding: 14, border: '1px solid var(--border)', borderRadius: 8 }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{cat.name}</div>
+                <div style={{ color: 'var(--gold)', fontSize: 20, fontWeight: 900 }}>10 pcs = BDT {(cat.defaultPrice * 10).toLocaleString()}</div>
+                <div style={{ color: 'var(--success)', fontSize: 12, marginTop: 4 }}>100 pcs = BDT {(cat.defaultPrice * 100).toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+
           <h2 style={{ fontSize: 18, marginBottom: 14 }}>Bulk Excel Format</h2>
           <div className="grid-3">
             <div>
