@@ -100,6 +100,44 @@
   color: var(--text-muted);
 }
 
+.resources {
+  margin-top: 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.resourceTitle {
+  font-size: 20px;
+  margin: 6px 0 14px;
+}
+
+.resourceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.resourceCard {
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.resourceCard strong {
+  color: var(--gold);
+  font-size: 12px;
+}
+
 @media (max-width: 620px) {
   .main {
     padding: 22px 12px 104px;

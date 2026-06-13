@@ -16,6 +16,7 @@ const navItems = [
   { href: '/admin/payments', icon: 'Pay', label: 'Payment Monitor' },
   { href: '/admin/notifications', icon: 'Msg', label: 'Notify Users' },
   { href: '/admin/daily-report', icon: 'Rpt', label: 'Daily Report' },
+  { href: '/admin/permissions', icon: 'Perm', label: 'Permissions' },
   { href: '/admin/withdrawals', icon: 'W', label: 'Withdrawals' },
   { href: '/admin/reports', icon: 'R', label: 'Reports', urgent: true },
   { href: '/admin/support', icon: 'S', label: 'Support', urgent: true },

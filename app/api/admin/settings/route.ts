@@ -13,8 +13,10 @@ export async function POST(req: NextRequest) {
     'site_name', 'commission_rate', 'report_window_hours', 'min_topup_bdt',
     'bkash_number', 'nagad_number', 'rocket_number', 'crypto_wallet', 'usd_rate', 'usdt_rate',
     'maintenance_mode', 'maintenance_message', 'contact_email', 'contact_telegram',
-    'homepage_badges', 'reject_templates', 'support_reply_templates', 'fraud_rules', 'payout_min_bdt',
-    'payout_limit_daily_bdt', 'next_payout_time'
+    'homepage_badges', 'homepage_hero_badge', 'homepage_hero_title', 'homepage_hero_highlight',
+    'homepage_hero_subtitle', 'live_resources', 'reject_templates', 'support_reply_templates',
+    'fraud_rules', 'payout_min_bdt', 'payout_limit_daily_bdt', 'next_payout_time',
+    'subadmin_permissions'
   ]
 
   for (const key of keys) {

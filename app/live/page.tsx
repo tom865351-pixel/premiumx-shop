@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { getSetting } from '@/lib/settings'
 import styles from './Live.module.css'
 
 function visibleForRole(target: string, role: string) {
@@ -35,15 +36,25 @@ export default async function LivePage() {
   })
   if (!user) redirect('/login')
 
-  const notices = await prisma.announcement.findMany({
+  const [notices, rawResources] = await Promise.all([
+    prisma.announcement.findMany({
     where: {
       isActive: true,
       OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     },
     orderBy: [{ scheduledAt: 'asc' }, { createdAt: 'desc' }],
-  })
+    }),
+    getSetting('live_resources'),
+  ])
 
   const visible = notices.filter((notice) => visibleForRole(notice.target, user.role))
+  const resources = rawResources
+    .split('\n')
+    .map((line) => {
+      const [title, href] = line.split('|').map((item) => item?.trim())
+      return title && href ? { title, href } : null
+    })
+    .filter(Boolean) as { title: string; href: string }[]
 
   return (
     <div className={styles.shell}>
@@ -94,6 +105,23 @@ export default async function LivePage() {
                 </div>
               </article>
             ))}
+          </section>
+        )}
+
+        {resources.length > 0 && (
+          <section className={styles.resources}>
+            <div>
+              <div className={styles.eyebrow}>Recordings and resources</div>
+              <h2 className={styles.resourceTitle}>Class Links</h2>
+            </div>
+            <div className={styles.resourceGrid}>
+              {resources.map((resource) => (
+                <a key={`${resource.title}-${resource.href}`} href={resource.href} className={styles.resourceCard}>
+                  <span>{resource.title}</span>
+                  <strong>Open</strong>
+                </a>
+              ))}
+            </div>
           </section>
         )}
       </main>

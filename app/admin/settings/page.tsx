@@ -22,12 +22,18 @@ export default async function AdminSettings() {
     'contact_email',
     'contact_telegram',
     'homepage_badges',
+    'homepage_hero_badge',
+    'homepage_hero_title',
+    'homepage_hero_highlight',
+    'homepage_hero_subtitle',
+    'live_resources',
     'reject_templates',
     'support_reply_templates',
     'fraud_rules',
     'payout_min_bdt',
     'payout_limit_daily_bdt',
     'next_payout_time',
+    'subadmin_permissions',
   ])
 
   return (
@@ -160,6 +166,37 @@ export default async function AdminSettings() {
               <div className="form-group">
                 <label className="form-label">Fraud Rules JSON</label>
                 <textarea className="input" name="fraud_rules" defaultValue={settings.fraud_rules} rows={4} placeholder='{"highRejectRate":40}' />
+              </div>
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: 22, gridColumn: '1 / -1' }}>
+            <h3 style={{ marginBottom: 18, fontSize: 16, fontWeight: 800 }}>Homepage & Live Content Control</h3>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+              <div className="form-group">
+                <label className="form-label">Hero Badge</label>
+                <input className="input" name="homepage_hero_badge" defaultValue={settings.homepage_hero_badge} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Hero Title</label>
+                <input className="input" name="homepage_hero_title" defaultValue={settings.homepage_hero_title} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Hero Highlight</label>
+                <input className="input" name="homepage_hero_highlight" defaultValue={settings.homepage_hero_highlight} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Hero Subtitle</label>
+                <textarea className="input" name="homepage_hero_subtitle" defaultValue={settings.homepage_hero_subtitle} rows={4} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Live Resource Links</label>
+                <textarea className="input" name="live_resources" defaultValue={settings.live_resources} rows={4} placeholder="Title|URL, one per line" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Sub-admin Permissions JSON</label>
+                <textarea className="input" name="subadmin_permissions" defaultValue={settings.subadmin_permissions} rows={4} />
               </div>
             </div>
           </div>

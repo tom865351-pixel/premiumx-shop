@@ -3,7 +3,7 @@ import Navbar from '@/components/layout/Navbar'
 import styles from './page.module.css'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
-import { getSetting } from '@/lib/settings'
+import { getSettings } from '@/lib/settings'
 
 function platformLogo(name = '') {
   const key = name.toLowerCase()
@@ -21,13 +21,13 @@ export default async function Home() {
   const authUser = await getAuthUser()
   const user = authUser ? await prisma.user.findUnique({ where: { id: authUser.userId } }).catch(() => null) : null
 
-  const [categories, pendingCount, paidCount, homepageBadges] = await Promise.all([
+  const [categories, pendingCount, paidCount, homeSettings] = await Promise.all([
     prisma.category.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } }).catch(() => []),
     prisma.account.count({ where: { status: 'pending' } }).catch(() => 0),
     prisma.account.count({ where: { status: { in: ['approved', 'sold'] } } }).catch(() => 0),
-    getSetting('homepage_badges'),
+    getSettings(['homepage_badges', 'homepage_hero_badge', 'homepage_hero_title', 'homepage_hero_highlight', 'homepage_hero_subtitle']),
   ])
-  const trustBadges = homepageBadges.split(',').map((item) => item.trim()).filter(Boolean).slice(0, 4)
+  const trustBadges = homeSettings.homepage_badges.split(',').map((item) => item.trim()).filter(Boolean).slice(0, 4)
 
   return (
     <main className={styles.main}>
@@ -37,15 +37,14 @@ export default async function Home() {
         <div className={styles.particles} />
         <div className={`container ${styles.heroInner}`}>
           <div className="badge badge-gold fade-in" style={{ animationDelay: '0.1s' }}>
-            PremiumX buys verified digital accounts from sellers
+            {homeSettings.homepage_hero_badge}
           </div>
           <h1 className={styles.title}>
-            Sell Your Digital Accounts<br />
-            <span className="text-gold">Get Paid After Admin Review</span>
+            {homeSettings.homepage_hero_title}<br />
+            <span className="text-gold">{homeSettings.homepage_hero_highlight}</span>
           </h1>
           <p className={styles.subtitle}>
-            Submit Instagram, Facebook, Gmail, TikTok and other accounts one by one or by Excel upload.
-            Admin reviews the stock, buys valid accounts, and your wallet balance updates.
+            {homeSettings.homepage_hero_subtitle}
           </p>
           <div className={styles.actions}>
             <Link href="/sell" className="btn btn-gold btn-lg">Start Selling</Link>
