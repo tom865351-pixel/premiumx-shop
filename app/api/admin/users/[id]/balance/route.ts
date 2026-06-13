@@ -8,11 +8,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { amount, action } = await req.json()
+  const { amount, action, reason } = await req.json()
   const numAmount = parseFloat(amount)
+  const auditReason = String(reason || '').trim()
 
   if (isNaN(numAmount) || numAmount <= 0) {
     return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
+  }
+
+  if (!auditReason) {
+    return NextResponse.json({ error: 'Reason is required for wallet audit' }, { status: 400 })
   }
 
   const user = await prisma.user.findUnique({ where: { id: params.id } })
@@ -35,8 +40,18 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       type: 'topup', // Reusing topup type for balance additions, could be 'admin_adjustment' if added to schema but topup/refund fits.
       amount: action === 'add' ? numAmount : -numAmount,
       balance: updatedUser.balance,
-      description: `Admin Balance Adjustment (${action.toUpperCase()})`
+      description: `Admin balance adjustment (${action.toUpperCase()}): ${auditReason}`
     }
+  })
+
+  await prisma.notification.create({
+    data: {
+      userId: user.id,
+      title: 'Wallet Balance Adjusted',
+      message: `Admin ${action === 'add' ? 'added' : 'deducted'} BDT ${numAmount}. Reason: ${auditReason}`,
+      type: action === 'add' ? 'success' : 'warning',
+      link: '/wallet',
+    },
   })
 
   return NextResponse.json({ success: true, newBalance: updatedUser.balance })

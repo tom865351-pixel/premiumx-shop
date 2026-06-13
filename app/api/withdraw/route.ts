@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { getSettings } from '@/lib/settings'
 
 const METHODS = ['bkash', 'nagad', 'rocket', 'crypto', 'bank']
-const MIN_WITHDRAWAL = 100
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
@@ -11,14 +11,21 @@ export async function POST(req: NextRequest) {
 
   try {
     const { amount, method, accountNumber } = await req.json()
+    const settings = await getSettings(['payout_min_bdt', 'payout_limit_daily_bdt'])
+    const minWithdrawal = Number.parseFloat(settings.payout_min_bdt || '100') || 100
+    const dailyLimit = Number.parseFloat(settings.payout_limit_daily_bdt || '50000') || 50000
 
     if (!amount || !method || !accountNumber) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
     }
 
     const numAmount = Number.parseFloat(String(amount))
-    if (Number.isNaN(numAmount) || numAmount < MIN_WITHDRAWAL) {
-      return NextResponse.json({ error: `Minimum withdrawal is BDT ${MIN_WITHDRAWAL}` }, { status: 400 })
+    if (Number.isNaN(numAmount) || numAmount < minWithdrawal) {
+      return NextResponse.json({ error: `Minimum withdrawal is BDT ${minWithdrawal}` }, { status: 400 })
+    }
+
+    if (numAmount > dailyLimit) {
+      return NextResponse.json({ error: `Maximum withdrawal per request is BDT ${dailyLimit}` }, { status: 400 })
     }
 
     const cleanMethod = String(method).toLowerCase()
@@ -39,6 +46,16 @@ export async function POST(req: NextRequest) {
         throw new Error('Insufficient balance')
       }
 
+      const existingSameWallet = await tx.withdrawal.findFirst({
+        where: {
+          userId: { not: user.userId },
+          method: cleanMethod,
+          accountNumber: cleanAccountNumber,
+          status: { in: ['pending', 'approved'] },
+        },
+        include: { user: { select: { username: true } } },
+      })
+
       const created = await tx.withdrawal.create({
         data: {
           userId: user.userId,
@@ -46,6 +63,7 @@ export async function POST(req: NextRequest) {
           method: cleanMethod,
           accountNumber: cleanAccountNumber,
           status: 'pending',
+          adminNote: existingSameWallet ? `Risk check: same payout wallet also used by @${existingSameWallet.user.username}` : null,
         },
       })
 

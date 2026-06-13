@@ -53,13 +53,18 @@ export default function UserActions({ user }: { user: AdminUser }) {
   const modifyBalance = async (action: 'add' | 'deduct') => {
     const amount = prompt(`Enter amount to ${action}:`)
     if (!amount || isNaN(parseFloat(amount))) return
+    const reason = prompt('Reason for this balance adjustment:')
+    if (!reason?.trim()) {
+      alert('Reason is required for wallet audit.')
+      return
+    }
 
     setLoading(true)
     try {
       const data = await requestJson(`/api/admin/users/${user.id}/balance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, action }),
+        body: JSON.stringify({ amount, action, reason }),
       })
       alert(`Success. New balance: BDT ${data.newBalance}`)
       refresh()

@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function TicketReplyForm({ ticketId, isAdmin }: { ticketId: string, isAdmin: boolean }) {
+export default function TicketReplyForm({ ticketId, isAdmin, templates = [] }: { ticketId: string, isAdmin: boolean, templates?: string[] }) {
   const router = useRouter()
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,9 +25,18 @@ export default function TicketReplyForm({ ticketId, isAdmin }: { ticketId: strin
 
   return (
     <form onSubmit={submit} className="card" style={{ padding: 24 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>
-        {isAdmin ? '👑 Reply as Support Team' : '💬 Add Reply'}
+      <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16 }}>
+        {isAdmin ? 'Reply as Support Team' : 'Add Reply'}
       </h3>
+      {isAdmin && templates.length > 0 && (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+          {templates.slice(0, 6).map((template) => (
+            <button key={template} type="button" className="btn btn-sm btn-outline" onClick={() => setMessage(template)}>
+              {template.slice(0, 34)}
+            </button>
+          ))}
+        </div>
+      )}
       <textarea
         className="input"
         value={message}
@@ -46,7 +55,7 @@ export default function TicketReplyForm({ ticketId, isAdmin }: { ticketId: strin
         )}
         <div style={{ flex: 1 }} />
         <button className="btn btn-gold" type="submit" disabled={loading || !message.trim()}>
-          {loading ? 'Sending...' : '📨 Send Reply'}
+          {loading ? 'Sending...' : 'Send Reply'}
         </button>
       </div>
     </form>

@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   maintenance_message: 'PremiumX is being updated. Please check again soon.',
   homepage_badges: 'Admin reviewed stock,Wallet payout tracking,Excel bulk submit',
   reject_templates: 'Wrong password\nDuplicate account\nIncomplete recovery info\nInvalid account details',
+  support_reply_templates: 'Thanks for contacting PremiumX. We are checking this now.\nPlease send your transaction ID and payment method.\nYour issue has been solved. We are closing this ticket.',
   fraud_rules: '{"duplicateLogin":true,"repeatedPayout":true,"missingRecovery":true,"highRejectRate":40}',
   payout_min_bdt: '100',
   payout_limit_daily_bdt: '50000',

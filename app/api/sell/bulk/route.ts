@@ -41,6 +41,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Maximum 500 accounts can be uploaded at once' }, { status: 400 })
     }
 
+    let missingRows = 0
+    const seen = new Set<string>()
+    let duplicateRows = 0
+
     const accountsData = rows.map((row: any) => {
       // Handle different possible column names (case-insensitive mapping)
       const getVal = (keys: string[]) => {
@@ -54,7 +58,17 @@ export async function POST(req: Request) {
       const password = getVal(['password', 'pass', 'pw'])
       const twoFA = getVal(['2fa', 'twofa', 'secret', '2fa secret'])
 
-      if (!username || !password) return null
+      if (!username || !password) {
+        missingRows += 1
+        return null
+      }
+
+      const duplicateKey = username.toLowerCase().trim()
+      if (seen.has(duplicateKey)) {
+        duplicateRows += 1
+        return null
+      }
+      seen.add(duplicateKey)
 
       return {
         sellerId: authUser.userId,
@@ -79,7 +93,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
       success: true, 
-      count: accountsData.length 
+      count: accountsData.length,
+      skippedMissing: missingRows,
+      skippedDuplicates: duplicateRows,
+      message: `Imported ${accountsData.length} accounts. Skipped ${missingRows} missing rows and ${duplicateRows} duplicate rows.`,
     })
 
   } catch (error: any) {

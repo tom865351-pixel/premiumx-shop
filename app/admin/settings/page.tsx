@@ -23,6 +23,7 @@ export default async function AdminSettings() {
     'contact_telegram',
     'homepage_badges',
     'reject_templates',
+    'support_reply_templates',
     'fraud_rules',
     'payout_min_bdt',
     'payout_limit_daily_bdt',
@@ -151,6 +152,10 @@ export default async function AdminSettings() {
               <div className="form-group">
                 <label className="form-label">Reject Reason Templates</label>
                 <textarea className="input" name="reject_templates" defaultValue={settings.reject_templates} rows={4} placeholder="One reason per line" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Support Reply Templates</label>
+                <textarea className="input" name="support_reply_templates" defaultValue={settings.support_reply_templates} rows={4} placeholder="One canned reply per line" />
               </div>
               <div className="form-group">
                 <label className="form-label">Fraud Rules JSON</label>

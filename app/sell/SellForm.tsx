@@ -84,7 +84,10 @@ export default function SellForm({ categories }: { categories: Category[] }) {
       const resData = await res.json()
       if (!res.ok) throw new Error(resData.error || 'Failed to process file')
 
-      setMessage({ type: 'success', text: `Uploaded ${resData.count} accounts for admin review. Your wallet will update after approval.` })
+      setMessage({
+        type: 'success',
+        text: resData.message || `Uploaded ${resData.count} accounts for admin review. Your wallet will update after approval.`,
+      })
 
       setTimeout(() => {
         router.push('/dashboard')
