@@ -60,6 +60,7 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [expandedSellerId, setExpandedSellerId] = useState<string | null>(null)
+  const [revealedIds, setRevealedIds] = useState<string[]>([])
 
   const groupedByStatus = {
     pending: accounts.filter((account) => account.status === 'pending'),
@@ -163,6 +164,11 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
   const toggleSellerSelection = (ids: string[]) => {
     const allSelected = ids.every((id) => selectedIds.includes(id))
     setSelectedIds((prev) => allSelected ? prev.filter((id) => !ids.includes(id)) : Array.from(new Set([...prev, ...ids])))
+  }
+
+  const revealAccount = (account: any) => {
+    if (!confirm(`Reveal password for ${account.title}? This should only be used for admin review.`)) return
+    setRevealedIds((prev) => Array.from(new Set([...prev, account.id])))
   }
 
   return (
@@ -291,8 +297,14 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
                           <div style={{ minWidth: 0 }}>
                             <div className={styles.accountTitle}>{account.title}</div>
                             <div className={styles.credential}>User: {account.username}</div>
-                            <div className={styles.credential}>Pass: {account.password}</div>
-                            {account.twoFASecret && <div className={styles.credential}>2FA: {account.twoFASecret}</div>}
+                            <div className={styles.credential}>
+                              Pass: {revealedIds.includes(account.id) ? account.password : 'Hidden until reveal'}
+                            </div>
+                            {account.twoFASecret && (
+                              <div className={styles.credential}>
+                                2FA: {revealedIds.includes(account.id) ? account.twoFASecret : 'Hidden until reveal'}
+                              </div>
+                            )}
                             <div className={styles.platform} style={{ marginTop: 8 }}>
                               <span className={styles.logo} style={{ background: logo.bg }}>{logo.text}</span>
                               <span>{account.category?.name}</span>
@@ -308,6 +320,9 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
                                 <button className="btn btn-sm btn-gold" onClick={() => handleSingleAction(account.id, 'approve')} disabled={loading}>Buy</button>
                                 <button className="btn btn-sm btn-outline" onClick={() => handleSingleAction(account.id, 'reject')} disabled={loading} style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}>Reject</button>
                               </>
+                            )}
+                            {!revealedIds.includes(account.id) && (
+                              <button className="btn btn-sm btn-outline" onClick={() => revealAccount(account)} disabled={loading}>Reveal</button>
                             )}
                             <button className="btn btn-sm btn-outline" onClick={() => handleDelete(account.id)} disabled={loading} style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}>Delete</button>
                           </div>

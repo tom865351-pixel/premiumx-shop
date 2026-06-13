@@ -29,6 +29,7 @@ export default async function AdminDeposits() {
           <h1 className="page-title">Wallet Deposits</h1>
           <p className="page-subtitle">Approve manual add money requests from the single wallet system.</p>
         </div>
+        <a href="/admin/payments" className="btn btn-outline">Open Payment Monitor</a>
       </div>
 
       <div className="grid-3" style={{ marginBottom: 32 }}>
@@ -92,6 +93,11 @@ export default async function AdminDeposits() {
                         <form action={`/api/admin/deposits/${deposit.id}/reject`} method="POST">
                           <button type="submit" className="btn btn-sm btn-danger">Reject</button>
                         </form>
+                        {deposit.transactionId && (
+                          <a className="btn btn-sm btn-outline" href={`/admin/payments?tx=${deposit.transactionId}`}>
+                            Track TrxID
+                          </a>
+                        )}
                       </div>
                     )}
                     {deposit.status !== 'pending' && (
