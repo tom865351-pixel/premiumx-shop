@@ -9,7 +9,8 @@ export default function AnnouncementForm() {
     title: '',
     message: '',
     type: 'info',
-    target: 'all'
+    target: 'all',
+    link: ''
   })
 
   const submit = async (e: React.FormEvent) => {
@@ -22,7 +23,7 @@ export default function AnnouncementForm() {
         body: JSON.stringify(form)
       })
       if (!res.ok) throw new Error('Failed to create')
-      setForm({ title: '', message: '', type: 'info', target: 'all' })
+      setForm({ title: '', message: '', type: 'info', target: 'all', link: '' })
       router.refresh()
     } catch (err: any) {
       alert(err.message)
@@ -43,6 +44,12 @@ export default function AnnouncementForm() {
       <div className="form-group">
         <label className="form-label">Message</label>
         <textarea className="input" rows={3} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required placeholder="Detailed message..." />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Link (Optional)</label>
+        <input className="input" type="url" value={form.link || ''} onChange={e => setForm({ ...form, link: e.target.value })} placeholder="e.g. https://meet.google.com/..." />
+        <span className="form-hint">Used for Meetings or Redirects</span>
       </div>
 
       <div className="grid-2" style={{ gap: 16 }}>

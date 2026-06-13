@@ -35,6 +35,28 @@ export default function UserActions({ user }: { user: { id: string, isBanned: bo
     }
   }
 
+  const changeRole = async () => {
+    const newRole = prompt(`Current role is ${user.role}. Enter new role (buyer, seller, admin):`)
+    if (!newRole || !['buyer', 'seller', 'admin'].includes(newRole.toLowerCase())) return
+
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/role`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole.toLowerCase() })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      alert(`Role updated to ${newRole}!`)
+      router.refresh()
+    } catch (err: any) {
+      alert(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (user.role === 'admin') {
     return <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Admin</span>
   }
@@ -57,6 +79,14 @@ export default function UserActions({ user }: { user: { id: string, isBanned: bo
         title="Deduct Balance"
       >
         💰-
+      </button>
+      <button
+        className="btn btn-sm btn-outline"
+        onClick={changeRole}
+        disabled={loading}
+        title="Change Role"
+      >
+        👤 Role
       </button>
       <button
         className={`btn btn-sm ${user.isBanned ? 'btn-gold' : 'btn-outline'}`}

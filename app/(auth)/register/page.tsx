@@ -16,6 +16,7 @@ export default function Register() {
     const formData = new FormData(e.currentTarget)
     const email = formData.get('email')
     const username = formData.get('username')
+    const phone = formData.get('phone')
     const password = formData.get('password')
     const confirm = formData.get('confirm')
 
@@ -29,7 +30,7 @@ export default function Register() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, username, password }),
+        body: JSON.stringify({ email, username, phone, password }),
       })
       
       const data = await res.json()
@@ -66,6 +67,10 @@ export default function Register() {
           <div className="form-group">
             <label className="form-label">Email Address</label>
             <input type="email" name="email" required placeholder="name@example.com" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Phone Number *</label>
+            <input type="tel" name="phone" required placeholder="e.g. 01700000000" pattern="[0-9+]+" title="Only numbers and + sign" />
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>

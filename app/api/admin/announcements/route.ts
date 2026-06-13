@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const { title, message, type, target } = await req.json()
+  const { title, message, type, target, link } = await req.json()
   
   if (!title || !message) {
     return NextResponse.json({ error: 'Title and message required' }, { status: 400 })
@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       message,
       type: type || 'info',
       target: target || 'all',
+      link: link || null,
       isActive: true
     }
   })

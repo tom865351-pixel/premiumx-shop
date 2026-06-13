@@ -4,9 +4,9 @@ import { hashPassword, signToken } from '@/lib/auth'
 
 export async function POST(req: Request) {
   try {
-    const { email, username, password } = await req.json()
+    const { email, username, phone, password } = await req.json()
 
-    if (!email || !username || !password) {
+    if (!email || !username || !password || !phone) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
     }
 
@@ -19,7 +19,8 @@ export async function POST(req: Request) {
       where: {
         OR: [
           { email },
-          { username }
+          { username },
+          { phone }
         ]
       }
     })
@@ -27,6 +28,9 @@ export async function POST(req: Request) {
     if (existing) {
       if (existing.email === email) {
         return NextResponse.json({ error: 'Email already in use' }, { status: 400 })
+      }
+      if (existing.phone === phone) {
+        return NextResponse.json({ error: 'Phone number already registered' }, { status: 400 })
       }
       return NextResponse.json({ error: 'Username already taken' }, { status: 400 })
     }
@@ -37,6 +41,7 @@ export async function POST(req: Request) {
       data: {
         email,
         username,
+        phone,
         password: hashedPassword,
         // First user defaults to admin if db is empty, but we seeded an admin already
       }

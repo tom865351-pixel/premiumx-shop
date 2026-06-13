@@ -12,6 +12,7 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   username      String    @unique
+  phone         String?   @unique
   password      String
   role          String    @default("buyer") // buyer, seller, admin, sub-admin, stock-manager
   balance       Float     @default(0)
@@ -257,6 +258,7 @@ model Announcement {
   type        String    @default("info") // info, warning, success
   target      String    @default("all") // all, buyers, sellers
   isActive    Boolean   @default(true)
+  link        String?   // For meeting links or redirects
   scheduledAt DateTime? // for scheduled broadcasts
   expiresAt   DateTime?
   createdAt   DateTime  @default(now())

@@ -31,6 +31,7 @@ export default async function AdminUsers() {
           <thead>
             <tr>
               <th>User</th>
+              <th>Phone</th>
               <th>Role</th>
               <th>Balance</th>
               <th>Purchases</th>
@@ -42,13 +43,16 @@ export default async function AdminUsers() {
           </thead>
           <tbody>
             {users.length === 0 ? (
-              <tr><td colSpan={8} className="text-center">No users found</td></tr>
+              <tr><td colSpan={9} className="text-center">No users found</td></tr>
             ) : (
               users.map(u => (
                 <tr key={u.id}>
                   <td>
                     <div style={{ fontWeight: 600 }}>{u.username}</div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{u.email}</div>
+                  </td>
+                  <td>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{u.phone || 'N/A'}</div>
                   </td>
                   <td>
                     <span className={`badge`} style={{

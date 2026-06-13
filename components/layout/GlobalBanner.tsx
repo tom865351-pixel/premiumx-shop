@@ -52,7 +52,8 @@ export default async function GlobalBanner() {
             display: 'flex',
             justifyContent: 'center',
             gap: 12,
-            alignItems: 'center'
+            alignItems: 'center',
+            flexWrap: 'wrap'
           }}>
             <span style={{ fontSize: 18 }}>
               {ann.type === 'danger' ? '🚨' : ann.type === 'warning' ? '⚠️' : ann.type === 'success' ? '✅' : '📢'}
@@ -60,6 +61,14 @@ export default async function GlobalBanner() {
             <span>
               <strong>{ann.title}:</strong> {ann.message}
             </span>
+            {ann.link && (
+              <a href={ann.link} target="_blank" rel="noreferrer" style={{
+                background: 'rgba(0,0,0,0.2)', padding: '4px 12px', borderRadius: 20, 
+                color, textDecoration: 'none', fontWeight: 700, fontSize: 12, border: '1px solid rgba(255,255,255,0.3)'
+              }}>
+                🔗 Join Link
+              </a>
+            )}
           </div>
         )
       })}
