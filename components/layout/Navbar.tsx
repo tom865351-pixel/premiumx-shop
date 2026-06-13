@@ -102,6 +102,11 @@ export default function Navbar({ user }: NavbarProps) {
     if (savedLang) setLang(savedLang)
   }, [])
 
+  useEffect(() => {
+    setMenuOpen(false)
+    setUserMenuOpen(false)
+  }, [pathname])
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.inner}>
