@@ -208,6 +208,22 @@ export default function SellForm({ categories }: { categories: Category[] }) {
                 <input type="text" name="twoFASecret" placeholder="Paste 2FA secret or recovery code here" className="form-input" />
               </div>
 
+              <div className="form-group">
+                <label className="form-label">Recovery Email (Optional)</label>
+                <input type="text" name="recoveryEmail" placeholder="Recovery email if available" className="form-input" />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Recovery Phone (Optional)</label>
+                <input type="text" name="recoveryPhone" placeholder="Recovery phone if available" className="form-input" />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Account Age / Proof Link (Optional)</label>
+                <input type="text" name="accountAge" placeholder="Example: 2 years old" className="form-input" style={{ marginBottom: 10 }} />
+                <input type="url" name="proofLink" placeholder="Screenshot/proof link" className="form-input" />
+              </div>
+
               <button type="submit" className="btn btn-gold w-full" disabled={loading} style={{ marginTop: 8 }}>
                 {loading ? <div className="spinner" /> : 'Submit for Review'}
               </button>

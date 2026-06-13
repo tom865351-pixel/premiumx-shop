@@ -185,6 +185,7 @@ img {
 .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
 .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
 .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-info { background: var(--info-bg); color: var(--info); border: 1px solid rgba(56, 189, 248, 0.3); }
 .badge-muted { background: rgba(71, 85, 105, 0.2); color: var(--text-muted); border: 1px solid var(--border); }
 
 /* Buttons */

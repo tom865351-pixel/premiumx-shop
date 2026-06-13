@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     const data = await req.json()
     const { 
-      categoryId, title, username, password, twoFASecret 
+      categoryId, title, username, password, twoFASecret, recoveryEmail, recoveryPhone, accountAge, proofLink
     } = data
 
     if (!categoryId || !title || !username || !password) {
@@ -32,6 +32,10 @@ export async function POST(req: Request) {
         username,
         password,
         twoFASecret: twoFASecret || null,
+        recoveryEmail: recoveryEmail || null,
+        recoveryPhone: recoveryPhone || null,
+        accountAge: accountAge || null,
+        screenshots: proofLink ? JSON.stringify([proofLink]) : '[]',
         price: (category as any).defaultPrice || 0,
         status: 'pending' // Admin needs to approve
       }

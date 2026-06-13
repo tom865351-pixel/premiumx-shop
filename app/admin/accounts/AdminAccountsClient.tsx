@@ -52,6 +52,15 @@ function isIncomplete(account: any) {
   return !account.twoFASecret && !account.recoveryEmail && !account.recoveryPhone
 }
 
+function proofLinks(account: any) {
+  try {
+    const parsed = JSON.parse(account.screenshots || '[]')
+    return Array.isArray(parsed) ? parsed.filter(Boolean) : []
+  } catch {
+    return []
+  }
+}
+
 export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: { accounts: any[]; rejectTemplates?: string }) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Status>('pending')
@@ -305,6 +314,9 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
                                 2FA: {revealedIds.includes(account.id) ? account.twoFASecret : 'Hidden until reveal'}
                               </div>
                             )}
+                            {account.recoveryEmail && <div className={styles.credential}>Recovery email: {account.recoveryEmail}</div>}
+                            {account.recoveryPhone && <div className={styles.credential}>Recovery phone: {account.recoveryPhone}</div>}
+                            {account.accountAge && <div className={styles.credential}>Age: {account.accountAge}</div>}
                             <div className={styles.platform} style={{ marginTop: 8 }}>
                               <span className={styles.logo} style={{ background: logo.bg }}>{logo.text}</span>
                               <span>{account.category?.name}</span>
@@ -312,6 +324,11 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
                               <span className="text-gold">BDT {Number(account.price).toLocaleString()}</span>
                               <span className={`badge badge-${qualityScore(account) >= 75 ? 'success' : qualityScore(account) >= 55 ? 'warning' : 'danger'}`}>Quality {qualityScore(account)}</span>
                               {isIncomplete(account) && <span className="badge badge-warning">Missing recovery/2FA</span>}
+                              {proofLinks(account).length > 0 && (
+                                <a href={proofLinks(account)[0]} target="_blank" className="badge badge-info" onClick={(event) => event.stopPropagation()}>
+                                  Proof
+                                </a>
+                              )}
                             </div>
                           </div>
                           <div className={styles.actions}>

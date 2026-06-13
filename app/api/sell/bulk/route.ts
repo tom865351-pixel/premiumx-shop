@@ -57,6 +57,10 @@ export async function POST(req: Request) {
       const username = getVal(['username', 'email', 'user', 'account'])
       const password = getVal(['password', 'pass', 'pw'])
       const twoFA = getVal(['2fa', 'twofa', 'secret', '2fa secret'])
+      const recoveryEmail = getVal(['recoveryemail', 'recovery email', 'recovery_email'])
+      const recoveryPhone = getVal(['recoveryphone', 'recovery phone', 'recovery_phone'])
+      const accountAge = getVal(['age', 'account age', 'accountage'])
+      const proofLink = getVal(['proof', 'screenshot', 'proof link', 'prooflink'])
 
       if (!username || !password) {
         missingRows += 1
@@ -77,6 +81,10 @@ export async function POST(req: Request) {
         username: username,
         password: password,
         twoFASecret: twoFA || null,
+        recoveryEmail: recoveryEmail || null,
+        recoveryPhone: recoveryPhone || null,
+        accountAge: accountAge || null,
+        screenshots: proofLink ? JSON.stringify([proofLink]) : '[]',
         price: (category as any).defaultPrice || 0,
         status: 'pending'
       }
