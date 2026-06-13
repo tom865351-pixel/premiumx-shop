@@ -1,0 +1,75 @@
+'use client'
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+
+export default function FloatingSupport() {
+  const [mounted, setMounted] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+  if (!mounted) return null
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: '90px', // Above mobile bottom nav
+      right: '20px',
+      zIndex: 9998,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      gap: '12px'
+    }}>
+      {/* Menu Options */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        opacity: isOpen ? 1 : 0,
+        transform: isOpen ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.9)',
+        pointerEvents: isOpen ? 'auto' : 'none',
+        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        transformOrigin: 'bottom right'
+      }}>
+        <a href="https://wa.me/8801234567890" target="_blank" rel="noreferrer" style={{
+          background: '#25D366', color: '#fff', padding: '10px 16px', borderRadius: '30px',
+          display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '14px',
+          boxShadow: '0 4px 15px rgba(37, 211, 102, 0.4)', textDecoration: 'none'
+        }}>
+          <span style={{ fontSize: '20px' }}>💬</span> WhatsApp
+        </a>
+        <a href="https://t.me/premiumxshop" target="_blank" rel="noreferrer" style={{
+          background: '#0088cc', color: '#fff', padding: '10px 16px', borderRadius: '30px',
+          display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '14px',
+          boxShadow: '0 4px 15px rgba(0, 136, 204, 0.4)', textDecoration: 'none'
+        }}>
+          <span style={{ fontSize: '20px' }}>✈️</span> Telegram
+        </a>
+        <Link href="/support" style={{
+          background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text)', 
+          padding: '10px 16px', borderRadius: '30px',
+          display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '14px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)', textDecoration: 'none'
+        }}>
+          <span style={{ fontSize: '20px' }}>🎫</span> Open Ticket
+        </Link>
+      </div>
+
+      {/* Main Button */}
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: '56px', height: '56px', borderRadius: '50%',
+          background: 'linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%)',
+          border: 'none', color: '#000', fontSize: '28px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(212, 175, 55, 0.5)', cursor: 'pointer',
+          transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          transform: isOpen ? 'rotate(45deg)' : 'rotate(0)'
+        }}
+      >
+        {isOpen ? '✖' : '🎧'}
+      </button>
+    </div>
+  )
+}
