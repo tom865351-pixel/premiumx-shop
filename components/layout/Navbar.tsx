@@ -209,6 +209,7 @@ export default function Navbar({ user }: NavbarProps) {
                     <Link href="/sell" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       📤 Sell Account
                     </Link>
+                    {user && (user.role === 'admin' || user.role === 'sub-admin') && (
                       <Link href="/admin/dashboard" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                         ⚙️ {text.admin}
                       </Link>
