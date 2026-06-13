@@ -160,7 +160,7 @@ export default function Navbar({ user }: NavbarProps) {
                   <span className={styles.balanceIcon}>💰</span>
                   <span>{formatBalance(user.balance)}</span>
                 </Link>
-                <Link href="/deposit" className={`btn btn-blue btn-sm ${styles.addMoneyBtn}`} style={{ padding: '6px 12px', fontSize: 13, borderRadius: 20 }}>
+                <Link href="/wallet" className={`btn btn-blue btn-sm ${styles.addMoneyBtn}`} style={{ padding: '6px 12px', fontSize: 13, borderRadius: 20 }}>
                   Wallet
                 </Link>
               </div>
@@ -191,8 +191,8 @@ export default function Navbar({ user }: NavbarProps) {
                     <Link href="/wallet" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       💰 {text.wallet}
                     </Link>
-                    <Link href="/deposit" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)} style={{ color: 'var(--gold)', fontWeight: 600 }}>
-                      Wallet
+                    <Link href="/wallet" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)} style={{ color: 'var(--gold)', fontWeight: 600 }}>
+                      Add Money
                     </Link>
                     <Link href="/orders" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       {text.orders}

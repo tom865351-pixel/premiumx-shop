@@ -13,39 +13,35 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   if (deposit.status !== 'pending') return NextResponse.json({ error: 'Already processed' }, { status: 400 })
 
   await prisma.$transaction(async (tx) => {
-    // 1. Update TopupRequest status
     await tx.topupRequest.update({
       where: { id: params.id },
-      data: { status: 'approved', processedAt: new Date() }
+      data: { status: 'approved', processedAt: new Date() },
     })
 
-    // 2. Add balance to user wallet
     const updatedUser = await tx.user.update({
       where: { id: deposit.userId },
-      data: { balance: { increment: deposit.amount } }
+      data: { balance: { increment: deposit.amount } },
     })
 
-    // 3. Create transaction log
     await tx.transaction.create({
       data: {
         userId: deposit.userId,
         type: 'topup',
         amount: deposit.amount,
         balance: updatedUser.balance,
-        description: `Wallet Top-up via ${deposit.method.toUpperCase()} (TrxID: ${deposit.transactionId})`,
+        description: `Wallet add money via ${deposit.method.toUpperCase()} (TrxID: ${deposit.transactionId || 'N/A'})`,
         topupId: deposit.id,
-      }
+      },
     })
 
-    // 4. Notify user
     await tx.notification.create({
       data: {
         userId: deposit.userId,
-        title: '✅ Deposit Approved!',
-        message: `৳${deposit.amount} has been added to your wallet. Enjoy shopping!`,
+        title: 'Add Money Approved',
+        message: `BDT ${deposit.amount} has been added to your wallet.`,
         type: 'success',
         link: '/wallet',
-      }
+      },
     })
   })
 

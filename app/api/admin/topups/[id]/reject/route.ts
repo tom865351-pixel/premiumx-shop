@@ -21,12 +21,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   await prisma.notification.create({
     data: {
       userId: topup.userId,
-      title: 'Topup Rejected ❌',
-      message: `Your topup request of ৳${topup.amount} was rejected. Please contact support.`,
+      title: 'Add Money Rejected',
+      message: `Your add money request of BDT ${topup.amount} was rejected. Please contact support.`,
       type: 'danger',
       link: '/wallet',
     },
   })
 
-  return NextResponse.redirect(new URL('/admin/payments', req.url))
+  return NextResponse.redirect(new URL('/admin/deposits', req.url))
 }

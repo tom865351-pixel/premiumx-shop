@@ -2,8 +2,8 @@ import { redirect } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
-import TopupModal from './TopupModal'
 import WithdrawModal from './WithdrawModal'
+import DepositForm from '@/app/deposit/DepositForm'
 
 function txLabel(type: string) {
   if (type === 'topup') return 'Topup'
@@ -36,7 +36,7 @@ export default async function WalletPage() {
     where: { id: authUser.userId },
     include: {
       transactions: { orderBy: { createdAt: 'desc' }, take: 20 },
-      topupRequests: { orderBy: { createdAt: 'desc' }, take: 3 },
+      topupRequests: { orderBy: { createdAt: 'desc' }, take: 8 },
       withdrawals: { orderBy: { createdAt: 'desc' }, take: 8 },
     },
   })
@@ -58,7 +58,7 @@ export default async function WalletPage() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Seller Wallet</h1>
-            <p className="page-subtitle">Track sales balance, pending payout holds, topups, and withdrawal history.</p>
+            <p className="page-subtitle">Add money, withdraw seller earnings, and track every wallet movement in one place.</p>
           </div>
         </div>
 
@@ -68,7 +68,6 @@ export default async function WalletPage() {
             <div style={{ fontSize: 38, fontWeight: 800, color: 'var(--gold)', fontFamily: 'Space Grotesk', marginBottom: 14 }}>
               BDT {user.balance.toLocaleString()}
             </div>
-            <TopupModal />
             <WithdrawModal balance={user.balance} />
           </div>
 
@@ -103,6 +102,45 @@ export default async function WalletPage() {
             <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
               Minimum withdrawal is BDT 100. Requested amount is reserved instantly. Admin pays manually and adds a reference when approving.
             </p>
+          </div>
+        </div>
+
+        <div className="grid-2" style={{ gap: 18, marginBottom: 28, alignItems: 'start' }}>
+          <div>
+            <h2 style={{ fontSize: 18, marginBottom: 14 }}>Add Money</h2>
+            <DepositForm />
+          </div>
+
+          <div>
+            <h2 style={{ fontSize: 18, marginBottom: 14 }}>Recent Add Money Requests</h2>
+            <div className="table-container card">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>TrxID</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {user.topupRequests.length === 0 ? (
+                    <tr><td colSpan={5} className="text-center" style={{ padding: 32, color: 'var(--text-muted)' }}>No add money requests yet</td></tr>
+                  ) : (
+                    user.topupRequests.map((topup) => (
+                      <tr key={topup.id}>
+                        <td className="font-mono text-gold" style={{ fontWeight: 800 }}>BDT {topup.amount.toLocaleString()}</td>
+                        <td style={{ textTransform: 'uppercase' }}>{topup.method}</td>
+                        <td className="font-mono" style={{ fontSize: 12 }}>{topup.transactionId || '-'}</td>
+                        <td><span className={`badge badge-${statusBadge(topup.status)}`}>{topup.status}</span></td>
+                        <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(topup.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 

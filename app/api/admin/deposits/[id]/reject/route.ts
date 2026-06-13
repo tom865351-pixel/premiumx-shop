@@ -10,22 +10,24 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   const deposit = await prisma.topupRequest.findUnique({ where: { id: params.id } })
   if (!deposit) return NextResponse.json({ error: 'Deposit not found' }, { status: 404 })
+  if (deposit.status !== 'pending') return NextResponse.json({ error: 'Already processed' }, { status: 400 })
 
-  const { note } = await req.json().catch(() => ({ note: '' }))
+  const formData = await req.formData().catch(() => null)
+  const note = String(formData?.get('note') || 'Invalid Transaction ID').trim()
 
   await prisma.topupRequest.update({
     where: { id: params.id },
-    data: { status: 'rejected', adminNote: note || 'Invalid Transaction ID', processedAt: new Date() }
+    data: { status: 'rejected', adminNote: note, processedAt: new Date() },
   })
 
   await prisma.notification.create({
     data: {
       userId: deposit.userId,
-      title: '❌ Deposit Rejected',
-      message: `Your deposit of ৳${deposit.amount} was rejected. Reason: ${note || 'Invalid Transaction ID'}. Contact support if you believe this is an error.`,
+      title: 'Add Money Rejected',
+      message: `Your add money request of BDT ${deposit.amount} was rejected. Reason: ${note}.`,
       type: 'danger',
-      link: '/deposit',
-    }
+      link: '/wallet',
+    },
   })
 
   return NextResponse.redirect(new URL('/admin/deposits', req.url))

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         type: 'topup',
         amount: topup.amount,
         balance: updatedUser.balance,
-        description: `Topup via ${topup.method}`,
+        description: `Wallet add money via ${topup.method.toUpperCase()}`,
         topupId: topup.id,
       },
     })
@@ -38,13 +38,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     await tx.notification.create({
       data: {
         userId: topup.userId,
-        title: 'Topup Approved! ✅',
-        message: `Your topup of ৳${topup.amount} has been approved and added to your balance.`,
+        title: 'Add Money Approved',
+        message: `BDT ${topup.amount} has been approved and added to your balance.`,
         type: 'success',
         link: '/wallet',
       },
     })
   })
 
-  return NextResponse.redirect(new URL('/admin/payments', req.url))
+  return NextResponse.redirect(new URL('/admin/deposits', req.url))
 }

@@ -2,6 +2,12 @@ import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 
+function statusBadge(status: string) {
+  if (status === 'approved') return 'success'
+  if (status === 'rejected') return 'danger'
+  return 'warning'
+}
+
 export default async function AdminDeposits() {
   const authUser = await getAuthUser()
   if (!authUser || authUser.role !== 'admin') redirect('/login')
@@ -11,38 +17,37 @@ export default async function AdminDeposits() {
     include: { user: { select: { username: true, email: true, balance: true } } },
   })
 
-  const pending = deposits.filter(d => d.status === 'pending')
+  const pending = deposits.filter((deposit) => deposit.status === 'pending')
   const totalApproved = deposits
-    .filter(d => d.status === 'approved')
-    .reduce((sum, d) => sum + d.amount, 0)
+    .filter((deposit) => deposit.status === 'approved')
+    .reduce((sum, deposit) => sum + deposit.amount, 0)
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">💳 Manage Deposits</h1>
-          <p className="page-subtitle">Approve or reject user deposit requests.</p>
+          <h1 className="page-title">Wallet Deposits</h1>
+          <p className="page-subtitle">Approve manual add money requests from the single wallet system.</p>
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid-3" style={{ marginBottom: 32 }}>
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'var(--warning-bg)', color: 'var(--warning)' }}>⏳</div>
+          <div className="stat-icon" style={{ background: 'var(--warning-bg)', color: 'var(--warning)' }}>WAIT</div>
           <div>
             <div className="stat-value">{pending.length}</div>
             <div className="stat-label">Pending</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'var(--success-bg)', color: 'var(--success)' }}>💰</div>
+          <div className="stat-icon" style={{ background: 'var(--success-bg)', color: 'var(--success)' }}>BDT</div>
           <div>
-            <div className="stat-value">৳{totalApproved.toLocaleString()}</div>
-            <div className="stat-label">Total Deposited</div>
+            <div className="stat-value">BDT {totalApproved.toLocaleString()}</div>
+            <div className="stat-label">Total Added</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'var(--info-bg)', color: 'var(--info)' }}>📋</div>
+          <div className="stat-icon" style={{ background: 'var(--info-bg)', color: 'var(--info)' }}>ALL</div>
           <div>
             <div className="stat-value">{deposits.length}</div>
             <div className="stat-label">Total Requests</div>
@@ -65,39 +70,33 @@ export default async function AdminDeposits() {
           </thead>
           <tbody>
             {deposits.length === 0 ? (
-              <tr><td colSpan={7} className="text-center" style={{ padding: 40, color: 'var(--text-muted)' }}>No deposit requests yet.</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: 40, color: 'var(--text-muted)' }}>No add money requests yet.</td></tr>
             ) : (
-              deposits.map(dep => (
-                <tr key={dep.id}>
+              deposits.map((deposit) => (
+                <tr key={deposit.id}>
                   <td>
-                    <div style={{ fontWeight: 600 }}>@{dep.user.username}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Wallet: ৳{dep.user.balance.toFixed(0)}</div>
+                    <div style={{ fontWeight: 700 }}>@{deposit.user.username}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Wallet: BDT {deposit.user.balance.toFixed(0)}</div>
                   </td>
-                  <td className="font-mono text-gold" style={{ fontWeight: 700, fontSize: 16 }}>৳{dep.amount}</td>
+                  <td className="font-mono text-gold" style={{ fontWeight: 800, fontSize: 16 }}>BDT {deposit.amount.toLocaleString()}</td>
+                  <td><span style={{ textTransform: 'uppercase', fontWeight: 700 }}>{deposit.method}</span></td>
+                  <td className="font-mono" style={{ fontSize: 13, letterSpacing: 1 }}>{deposit.transactionId || '-'}</td>
+                  <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(deposit.createdAt).toLocaleString()}</td>
+                  <td><span className={`badge badge-${statusBadge(deposit.status)}`}>{deposit.status}</span></td>
                   <td>
-                    <span style={{ textTransform: 'uppercase', fontWeight: 600 }}>{dep.method}</span>
-                  </td>
-                  <td className="font-mono" style={{ fontSize: 13, letterSpacing: 1 }}>{dep.transactionId}</td>
-                  <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(dep.createdAt).toLocaleString()}</td>
-                  <td>
-                    <span className={`badge badge-${dep.status === 'approved' ? 'success' : dep.status === 'pending' ? 'warning' : 'danger'}`}>
-                      {dep.status}
-                    </span>
-                  </td>
-                  <td>
-                    {dep.status === 'pending' && (
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <form action={`/api/admin/deposits/${dep.id}/approve`} method="POST">
-                          <button type="submit" className="btn btn-sm btn-gold">✅ Approve</button>
+                    {deposit.status === 'pending' && (
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <form action={`/api/admin/deposits/${deposit.id}/approve`} method="POST">
+                          <button type="submit" className="btn btn-sm btn-gold">Approve</button>
                         </form>
-                        <form action={`/api/admin/deposits/${dep.id}/reject`} method="POST">
-                          <button type="submit" className="btn btn-sm btn-danger">❌ Reject</button>
+                        <form action={`/api/admin/deposits/${deposit.id}/reject`} method="POST">
+                          <button type="submit" className="btn btn-sm btn-danger">Reject</button>
                         </form>
                       </div>
                     )}
-                    {dep.status !== 'pending' && (
+                    {deposit.status !== 'pending' && (
                       <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                        {dep.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                        {deposit.status === 'approved' ? 'Approved' : 'Rejected'}
                       </span>
                     )}
                   </td>

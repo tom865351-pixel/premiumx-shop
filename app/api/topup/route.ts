@@ -10,19 +10,24 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json()
-    const { amount, paymentMethod, transactionId } = data
+    const amount = Number.parseFloat(String(data.amount || '0'))
+    const paymentMethod = String(data.paymentMethod || data.method || '').toLowerCase()
+    const transactionId = String(data.transactionId || '').trim()
 
     if (!amount || amount < 50) {
-      return NextResponse.json({ error: 'Minimum topup amount is ৳50' }, { status: 400 })
+      return NextResponse.json({ error: 'Minimum add money amount is BDT 50' }, { status: 400 })
     }
 
-    if (!paymentMethod || !transactionId) {
+    if (!['bkash', 'nagad', 'rocket', 'binance'].includes(paymentMethod)) {
+      return NextResponse.json({ error: 'Invalid payment method' }, { status: 400 })
+    }
+
+    if (transactionId.length < 4) {
       return NextResponse.json({ error: 'Payment method and Transaction ID are required' }, { status: 400 })
     }
 
-    // Check if transaction ID is already used
     const existing = await prisma.topupRequest.findFirst({
-      where: { transactionId }
+      where: { transactionId },
     })
 
     if (existing) {
@@ -35,12 +40,11 @@ export async function POST(req: Request) {
         amount,
         method: paymentMethod,
         transactionId,
-        status: 'pending'
-      }
+        status: 'pending',
+      },
     })
 
     return NextResponse.json({ success: true, request })
-
   } catch (error: any) {
     console.error('Topup API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
