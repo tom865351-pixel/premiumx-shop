@@ -6,6 +6,7 @@ import Spinner from '@/components/ui/Spinner'
 import styles from './AdminAccounts.module.css'
 
 type Status = 'pending' | 'approved' | 'sold' | 'rejected'
+type QueueFilter = 'new' | 'old' | 'high-value' | 'incomplete'
 
 const STATUS_CONFIG: Record<Status, { label: string; badge: string; icon: string; color: string }> = {
   pending: { label: 'Pending', badge: 'badge-warning', icon: 'WAIT', color: '#f59e0b' },
@@ -36,9 +37,25 @@ function platformLogo(name = '') {
   return { text: name.slice(0, 2).toUpperCase() || 'PX', bg: 'linear-gradient(135deg,#0ea5e9,#9333ea)' }
 }
 
-export default function AdminAccountsClient({ accounts }: { accounts: any[] }) {
+function qualityScore(account: any) {
+  let score = 35
+  if (account.username) score += 10
+  if (account.password) score += 10
+  if (account.twoFASecret) score += 15
+  if (account.recoveryEmail || account.recoveryPhone) score += 15
+  if (account.accountAge) score += 8
+  if (account.description) score += 7
+  return Math.min(100, score)
+}
+
+function isIncomplete(account: any) {
+  return !account.twoFASecret && !account.recoveryEmail && !account.recoveryPhone
+}
+
+export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: { accounts: any[]; rejectTemplates?: string }) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Status>('pending')
+  const [queueFilter, setQueueFilter] = useState<QueueFilter>('new')
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
@@ -53,7 +70,7 @@ export default function AdminAccountsClient({ accounts }: { accounts: any[] }) {
 
   const sellerGroups = useMemo(() => {
     const q = search.trim().toLowerCase()
-    const visibleAccounts = groupedByStatus[activeTab].filter((account) => {
+    let visibleAccounts = groupedByStatus[activeTab].filter((account) => {
       if (!q) return true
       return (
         account.title?.toLowerCase().includes(q) ||
@@ -63,6 +80,18 @@ export default function AdminAccountsClient({ accounts }: { accounts: any[] }) {
         account.category?.name?.toLowerCase().includes(q)
       )
     })
+
+    if (activeTab === 'pending') {
+      if (queueFilter === 'old') {
+        visibleAccounts = [...visibleAccounts].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      } else if (queueFilter === 'high-value') {
+        visibleAccounts = [...visibleAccounts].sort((a, b) => Number(b.price || 0) - Number(a.price || 0))
+      } else if (queueFilter === 'incomplete') {
+        visibleAccounts = visibleAccounts.filter(isIncomplete)
+      } else {
+        visibleAccounts = [...visibleAccounts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      }
+    }
 
     const map = new Map<string, any>()
     for (const account of visibleAccounts) {
@@ -82,19 +111,24 @@ export default function AdminAccountsClient({ accounts }: { accounts: any[] }) {
     }
 
     return Array.from(map.values()).sort((a, b) => new Date(b.latest).getTime() - new Date(a.latest).getTime())
-  }, [accounts, activeTab, search])
+  }, [accounts, activeTab, search, queueFilter])
 
   const visibleAccountIds = sellerGroups.flatMap((group) => group.accounts.map((account: any) => account.id))
 
   const handleBulkAction = async (action: 'approve' | 'reject', ids = selectedIds) => {
     if (ids.length === 0) return
+    const note = action === 'reject'
+      ? prompt(`Reject reason:\n${rejectTemplates || 'Wrong password\nDuplicate account\nIncomplete details'}`, rejectTemplates.split('\n').filter(Boolean)[0] || '')
+      : prompt('Approval note or price note (optional):', '')
+    if (action === 'reject' && note === null) return
+    if (action === 'approve' && note === null) return
     if (!confirm(`Are you sure you want to ${action} ${ids.length} accounts?`)) return
     setLoading(true)
     try {
       const res = await fetch('/api/admin/accounts/bulk-action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accountIds: ids, action }),
+        body: JSON.stringify({ accountIds: ids, action, note }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Bulk action failed')
@@ -171,6 +205,14 @@ export default function AdminAccountsClient({ accounts }: { accounts: any[] }) {
             )
           })}
         </div>
+        {activeTab === 'pending' && (
+          <select className={`form-input ${styles.queueSelect}`} value={queueFilter} onChange={(event) => setQueueFilter(event.target.value as QueueFilter)}>
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+            <option value="high-value">High value first</option>
+            <option value="incomplete">Missing recovery/2FA</option>
+          </select>
+        )}
         <input
           type="text"
           placeholder="Search seller, platform, username..."
@@ -256,6 +298,8 @@ export default function AdminAccountsClient({ accounts }: { accounts: any[] }) {
                               <span>{account.category?.name}</span>
                               <span className={`badge ${STATUS_CONFIG[account.status as Status]?.badge || 'badge-muted'}`}>{account.status}</span>
                               <span className="text-gold">BDT {Number(account.price).toLocaleString()}</span>
+                              <span className={`badge badge-${qualityScore(account) >= 75 ? 'success' : qualityScore(account) >= 55 ? 'warning' : 'danger'}`}>Quality {qualityScore(account)}</span>
+                              {isIncomplete(account) && <span className="badge badge-warning">Missing recovery/2FA</span>}
                             </div>
                           </div>
                           <div className={styles.actions}>

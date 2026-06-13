@@ -3,6 +3,7 @@ import Navbar from '@/components/layout/Navbar'
 import styles from './page.module.css'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { getSetting } from '@/lib/settings'
 
 function platformLogo(name = '') {
   const key = name.toLowerCase()
@@ -20,11 +21,13 @@ export default async function Home() {
   const authUser = await getAuthUser()
   const user = authUser ? await prisma.user.findUnique({ where: { id: authUser.userId } }).catch(() => null) : null
 
-  const [categories, pendingCount, paidCount] = await Promise.all([
+  const [categories, pendingCount, paidCount, homepageBadges] = await Promise.all([
     prisma.category.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } }).catch(() => []),
     prisma.account.count({ where: { status: 'pending' } }).catch(() => 0),
     prisma.account.count({ where: { status: { in: ['approved', 'sold'] } } }).catch(() => 0),
+    getSetting('homepage_badges'),
   ])
+  const trustBadges = homepageBadges.split(',').map((item) => item.trim()).filter(Boolean).slice(0, 4)
 
   return (
     <main className={styles.main}>
@@ -50,9 +53,7 @@ export default async function Home() {
           </div>
 
           <div className={styles.heroTrust}>
-            <span>Admin reviewed stock</span>
-            <span>Wallet payout tracking</span>
-            <span>Excel bulk submit</span>
+            {trustBadges.map((badge) => <span key={badge}>{badge}</span>)}
           </div>
 
           <div className={styles.stats}>

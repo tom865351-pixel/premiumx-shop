@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import AdminAccountsClient from './AdminAccountsClient'
+import { getSetting } from '@/lib/settings'
 
 export default async function AdminAccounts() {
   const user = await getAuthUser()
@@ -12,5 +13,7 @@ export default async function AdminAccounts() {
     include: { category: true, seller: true }
   })
 
-  return <AdminAccountsClient accounts={accounts} />
+  const rejectTemplates = await getSetting('reject_templates')
+
+  return <AdminAccountsClient accounts={accounts} rejectTemplates={rejectTemplates} />
 }

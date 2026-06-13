@@ -15,6 +15,13 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   usdt_rate: '110',
   contact_email: 'support@premiumx.shop',
   contact_telegram: '@premiumxshop',
+  maintenance_message: 'PremiumX is being updated. Please check again soon.',
+  homepage_badges: 'Admin reviewed stock,Wallet payout tracking,Excel bulk submit',
+  reject_templates: 'Wrong password\nDuplicate account\nIncomplete recovery info\nInvalid account details',
+  fraud_rules: '{"duplicateLogin":true,"repeatedPayout":true,"missingRecovery":true,"highRejectRate":40}',
+  payout_min_bdt: '100',
+  payout_limit_daily_bdt: '50000',
+  next_payout_time: 'Every day at 10:00 PM',
 }
 
 export async function getSetting(key: string): Promise<string> {

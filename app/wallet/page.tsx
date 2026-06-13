@@ -45,7 +45,7 @@ export default async function WalletPage() {
 
   if (!user) redirect('/login')
 
-  const walletSettings = await getSettings(['min_topup_bdt', 'bkash_number', 'nagad_number', 'rocket_number'])
+  const walletSettings = await getSettings(['min_topup_bdt', 'bkash_number', 'nagad_number', 'rocket_number', 'payout_min_bdt', 'next_payout_time'])
   const minTopup = Number.parseFloat(walletSettings.min_topup_bdt || '50') || 50
   const paymentMethods = [
     { value: 'bkash', label: 'bKash', name: 'bKash', number: walletSettings.bkash_number },
@@ -103,6 +103,12 @@ export default async function WalletPage() {
             <div className={styles.label}>Added Money</div>
             <div className={styles.metricValue} style={{ color: 'var(--info)' }}>BDT {totalTopup.toLocaleString()}</div>
             <div className={styles.metricHint}>{pendingTopups} pending add money request{pendingTopups === 1 ? '' : 's'}</div>
+          </div>
+
+          <div className={styles.metricCard}>
+            <div className={styles.label}>Next Payout</div>
+            <div className={styles.metricValue} style={{ color: 'var(--gold)', fontSize: 22 }}>{walletSettings.next_payout_time}</div>
+            <div className={styles.metricHint}>Minimum withdrawal BDT {Number(walletSettings.payout_min_bdt || 100).toLocaleString()}</div>
           </div>
         </section>
 

@@ -18,8 +18,15 @@ export default async function AdminSettings() {
     'usd_rate',
     'usdt_rate',
     'maintenance_mode',
+    'maintenance_message',
     'contact_email',
     'contact_telegram',
+    'homepage_badges',
+    'reject_templates',
+    'fraud_rules',
+    'payout_min_bdt',
+    'payout_limit_daily_bdt',
+    'next_payout_time',
   ])
 
   return (
@@ -58,6 +65,11 @@ export default async function AdminSettings() {
                 <option value="true">On - maintenance</option>
               </select>
             </div>
+
+            <div className="form-group">
+              <label className="form-label">Maintenance Message</label>
+              <textarea className="input" name="maintenance_message" defaultValue={settings.maintenance_message} rows={3} placeholder="Site update message" />
+            </div>
           </div>
 
           <div className="card" style={{ padding: 22 }}>
@@ -76,6 +88,21 @@ export default async function AdminSettings() {
             <div className="form-group">
               <label className="form-label">Min Add Money Amount (BDT)</label>
               <input className="input" name="min_topup_bdt" type="number" min="1" defaultValue={settings.min_topup_bdt} placeholder="100" />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Min Withdrawal Amount (BDT)</label>
+              <input className="input" name="payout_min_bdt" type="number" min="1" defaultValue={settings.payout_min_bdt} placeholder="100" />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Daily Payout Limit (BDT)</label>
+              <input className="input" name="payout_limit_daily_bdt" type="number" min="1" defaultValue={settings.payout_limit_daily_bdt} placeholder="50000" />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Next Payout Time Text</label>
+              <input className="input" name="next_payout_time" defaultValue={settings.next_payout_time} placeholder="Every day at 10:00 PM" />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -109,6 +136,25 @@ export default async function AdminSettings() {
               <div className="form-group">
                 <label className="form-label">Crypto Wallet (USDT TRC20)</label>
                 <input className="input" name="crypto_wallet" defaultValue={settings.crypto_wallet} placeholder="TXXXXXXXXXXX" />
+              </div>
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: 22, gridColumn: '1 / -1' }}>
+            <h3 style={{ marginBottom: 18, fontSize: 16, fontWeight: 800 }}>Admin Workflow Controls</h3>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+              <div className="form-group">
+                <label className="form-label">Homepage Badges (comma separated)</label>
+                <textarea className="input" name="homepage_badges" defaultValue={settings.homepage_badges} rows={4} placeholder="Admin reviewed stock,Wallet payout tracking" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Reject Reason Templates</label>
+                <textarea className="input" name="reject_templates" defaultValue={settings.reject_templates} rows={4} placeholder="One reason per line" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Fraud Rules JSON</label>
+                <textarea className="input" name="fraud_rules" defaultValue={settings.fraud_rules} rows={4} placeholder='{"highRejectRate":40}' />
               </div>
             </div>
           </div>

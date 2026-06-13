@@ -32,6 +32,10 @@
   width: min(280px, 100%);
 }
 
+.queueSelect {
+  width: min(210px, 100%);
+}
+
 .sellerList {
   display: grid;
   gap: 12px;
@@ -200,6 +204,10 @@
 
   .search {
     margin-left: 0;
+    width: 100%;
+  }
+
+  .queueSelect {
     width: 100%;
   }
 

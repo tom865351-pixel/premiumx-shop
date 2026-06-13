@@ -12,7 +12,9 @@ export async function POST(req: NextRequest) {
   const keys = [
     'site_name', 'commission_rate', 'report_window_hours', 'min_topup_bdt',
     'bkash_number', 'nagad_number', 'rocket_number', 'crypto_wallet', 'usd_rate', 'usdt_rate',
-    'maintenance_mode', 'contact_email', 'contact_telegram'
+    'maintenance_mode', 'maintenance_message', 'contact_email', 'contact_telegram',
+    'homepage_badges', 'reject_templates', 'fraud_rules', 'payout_min_bdt',
+    'payout_limit_daily_bdt', 'next_payout_time'
   ]
 
   for (const key of keys) {
