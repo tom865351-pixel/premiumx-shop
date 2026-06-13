@@ -11,6 +11,15 @@ function statusClass(status: string) {
   return 'warning'
 }
 
+function reviewTimer(createdAt: Date) {
+  const due = new Date(createdAt)
+  due.setHours(due.getHours() + 24)
+  const diff = due.getTime() - Date.now()
+  if (diff <= 0) return 'Review due now'
+  const hours = Math.ceil(diff / (1000 * 60 * 60))
+  return `${hours}h review target left`
+}
+
 export default async function OrdersPage() {
   const authUser = await getAuthUser()
   if (!authUser) redirect('/login')
@@ -31,6 +40,12 @@ export default async function OrdersPage() {
   const bought = user.listings.filter((listing) => listing.status === 'approved' || listing.status === 'sold').length
   const rejected = user.listings.filter((listing) => listing.status === 'rejected').length
   const totalValue = user.listings.reduce((sum, listing) => sum + listing.price, 0)
+  const since7 = new Date()
+  since7.setDate(since7.getDate() - 7)
+  const submitted7 = user.listings.filter((listing) => listing.createdAt >= since7).length
+  const earnedValue = user.listings
+    .filter((listing) => listing.status === 'approved' || listing.status === 'sold')
+    .reduce((sum, listing) => sum + listing.price, 0)
 
   return (
     <div className={styles.shell}>
@@ -86,6 +101,24 @@ export default async function OrdersPage() {
           </div>
         )}
 
+        <section className="card" style={{ padding: 18, marginBottom: 18 }}>
+          <h2 style={{ fontSize: 18, marginBottom: 12 }}>Seller Earnings Analytics</h2>
+          <div className="grid-3">
+            <div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Submitted Last 7 Days</div>
+              <div style={{ color: 'var(--info)', fontSize: 24, fontWeight: 900 }}>{submitted7}</div>
+            </div>
+            <div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Approved Earnings</div>
+              <div style={{ color: 'var(--success)', fontSize: 24, fontWeight: 900 }}>BDT {earnedValue.toLocaleString()}</div>
+            </div>
+            <div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Approval Rate</div>
+              <div style={{ color: 'var(--gold)', fontSize: 24, fontWeight: 900 }}>{user.listings.length ? Math.round((bought / user.listings.length) * 100) : 0}%</div>
+            </div>
+          </div>
+        </section>
+
         {user.listings.length === 0 ? (
           <div className={styles.empty}>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>No submissions yet</div>
@@ -119,6 +152,10 @@ export default async function OrdersPage() {
                   <div className={styles.miniBox}>
                     <div className={styles.miniLabel}>Admin Status</div>
                     <div className={styles.miniValue}>{listing.status === 'pending' ? 'Waiting review' : listing.status}</div>
+                  </div>
+                  <div className={styles.miniBox}>
+                    <div className={styles.miniLabel}>Review Timer</div>
+                    <div className={styles.miniValue}>{listing.status === 'pending' ? reviewTimer(listing.createdAt) : 'Processed'}</div>
                   </div>
                 </div>
               </article>

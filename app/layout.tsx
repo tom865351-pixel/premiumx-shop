@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: 'PremiumX Shop - Sell Digital Accounts',
   description: 'Submit Instagram, Facebook, Gmail, TikTok and other digital accounts to PremiumX for admin review and seller payouts.',
   keywords: 'sell accounts, seller payouts, instagram accounts, facebook accounts, digital account submissions',
+  manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'PremiumX' },
 }
 

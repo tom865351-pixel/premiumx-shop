@@ -1,0 +1,12 @@
+{
+  "name": "PremiumX Shop",
+  "short_name": "PremiumX",
+  "description": "Submit digital accounts, track wallet payouts, and join PremiumX seller sessions.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "orientation": "portrait",
+  "categories": ["business", "productivity"],
+  "icons": []
+}
