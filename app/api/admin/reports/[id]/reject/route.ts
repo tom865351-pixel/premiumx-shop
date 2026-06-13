@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { releaseSellerPayout } from '@/lib/orders'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
@@ -19,16 +20,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       data: { status: 'rejected', resolvedAt: new Date() },
     })
 
-    await tx.order.update({
-      where: { id: report.orderId },
-      data: { status: 'completed' },
-    })
+    await releaseSellerPayout(tx, report.orderId)
 
     await tx.notification.create({
       data: {
         userId: report.buyerId,
-        title: 'Dispute Rejected ❌',
-        message: `Your dispute report has been reviewed and rejected. The order stands as completed.`,
+        title: 'Dispute Rejected',
+        message: 'Your dispute report has been reviewed and rejected. The order stands as completed.',
         type: 'danger',
         link: '/orders',
       },

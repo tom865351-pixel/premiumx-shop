@@ -30,6 +30,11 @@ export async function POST(req: Request) {
       const seller = await tx.user.findUnique({ where: { id: account.sellerId } })
       if (!seller) throw new Error('Seller not found')
 
+      const commissionSetting = await tx.siteSetting.findUnique({ where: { key: 'commission_rate' } })
+      const commissionRate = Number(commissionSetting?.value || 0)
+      const commission = Number((account.price * Math.max(0, commissionRate) / 100).toFixed(2))
+      const sellerEarning = Number((account.price - commission).toFixed(2))
+
       await tx.user.update({
         where: { id: user.id },
         data: { balance: { decrement: account.price } },
@@ -55,8 +60,8 @@ export async function POST(req: Request) {
           buyerId: user.id,
           accountId: account.id,
           amount: account.price,
-          commission: 0,
-          sellerEarning: account.price,
+          commission,
+          sellerEarning,
           status: 'pending',
           reportWindowEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           deliveredAt: new Date(),
@@ -76,7 +81,7 @@ export async function POST(req: Request) {
         data: {
           userId: seller.id,
           title: 'Account Sold',
-          message: `Your account ${account.title} was sold for BDT ${account.price}. Payout will be released after the protection window.`,
+          message: `Your account ${account.title} was sold for BDT ${account.price}. Your payout is BDT ${sellerEarning} after commission and will be released after the protection window.`,
           type: 'info',
         },
       })
