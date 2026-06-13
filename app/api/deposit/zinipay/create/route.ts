@@ -36,6 +36,8 @@ export async function POST(req: NextRequest) {
     })
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://premiumx-shop.vercel.app'
+    const callbackUrl = `${baseUrl}/api/deposit/zinipay/callback?tx_id=${txId}&return=1`
+    const failUrl = `${baseUrl}/api/deposit/zinipay/callback?tx_id=${txId}&status=failed&return=1`
     const ziniResponse = await fetch('https://api.zinipay.com/v1/payment/create', {
       method: 'POST',
       headers: {
@@ -46,10 +48,10 @@ export async function POST(req: NextRequest) {
         amount: numAmount,
         currency: 'BDT',
         tran_id: txId,
-        redirect_url: `${baseUrl}/deposit/success?tx_id=${txId}`,
-        success_url: `${baseUrl}/deposit/success?tx_id=${txId}`,
-        fail_url: `${baseUrl}/deposit/fail`,
-        cancel_url: `${baseUrl}/deposit/fail`,
+        redirect_url: callbackUrl,
+        success_url: callbackUrl,
+        fail_url: failUrl,
+        cancel_url: failUrl,
         cus_name: user.username,
         cus_email: user.email || 'customer@premiumx.shop',
         desc: 'PremiumX Wallet Add Money',

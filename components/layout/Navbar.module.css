@@ -259,7 +259,7 @@
   .navLinks { display: none; }
   .authBtns { display: none; }
   .langBtn, .currencySelect { display: none; }
-  .mobileMenu { display: flex; }
+  .mobileMenu { display: none; }
   .logoText { font-size: 16px; }
   .logoX { font-size: 19px; }
   .logoShop {
@@ -272,25 +272,10 @@
   }
   .balanceIcon { display: none; }
   .addMoneyBtn {
-    max-width: 44px;
-    overflow: hidden;
-    padding: 7px 10px !important;
-    color: transparent !important;
-    position: relative;
-  }
-  .addMoneyBtn::after {
-    content: '+';
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    color: white;
-    font-size: 18px;
-    font-weight: 900;
+    display: none !important;
   }
   .iconBtn {
-    width: 34px;
-    height: 34px;
+    display: none;
   }
   .avatar {
     width: 34px;
@@ -300,7 +285,12 @@
 
 @media (max-width: 390px) {
   .iconBtn { display: none; }
-  .balanceBadge { max-width: 76px; }
+  .balanceBadge {
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 @keyframes fadeIn {

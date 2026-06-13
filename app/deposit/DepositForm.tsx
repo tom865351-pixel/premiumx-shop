@@ -24,7 +24,7 @@ export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [amount, setAmount] = useState('')
   const [selectedMethod, setMethod] = useState(methods[0]?.value || 'bkash')
-  const [activeTab, setActiveTab] = useState<'auto' | 'manual'>('manual')
+  const [activeTab, setActiveTab] = useState<'auto' | 'manual'>('auto')
   const selectedMethodData = methods.find((method) => method.value === selectedMethod) || methods[0] || DEFAULT_METHODS[0]
   const quickAmounts = Array.from(new Set([minAmount, ...QUICK_AMOUNTS])).filter((value) => value >= minAmount)
 
@@ -99,11 +99,11 @@ export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       <div className="tabs" style={{ borderBottom: '1px solid var(--border)', paddingBottom: 14 }}>
+        <button className={`tab ${activeTab === 'auto' ? 'active' : ''}`} onClick={() => setActiveTab('auto')}>
+          Auto Payment
+        </button>
         <button className={`tab ${activeTab === 'manual' ? 'active' : ''}`} onClick={() => setActiveTab('manual')}>
           Manual TrxID
-        </button>
-        <button className={`tab ${activeTab === 'auto' ? 'active' : ''}`} onClick={() => setActiveTab('auto')}>
-          Instant Gateway
         </button>
       </div>
 
@@ -145,10 +145,10 @@ export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 
       {activeTab === 'auto' ? (
         <div style={{ marginTop: 4 }}>
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16, lineHeight: 1.6 }}>
-            Pay through the gateway when it is available. Successful payments are added automatically.
+            Pay automatically with ZiniPay. Successful payments are added to your wallet after gateway confirmation.
           </p>
           <button onClick={handleZiniPay} className="btn btn-blue w-full btn-lg" disabled={ziniLoading}>
-            {ziniLoading ? <><Spinner size={18} /> Connecting...</> : 'Pay with Gateway'}
+            {ziniLoading ? <><Spinner size={18} /> Connecting...</> : 'Pay with ZiniPay'}
           </button>
         </div>
       ) : (
