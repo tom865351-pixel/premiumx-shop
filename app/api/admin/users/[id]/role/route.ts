@@ -11,7 +11,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
     const { role } = await req.json()
     
-    if (!['buyer', 'seller', 'admin'].includes(role)) {
+    if (!['buyer', 'seller', 'admin', 'sub-admin', 'stock-manager'].includes(role)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
     }
 

@@ -160,7 +160,7 @@ export default function Navbar({ user }: NavbarProps) {
                   <span className={styles.balanceIcon}>💰</span>
                   <span>{formatBalance(user.balance)}</span>
                 </Link>
-                <Link href="/deposit" className="btn btn-blue btn-sm" style={{ padding: '6px 12px', fontSize: 13, borderRadius: 20 }}>
+                <Link href="/deposit" className={`btn btn-blue btn-sm ${styles.addMoneyBtn}`} style={{ padding: '6px 12px', fontSize: 13, borderRadius: 20 }}>
                   ➕ Add Money
                 </Link>
               </div>

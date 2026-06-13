@@ -710,7 +710,15 @@ img {
   position: relative;
 }
 .mobile-nav-item .nav-icon {
-  font-size: 20px;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(148, 163, 184, 0.08);
+  font-size: 10px;
+  font-weight: 900;
   line-height: 1;
   transition: transform 0.2s ease;
 }
@@ -763,6 +771,25 @@ img {
   /* Add padding so content isn't hidden behind bottom nav */
   main { padding-bottom: 80px !important; }
   body { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+@media (max-width: 480px) {
+  .mobile-bottom-nav-inner {
+    padding: 0 6px;
+    gap: 4px;
+  }
+  .mobile-nav-item {
+    min-width: 0;
+    flex: 1;
+    font-size: 9px;
+    padding: 5px 3px;
+  }
+  .mobile-nav-item .nav-icon {
+    min-width: 24px;
+    height: 20px;
+    padding: 0 5px;
+    font-size: 9px;
+  }
 }
 
 /* ===== MOBILE SELL CATEGORY GRID ===== */

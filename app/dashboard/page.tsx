@@ -3,133 +3,181 @@ import Link from 'next/link'
 import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import styles from './Dashboard.module.css'
+
+function statusClass(status: string) {
+  if (status === 'completed') return 'success'
+  if (status === 'refunded') return 'warning'
+  if (status === 'disputed') return 'danger'
+  return 'warning'
+}
 
 export default async function Dashboard() {
   const user = await getAuthUser()
-  
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect('/login')
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.userId },
     include: {
-      purchases: { take: 5, orderBy: { createdAt: 'desc' }, include: { account: true } },
-      listings: true
-    }
+      purchases: {
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        include: { account: { include: { category: true } } },
+      },
+      listings: true,
+      withdrawals: { where: { status: 'pending' } },
+    },
   })
 
   if (!dbUser) redirect('/login')
 
+  const activeOrders = dbUser.purchases.filter((order) => order.status === 'pending').length
+  const totalSpent = dbUser.purchases.reduce((sum, order) => sum + order.amount, 0)
+  const activeListings = dbUser.listings.filter((listing) => listing.status === 'approved').length
+  const soldListings = dbUser.listings.filter((listing) => listing.status === 'sold').length
+  const sellerVolume = dbUser.listings
+    .filter((listing) => listing.status === 'sold')
+    .reduce((sum, listing) => sum + listing.price, 0)
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className={styles.shell}>
       <Navbar user={dbUser as any} />
-      
-      <main className="container" style={{ padding: '40px 20px', flex: 1 }}>
-        <div className="page-header">
+
+      <main className={`container ${styles.main}`}>
+        <section className={styles.hero}>
           <div>
-            <h1 className="page-title">Welcome back, {dbUser.username}!</h1>
-            <p className="page-subtitle">Manage your account and view your purchases.</p>
+            <div className={styles.eyebrow}>Account dashboard</div>
+            <h1 className={styles.title}>Welcome back, {dbUser.username}</h1>
+            <p className={styles.subtitle}>Track balance, purchases, seller stock, and buyer protection from one clean screen.</p>
           </div>
-          <Link href="/browse" className="btn btn-gold">Browse Accounts</Link>
-        </div>
+          <div className={styles.heroActions}>
+            <Link href="/browse" className="btn btn-gold">Buy Accounts</Link>
+            <Link href="/sell" className="btn btn-outline">Sell Account</Link>
+          </div>
+        </section>
 
-        <div className="grid-3" style={{ marginBottom: 40 }}>
-          <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'rgba(212,175,55,0.1)', color: 'var(--gold)' }}>💰</div>
-            <div>
-              <div className="stat-value">৳{dbUser.balance}</div>
-              <div className="stat-label">Wallet Balance</div>
+        <section className={styles.stats}>
+          <div className={styles.statCard}>
+            <div className={styles.statTop}>
+              <div className={styles.statLabel}>Wallet Balance</div>
+              <div className={styles.statIcon} style={{ background: 'rgba(212,175,55,0.12)', color: 'var(--gold)' }}>BDT</div>
             </div>
+            <div className={styles.statValue}>BDT {dbUser.balance.toLocaleString()}</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'rgba(147,51,234,0.1)', color: 'var(--purple)' }}>🛍️</div>
-            <div>
-              <div className="stat-value">{dbUser.purchases.length}</div>
-              <div className="stat-label">Total Purchases</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success)' }}>🛡️</div>
-            <div>
-              <div className="stat-value">Active</div>
-              <div className="stat-label">Account Status</div>
-            </div>
-          </div>
-        </div>
 
-        {dbUser.role === 'seller' && (
+          <div className={styles.statCard}>
+            <div className={styles.statTop}>
+              <div className={styles.statLabel}>Purchases</div>
+              <div className={styles.statIcon} style={{ background: 'rgba(14,165,233,0.12)', color: 'var(--primary)' }}>BUY</div>
+            </div>
+            <div className={styles.statValue}>{dbUser.purchases.length}</div>
+          </div>
+
+          <div className={styles.statCard}>
+            <div className={styles.statTop}>
+              <div className={styles.statLabel}>Protection Active</div>
+              <div className={styles.statIcon} style={{ background: 'rgba(245,158,11,0.12)', color: 'var(--warning)' }}>HOLD</div>
+            </div>
+            <div className={styles.statValue}>{activeOrders}</div>
+          </div>
+
+          <div className={styles.statCard}>
+            <div className={styles.statTop}>
+              <div className={styles.statLabel}>Total Spent</div>
+              <div className={styles.statIcon} style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--success)' }}>OK</div>
+            </div>
+            <div className={styles.statValue}>BDT {totalSpent.toLocaleString()}</div>
+          </div>
+        </section>
+
+        <section className={styles.quickActions} aria-label="Quick actions">
+          <Link href="/deposit" className={styles.quickAction}>Add Money</Link>
+          <Link href="/orders" className={styles.quickAction}>My Orders</Link>
+          <Link href="/support/new" className={styles.quickAction}>Open Ticket</Link>
+          <Link href="/referral" className={styles.quickAction}>Referral</Link>
+        </section>
+
+        {['seller', 'admin', 'sub-admin', 'stock-manager'].includes(dbUser.role) && (
           <>
-            <h2 style={{ fontSize: 18, marginBottom: 16, marginTop: 40, color: 'var(--purple)' }}>Seller Analytics</h2>
-            <div className="grid-3" style={{ marginBottom: 40 }}>
-              <div className="stat-card" style={{ borderColor: 'var(--purple)', background: 'rgba(147, 51, 234, 0.05)' }}>
-                <div className="stat-icon" style={{ background: 'var(--purple)', color: '#fff' }}>💸</div>
-                <div>
-                  <div className="stat-value text-purple">
-                    ৳{dbUser.listings.filter(l => l.status === 'sold').reduce((sum, l) => sum + l.price, 0).toLocaleString()}
-                  </div>
-                  <div className="stat-label">Total Earnings</div>
-                </div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon" style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success)' }}>📦</div>
-                <div>
-                  <div className="stat-value">{dbUser.listings.filter(l => l.status === 'approved').length}</div>
-                  <div className="stat-label">Active Listings</div>
-                </div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--info)' }}>✅</div>
-                <div>
-                  <div className="stat-value">{dbUser.listings.filter(l => l.status === 'sold').length}</div>
-                  <div className="stat-label">Total Sold</div>
-                </div>
-              </div>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Seller Snapshot</h2>
+              <Link href="/sell" className="btn btn-sm btn-outline">Add Stock</Link>
             </div>
+            <section className={styles.stats}>
+              <div className={styles.statCard}>
+                <div className={styles.statTop}>
+                  <div className={styles.statLabel}>Active Listings</div>
+                  <div className={styles.statIcon} style={{ background: 'rgba(147,51,234,0.12)', color: 'var(--purple)' }}>LIVE</div>
+                </div>
+                <div className={styles.statValue}>{activeListings}</div>
+              </div>
+              <div className={styles.statCard}>
+                <div className={styles.statTop}>
+                  <div className={styles.statLabel}>Sold Listings</div>
+                  <div className={styles.statIcon} style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--success)' }}>SOLD</div>
+                </div>
+                <div className={styles.statValue}>{soldListings}</div>
+              </div>
+              <div className={styles.statCard}>
+                <div className={styles.statTop}>
+                  <div className={styles.statLabel}>Sales Volume</div>
+                  <div className={styles.statIcon} style={{ background: 'rgba(212,175,55,0.12)', color: 'var(--gold)' }}>BDT</div>
+                </div>
+                <div className={styles.statValue}>BDT {sellerVolume.toLocaleString()}</div>
+              </div>
+              <div className={styles.statCard}>
+                <div className={styles.statTop}>
+                  <div className={styles.statLabel}>Pending Withdrawals</div>
+                  <div className={styles.statIcon} style={{ background: 'rgba(245,158,11,0.12)', color: 'var(--warning)' }}>WAIT</div>
+                </div>
+                <div className={styles.statValue}>{dbUser.withdrawals.length}</div>
+              </div>
+            </section>
           </>
         )}
 
-        <h2 style={{ fontSize: 18, marginBottom: 16 }}>Recent Purchases</h2>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Recent Purchases</h2>
+          <Link href="/orders" className="text-gold" style={{ fontSize: 13, fontWeight: 800 }}>View all</Link>
+        </div>
+
         {dbUser.purchases.length === 0 ? (
-          <div className="empty-state card">
-            <div className="empty-state-icon">🛒</div>
-            <div className="empty-state-title">No purchases yet</div>
-            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>You haven't bought any accounts yet.</p>
+          <div className={styles.empty}>
+            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>No purchases yet</div>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>Browse verified accounts and your first order will appear here.</p>
             <Link href="/browse" className="btn btn-outline">Start Browsing</Link>
           </div>
         ) : (
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Account</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dbUser.purchases.map(order => (
-                  <tr key={order.id}>
-                    <td className="font-mono">#{order.id.slice(-6).toUpperCase()}</td>
-                    <td>{order.account.title}</td>
-                    <td className="font-mono text-gold">৳{order.amount}</td>
-                    <td>
-                      <span className={`badge badge-${order.status === 'completed' ? 'success' : 'warning'}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td>
-                      <Link href="/orders" className="btn btn-sm btn-outline">View details</Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <section className={styles.orders}>
+            {dbUser.purchases.map((order) => (
+              <article key={order.id} className={styles.orderCard}>
+                <div className={styles.orderTop}>
+                  <div>
+                    <div className={styles.orderTitle}>{order.account.title}</div>
+                    <div className={styles.orderMeta}>
+                      #{order.id.slice(-6).toUpperCase()} · {order.account.category.name} · {new Date(order.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <span className={`badge badge-${statusClass(order.status)}`}>
+                    {order.status === 'pending' ? 'Protection active' : order.status}
+                  </span>
+                </div>
+                <div className={styles.orderGrid}>
+                  <div className={styles.miniBox}>
+                    <div className={styles.miniLabel}>Price</div>
+                    <div className={styles.miniValue}>BDT {order.amount.toLocaleString()}</div>
+                  </div>
+                  <div className={styles.miniBox}>
+                    <div className={styles.miniLabel}>Protection Ends</div>
+                    <div className={styles.miniValue}>{new Date(order.reportWindowEnd).toLocaleDateString()}</div>
+                  </div>
+                  <Link href="/orders" className={`${styles.miniBox} ${styles.miniValue}`} style={{ textDecoration: 'none', color: 'var(--gold)' }}>
+                    View Details
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </section>
         )}
       </main>
     </div>

@@ -209,6 +209,7 @@
 
 /* Auth buttons */
 .authBtns { display: flex; align-items: center; gap: 8px; }
+.addMoneyBtn { white-space: nowrap; }
 
 /* Mobile */
 .mobileMenu {
@@ -249,10 +250,57 @@
 .mobileNavLink:hover { background: var(--card); color: var(--text); }
 
 @media (max-width: 768px) {
+  .navbar { height: 58px; }
+  .inner {
+    padding: 0 10px;
+    gap: 8px;
+  }
+  .controls { gap: 6px; }
   .navLinks { display: none; }
   .authBtns { display: none; }
   .langBtn, .currencySelect { display: none; }
   .mobileMenu { display: flex; }
+  .logoText { font-size: 16px; }
+  .logoX { font-size: 19px; }
+  .logoShop {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  .balanceBadge {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+  .balanceIcon { display: none; }
+  .addMoneyBtn {
+    max-width: 44px;
+    overflow: hidden;
+    padding: 7px 10px !important;
+    color: transparent !important;
+    position: relative;
+  }
+  .addMoneyBtn::after {
+    content: '+';
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+  }
+  .iconBtn {
+    width: 34px;
+    height: 34px;
+  }
+  .avatar {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+@media (max-width: 390px) {
+  .iconBtn { display: none; }
+  .balanceBadge { max-width: 76px; }
 }
 
 @keyframes fadeIn {

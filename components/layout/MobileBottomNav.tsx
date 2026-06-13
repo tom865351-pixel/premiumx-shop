@@ -16,12 +16,12 @@ export default function MobileBottomNav({ user }: MobileNavProps) {
     <nav className="mobile-bottom-nav">
       <div className="mobile-bottom-nav-inner">
         <Link href="/" className={`mobile-nav-item ${pathname === '/' ? 'active' : ''}`}>
-          <span className="nav-icon">H</span>
+          <span className="nav-icon">Home</span>
           <span>Home</span>
         </Link>
 
         <Link href="/browse" className={`mobile-nav-item nav-buy ${isActive('/browse') || isActive('/account') ? 'active' : ''}`}>
-          <span className="nav-icon">B</span>
+          <span className="nav-icon">Buy</span>
           <span>Buy</span>
         </Link>
 
@@ -31,7 +31,7 @@ export default function MobileBottomNav({ user }: MobileNavProps) {
         </Link>
 
         <Link href={user ? '/orders' : '/login'} className={`mobile-nav-item ${isActive('/orders') ? 'active' : ''}`}>
-          <span className="nav-icon">O</span>
+          <span className="nav-icon">Bag</span>
           <span>Orders</span>
         </Link>
 
@@ -39,7 +39,7 @@ export default function MobileBottomNav({ user }: MobileNavProps) {
           href={user ? '/dashboard' : '/login'}
           className={`mobile-nav-item ${isActive('/dashboard') || isActive('/settings') || isActive('/referral') || isActive('/login') ? 'active' : ''}`}
         >
-          <span className="nav-icon">{user ? 'P' : 'L'}</span>
+          <span className="nav-icon">{user ? 'Me' : 'Login'}</span>
           <span>{user ? 'Profile' : 'Login'}</span>
         </Link>
       </div>

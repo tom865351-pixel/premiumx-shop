@@ -10,8 +10,8 @@ export default async function AdminUsers() {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
-      _count: { select: { purchases: true, listings: true } }
-    }
+      _count: { select: { purchases: true, listings: true } },
+    },
   })
 
   return (
@@ -19,10 +19,12 @@ export default async function AdminUsers() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Manage Users</h1>
-          <p className="page-subtitle">View and manage registered members.</p>
+          <p className="page-subtitle">View user details, edit profiles, reset passwords, and control access.</p>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Total: <strong style={{ color: 'var(--text-primary)' }}>{users.length}</strong> users</span>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+            Total: <strong style={{ color: 'var(--text-primary)' }}>{users.length}</strong> users
+          </span>
         </div>
       </div>
 
@@ -45,30 +47,40 @@ export default async function AdminUsers() {
             {users.length === 0 ? (
               <tr><td colSpan={9} className="text-center">No users found</td></tr>
             ) : (
-              users.map(u => (
+              users.map((u) => (
                 <tr key={u.id}>
                   <td>
-                    <div style={{ fontWeight: 600 }}>{u.username}</div>
+                    <div style={{ fontWeight: 700 }}>{u.username}</div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{u.email}</div>
                   </td>
                   <td>
                     <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{u.phone || 'N/A'}</div>
                   </td>
                   <td>
-                    <span className={`badge`} style={{
+                    <span className="badge" style={{
                       background: u.role === 'admin' ? 'rgba(212,175,55,0.2)' : u.role === 'seller' ? 'rgba(147,51,234,0.2)' : 'rgba(255,255,255,0.1)',
-                      color: u.role === 'admin' ? 'var(--gold)' : u.role === 'seller' ? 'var(--purple)' : 'var(--text-secondary)'
+                      color: u.role === 'admin' ? 'var(--gold)' : u.role === 'seller' ? 'var(--purple)' : 'var(--text-secondary)',
                     }}>
                       {u.role}
                     </span>
                   </td>
-                  <td className="font-mono text-gold">৳{u.balance.toLocaleString()}</td>
+                  <td className="font-mono text-gold">BDT {u.balance.toLocaleString()}</td>
                   <td style={{ textAlign: 'center' }}>{u._count.purchases}</td>
                   <td style={{ textAlign: 'center' }}>{u._count.listings}</td>
                   <td>
                     <span className={`badge badge-${u.isBanned ? 'danger' : 'success'}`}>
-                      {u.isBanned ? '🚫 Banned' : '✅ Active'}
+                      {u.isBanned ? 'Banned' : 'Active'}
                     </span>
+                    <div style={{ marginTop: 6 }}>
+                      <span className={`badge badge-${u.isVerified ? 'success' : 'muted'}`}>
+                        {u.isVerified ? 'Verified' : 'Unverified'}
+                      </span>
+                      {u.banReason && (
+                        <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 4, maxWidth: 160 }}>
+                          {u.banReason}
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>{new Date(u.createdAt).toLocaleDateString()}</td>
                   <td>
