@@ -49,6 +49,12 @@ export default async function Home() {
             <Link href="/browse" className="btn btn-outline btn-lg">View Rates</Link>
           </div>
 
+          <div className={styles.heroTrust}>
+            <span>Admin reviewed stock</span>
+            <span>Wallet payout tracking</span>
+            <span>Excel bulk submit</span>
+          </div>
+
           <div className={styles.stats}>
             <div className={styles.stat}>
               <div className={styles.statValue}>{pendingCount}</div>

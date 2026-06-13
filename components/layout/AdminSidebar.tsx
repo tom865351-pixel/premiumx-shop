@@ -26,8 +26,14 @@ export default function AdminSidebar({ open = false, onClose }: { open?: boolean
       <aside className={`${styles.sidebar} ${open ? styles.open : ''}`}>
         <div className={styles.logo}>
           <Link href="/" className={styles.logoLink}>
-            <span className={styles.logoText}>Premium</span>
-            <span className={styles.logoX}>X</span>
+            <span className={styles.logoMark}>PX</span>
+            <span className={styles.logoWords}>
+              <span>
+                <span className={styles.logoText}>Premium</span>
+                <span className={styles.logoX}>X</span>
+              </span>
+              <span className={styles.logoShop}>Shop</span>
+            </span>
           </Link>
           <span className={styles.adminBadge}>ADMIN</span>
           <button className={styles.closeBtn} onClick={onClose}>Close</button>
