@@ -12,7 +12,7 @@ export default function Register() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
+
     const formData = new FormData(e.currentTarget)
     const email = formData.get('email')
     const username = formData.get('username')
@@ -32,10 +32,10 @@ export default function Register() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, username, phone, password }),
       })
-      
+
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Registration failed')
-      
+
       router.push('/dashboard')
       router.refresh()
     } catch (err: any) {
@@ -54,7 +54,7 @@ export default function Register() {
             <span style={{ fontFamily: 'Space Grotesk', fontSize: 24, fontWeight: 800, color: 'var(--purple)' }}>X</span>
           </Link>
           <h1 style={{ fontSize: 20, marginTop: 16 }}>Create Account</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Join the trusted marketplace</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Join the trusted seller marketplace</p>
         </div>
 
         {error && <div className="alert alert-danger" style={{ marginBottom: 20 }}>{error}</div>}
@@ -70,17 +70,17 @@ export default function Register() {
           </div>
           <div className="form-group">
             <label className="form-label">Phone Number *</label>
-            <input type="tel" name="phone" required placeholder="e.g. 01700000000" pattern="[0-9+]+" title="Only numbers and + sign" />
+            <input type="tel" name="phone" required placeholder="01700000000" pattern="[0-9+]+" title="Only numbers and + sign" />
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input type="password" name="password" required minLength={6} placeholder="••••••••" />
+            <input type="password" name="password" required minLength={6} placeholder="Enter password" />
           </div>
           <div className="form-group">
             <label className="form-label">Confirm Password</label>
-            <input type="password" name="confirm" required minLength={6} placeholder="••••••••" />
+            <input type="password" name="confirm" required minLength={6} placeholder="Confirm password" />
           </div>
-          
+
           <button type="submit" className="btn btn-gold w-full" disabled={loading} style={{ marginTop: 8 }}>
             {loading ? <div className="spinner" /> : 'Create Account'}
           </button>

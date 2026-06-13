@@ -20,7 +20,7 @@ export default function MobileBottomNav({ user }: MobileNavProps) {
           <span>Home</span>
         </Link>
 
-        <Link href="/sell" className={`mobile-nav-item nav-buy ${isActive('/sell') ? 'active' : ''}`}>
+        <Link href={user ? '/sell' : '/register'} className={`mobile-nav-item nav-buy ${user ? isActive('/sell') ? 'active' : '' : isActive('/register') ? 'active' : ''}`}>
           <span className="nav-icon">Sell</span>
           <span>Sell</span>
         </Link>
@@ -36,11 +36,11 @@ export default function MobileBottomNav({ user }: MobileNavProps) {
         </Link>
 
         <Link
-          href={user ? '/dashboard' : '/login'}
-          className={`mobile-nav-item ${isActive('/dashboard') || isActive('/orders') || isActive('/settings') || isActive('/referral') || isActive('/login') ? 'active' : ''}`}
+          href={user ? '/dashboard' : '/register'}
+          className={`mobile-nav-item ${isActive('/dashboard') || isActive('/orders') || isActive('/settings') || isActive('/referral') || isActive('/login') || isActive('/register') ? 'active' : ''}`}
         >
-          <span className="nav-icon">{user ? 'Me' : 'In'}</span>
-          <span>{user ? 'Profile' : 'Login'}</span>
+          <span className="nav-icon">{user ? 'Me' : 'Join'}</span>
+          <span>{user ? 'Profile' : 'Sign Up'}</span>
         </Link>
       </div>
     </nav>

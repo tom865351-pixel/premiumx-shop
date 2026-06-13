@@ -99,10 +99,10 @@ export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       <div className="tabs" style={{ borderBottom: '1px solid var(--border)', paddingBottom: 14 }}>
-        <button className={`tab ${activeTab === 'auto' ? 'active' : ''}`} onClick={() => setActiveTab('auto')}>
+        <button type="button" className={`tab ${activeTab === 'auto' ? 'active' : ''}`} onClick={() => setActiveTab('auto')}>
           Auto Payment
         </button>
-        <button className={`tab ${activeTab === 'manual' ? 'active' : ''}`} onClick={() => setActiveTab('manual')}>
+        <button type="button" className={`tab ${activeTab === 'manual' ? 'active' : ''}`} onClick={() => setActiveTab('manual')}>
           Manual TrxID
         </button>
       </div>
@@ -147,7 +147,7 @@ export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16, lineHeight: 1.6 }}>
             Pay automatically with ZiniPay. Successful payments are added to your wallet after gateway confirmation.
           </p>
-          <button onClick={handleZiniPay} className="btn btn-blue w-full btn-lg" disabled={ziniLoading}>
+          <button type="button" onClick={handleZiniPay} className="btn btn-blue w-full btn-lg" disabled={ziniLoading}>
             {ziniLoading ? <><Spinner size={18} /> Connecting...</> : 'Pay with ZiniPay'}
           </button>
         </div>

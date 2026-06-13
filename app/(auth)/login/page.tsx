@@ -12,7 +12,7 @@ export default function Login() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
+
     const formData = new FormData(e.currentTarget)
     const email = formData.get('email')
     const password = formData.get('password')
@@ -23,10 +23,10 @@ export default function Login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
-      
+
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Login failed')
-      
+
       router.push('/dashboard')
       router.refresh()
     } catch (err: any) {
@@ -60,16 +60,16 @@ export default function Login() {
               <label className="form-label">Password</label>
               <Link href="/forgot-password" style={{ fontSize: 12, color: 'var(--gold)' }}>Forgot?</Link>
             </div>
-            <input type="password" name="password" required placeholder="••••••••" />
+            <input type="password" name="password" required placeholder="Enter password" />
           </div>
-          
+
           <button type="submit" className="btn btn-gold w-full" disabled={loading} style={{ marginTop: 8 }}>
             {loading ? <div className="spinner" /> : 'Sign In'}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--text-secondary)' }}>
-          Don't have an account? <Link href="/register" className="text-gold">Sign up</Link>
+          Don&apos;t have an account? <Link href="/register" className="text-gold">Sign up</Link>
         </div>
       </div>
     </div>

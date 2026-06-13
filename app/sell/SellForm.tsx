@@ -110,6 +110,7 @@ export default function SellForm({ categories }: { categories: Category[] }) {
           <div className="sell-category-grid">
             {categories.map((cat) => (
               <button
+                type="button"
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat)}
                 className="sell-category-btn"
@@ -152,7 +153,7 @@ export default function SellForm({ categories }: { categories: Category[] }) {
       ) : (
         <div className="card card-glass" style={{ maxWidth: 520, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
-            <button onClick={() => setSelectedCategory(null)} className="btn btn-sm btn-outline" style={{ padding: '4px 8px' }}>Back</button>
+            <button type="button" onClick={() => setSelectedCategory(null)} className="btn btn-sm btn-outline" style={{ padding: '4px 8px' }}>Back</button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
               <span
                 style={{
@@ -174,8 +175,8 @@ export default function SellForm({ categories }: { categories: Category[] }) {
           </div>
 
           <div className="tabs" style={{ marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
-            <button className={`tab ${activeTab === 'single' ? 'active' : ''}`} onClick={() => setActiveTab('single')}>Single Upload</button>
-            <button className={`tab ${activeTab === 'bulk' ? 'active' : ''}`} onClick={() => setActiveTab('bulk')}>Bulk Excel Upload</button>
+            <button type="button" className={`tab ${activeTab === 'single' ? 'active' : ''}`} onClick={() => setActiveTab('single')}>Single Upload</button>
+            <button type="button" className={`tab ${activeTab === 'bulk' ? 'active' : ''}`} onClick={() => setActiveTab('bulk')}>Bulk Excel Upload</button>
           </div>
 
           {message && (
