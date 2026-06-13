@@ -20,19 +20,11 @@ export default async function Home() {
   const authUser = await getAuthUser()
   const user = authUser ? await prisma.user.findUnique({ where: { id: authUser.userId } }).catch(() => null) : null
 
-  const [categories, pendingCount, paidCount, sellerCount] = await Promise.all([
+  const [categories, pendingCount, paidCount] = await Promise.all([
     prisma.category.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' } }).catch(() => []),
     prisma.account.count({ where: { status: 'pending' } }).catch(() => 0),
     prisma.account.count({ where: { status: { in: ['approved', 'sold'] } } }).catch(() => 0),
-    prisma.user.count({ where: { listings: { some: {} } } }).catch(() => 0),
   ])
-
-  const tickerItems = [
-    `${pendingCount} accounts waiting for admin review`,
-    `${paidCount} accounts bought from sellers`,
-    `${sellerCount} sellers submitted stock`,
-    'Upload one account or bulk Excel sheet',
-  ]
 
   return (
     <main className={styles.main}>
@@ -118,14 +110,37 @@ export default async function Home() {
         </div>
       </section>
 
-      <div className={styles.ticker}>
-        <div className={styles.tickerLabel}>LIVE</div>
-        <div className={styles.tickerTrack}>
-          {tickerItems.join('   •   ')}
-          &nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;
-          {tickerItems.join('   •   ')}
+      <section className={styles.section}>
+        <div className="container">
+          <div className={styles.toolsPanel}>
+            <div>
+              <div className="badge badge-blue">Seller control center</div>
+              <h2 className={styles.toolsTitle}>Everything sellers need, without noisy popups</h2>
+              <p className={styles.toolsText}>
+                Submit stock, join live sessions, track review status, and request payout from one clean flow.
+              </p>
+            </div>
+            <div className={styles.toolsGrid}>
+              <Link href="/sell" className={styles.toolItem}>
+                <span>Submit stock</span>
+                <strong>Single or Excel upload</strong>
+              </Link>
+              <Link href="/wallet" className={styles.toolItem}>
+                <span>Wallet</span>
+                <strong>Balance, hold, payout</strong>
+              </Link>
+              <Link href="/live" className={styles.toolItem}>
+                <span>Live sessions</span>
+                <strong>Class and support links</strong>
+              </Link>
+              <Link href="/support/new" className={styles.toolItem}>
+                <span>Support</span>
+                <strong>Open ticket anytime</strong>
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </main>
   )
 }

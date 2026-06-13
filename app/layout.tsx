@@ -3,9 +3,7 @@ import './globals.css'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import GlobalBanner from '@/components/layout/GlobalBanner'
-import NoticeBoard from '@/components/layout/NoticeBoard'
 import MobileBottomNav from '@/components/layout/MobileBottomNav'
-import LiveToast from '@/components/layout/LiveToast'
 import FloatingSupport from '@/components/layout/FloatingSupport'
 
 export const dynamic = 'force-dynamic'
@@ -62,9 +60,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={themeClass}>
         <GlobalBanner />
-        <NoticeBoard />
         {children}
-        <LiveToast />
         <FloatingSupport />
         <MobileBottomNav user={authUserData} />
       </body>

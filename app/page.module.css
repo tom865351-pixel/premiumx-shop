@@ -156,52 +156,67 @@
   color: var(--text);
 }
 
-/* Live Ticker - Fixed Bottom */
-.ticker {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(10, 15, 30, 0.95);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(13, 110, 253, 0.25);
-  padding: 7px 0;
-  overflow: hidden;
-  white-space: nowrap;
-  z-index: 50;
-  display: flex;
+.toolsPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 28px;
   align-items: center;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.12), rgba(212, 175, 55, 0.08));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 28px;
 }
 
-.tickerLabel {
-  flex-shrink: 0;
-  background: #EF4444;
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 1px;
-  margin: 0 16px;
-  animation: pulse 1.5s infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+.toolsTitle {
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 14px 0 10px;
 }
 
-.tickerTrack {
-  display: inline-block;
-  animation: scroll 40s linear infinite;
-  font-size: 12px;
+.toolsText {
   color: var(--text-secondary);
-  font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.3px;
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 520px;
 }
 
-@keyframes scroll {
-  from { transform: translateX(100vw); }
-  to { transform: translateX(-100%); }
+.toolsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.toolItem {
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(3, 7, 18, 0.46);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.toolItem:hover {
+  border-color: var(--gold);
+  background: rgba(13, 110, 253, 0.1);
+  transform: translateY(-2px);
+}
+
+.toolItem span {
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toolItem strong {
+  font-size: 15px;
+  line-height: 1.35;
 }
 
 /* Particles */
@@ -220,6 +235,7 @@
   .stats { flex-direction: column; gap: 20px; align-items: center; }
   .actions { flex-direction: column; width: 100%; padding: 0 20px; }
   .categories { grid-template-columns: repeat(2, 1fr); }
-  .tickerLabel { display: none; }
+  .toolsPanel { grid-template-columns: 1fr; padding: 20px; }
+  .toolsTitle { font-size: 22px; }
+  .toolsGrid { grid-template-columns: 1fr; }
 }
-
