@@ -87,13 +87,13 @@ export default async function AdminActivityPage() {
       <div className="card" style={{ padding: 18 }}>
         <div style={{ display: 'grid', gap: 12 }}>
           {events.map((event, index) => (
-            <div key={`${event.type}-${index}`} style={{ display: 'grid', gridTemplateColumns: '110px minmax(0, 1fr) 170px', gap: 12, alignItems: 'center', padding: 12, border: '1px solid var(--border)', borderRadius: 8 }}>
+            <div key={`${event.type}-${index}`} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, alignItems: 'center', padding: 12, border: '1px solid var(--border)', borderRadius: 8 }}>
               <span className={`badge badge-${event.tone}`}>{event.type}</span>
               <span style={{ minWidth: 0 }}>
                 <strong style={{ display: 'block' }}>{event.title}</strong>
                 <span style={{ display: 'block', color: 'var(--text-muted)', fontSize: 12, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.detail}</span>
               </span>
-              <span style={{ color: 'var(--text-muted)', fontSize: 12, textAlign: 'right' }}>{when(event.time)}</span>
+              <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{when(event.time)}</span>
             </div>
           ))}
         </div>

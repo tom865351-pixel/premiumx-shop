@@ -333,10 +333,12 @@ img {
   overflow-x: auto;
   border-radius: var(--radius);
   border: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
 }
 .table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 720px;
 }
 .table th {
   background: var(--surface);
@@ -440,6 +442,45 @@ img {
 @media (max-width: 768px) {
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .container { padding: 0 16px; }
+  .page-header {
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+  .page-header > * {
+    min-width: 0;
+  }
+  .page-title {
+    font-size: 26px !important;
+    line-height: 1.15 !important;
+  }
+  .page-subtitle {
+    font-size: 13px !important;
+  }
+  .card,
+  .card-glass {
+    border-radius: 8px;
+  }
+  .btn {
+    min-height: 42px;
+    white-space: normal;
+    text-align: center;
+  }
+  .btn-sm {
+    min-height: 36px;
+  }
+  .table-container {
+    margin-left: -4px;
+    margin-right: -4px;
+    max-width: calc(100vw - 16px);
+  }
+  .table {
+    min-width: 680px;
+  }
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
 }
 
 /* Divider */
@@ -471,6 +512,42 @@ img {
   max-height: 90vh;
   overflow-y: auto;
   animation: fadeIn 0.2s ease;
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 13px;
+  }
+  .container {
+    width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  input,
+  textarea,
+  select {
+    min-height: 42px;
+    font-size: 16px;
+  }
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 10px;
+  }
+  .modal {
+    max-width: none;
+    width: 100%;
+    max-height: 92dvh;
+    padding: 18px;
+    border-radius: 12px;
+  }
+  .modal-header {
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .badge {
+    max-width: 100%;
+    white-space: normal;
+  }
 }
 .modal-header {
   display: flex;
