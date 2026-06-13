@@ -8,6 +8,17 @@ export default function AddCategoryModal() {
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ name: '', icon: 'PX', color: '#9333EA', description: '', defaultPrice: '0' })
 
+  const handleLogoFile = (file?: File) => {
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file.')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setForm((current) => ({ ...current, icon: String(reader.result || current.icon) }))
+    reader.readAsDataURL(file)
+  }
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -40,6 +51,7 @@ export default function AddCategoryModal() {
                 <div className="form-group">
                   <label className="form-label">Icon / Short Label</label>
                   <input className="input" value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} placeholder="IG" />
+                  <input className="input" type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.svg" onChange={e => handleLogoFile(e.target.files?.[0])} style={{ marginTop: 8 }} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Default Price (BDT)</label>
@@ -50,6 +62,12 @@ export default function AddCategoryModal() {
                 <label className="form-label">Description (optional)</label>
                 <input className="input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Short description..." />
               </div>
+              {form.icon.startsWith('data:image') && (
+                <div className="form-group">
+                  <label className="form-label">Logo Preview</label>
+                  <img src={form.icon} alt="Category logo preview" style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', border: '1px solid var(--border)' }} />
+                </div>
+              )}
               <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
                 <button className="btn btn-gold" type="submit" disabled={loading} style={{ flex: 1 }}>
                   {loading ? 'Creating...' : 'Create Category'}

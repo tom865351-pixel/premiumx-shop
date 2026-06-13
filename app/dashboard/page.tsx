@@ -6,9 +6,32 @@ import { getAuthUser } from '@/lib/auth'
 import styles from './Dashboard.module.css'
 
 function statusClass(status: string) {
-  if (status === 'approved' || status === 'sold') return 'success'
+  if (status === 'approved' || status === 'sold' || status === 'bought') return 'success'
   if (status === 'rejected') return 'danger'
   return 'warning'
+}
+
+function submissionGroups(listings: any[]) {
+  const map = new Map<string, { category: string; status: string; count: number; total: number; latest: Date }>()
+  for (const listing of listings) {
+    const status = listing.status === 'approved' ? 'Bought' : listing.status
+    const key = `${listing.category.name}-${status}`
+    const current = map.get(key)
+    if (current) {
+      current.count += 1
+      current.total += listing.price
+      if (listing.createdAt > current.latest) current.latest = listing.createdAt
+    } else {
+      map.set(key, {
+        category: listing.category.name,
+        status,
+        count: 1,
+        total: listing.price,
+        latest: listing.createdAt,
+      })
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => b.latest.getTime() - a.latest.getTime())
 }
 
 export default async function Dashboard() {
@@ -19,7 +42,6 @@ export default async function Dashboard() {
     where: { id: user.userId },
     include: {
       listings: {
-        take: 8,
         orderBy: { createdAt: 'desc' },
         include: { category: true },
       },
@@ -38,6 +60,7 @@ export default async function Dashboard() {
   const paidVolume = dbUser.listings
     .filter((listing) => listing.status === 'approved' || listing.status === 'sold')
     .reduce((sum, listing) => sum + listing.price, 0)
+  const groups = submissionGroups(dbUser.listings).slice(0, 8)
 
   return (
     <div className={styles.shell}>
@@ -138,31 +161,31 @@ export default async function Dashboard() {
           </div>
         ) : (
           <section className={styles.orders}>
-            {dbUser.listings.map((listing) => (
-              <article key={listing.id} className={styles.orderCard}>
+            {groups.map((group) => (
+              <article key={`${group.category}-${group.status}`} className={styles.orderCard}>
                 <div className={styles.orderTop}>
                   <div>
-                    <div className={styles.orderTitle}>{listing.title}</div>
+                    <div className={styles.orderTitle}>{group.category}</div>
                     <div className={styles.orderMeta}>
-                      {listing.category.name} - {new Date(listing.createdAt).toLocaleDateString()}
+                      Latest submitted: {group.latest.toLocaleDateString()}
                     </div>
                   </div>
-                  <span className={`badge badge-${statusClass(listing.status)}`}>
-                    {listing.status === 'approved' ? 'Bought' : listing.status}
+                  <span className={`badge badge-${statusClass(group.status.toLowerCase())}`}>
+                    {group.status}
                   </span>
                 </div>
                 <div className={styles.orderGrid}>
                   <div className={styles.miniBox}>
-                    <div className={styles.miniLabel}>Username</div>
-                    <div className={styles.miniValue}>{listing.username}</div>
+                    <div className={styles.miniLabel}>Submitted Pieces</div>
+                    <div className={styles.miniValue}>{group.count} pcs</div>
                   </div>
                   <div className={styles.miniBox}>
-                    <div className={styles.miniLabel}>Rate</div>
-                    <div className={styles.miniValue}>BDT {listing.price.toLocaleString()}</div>
+                    <div className={styles.miniLabel}>Total Rate</div>
+                    <div className={styles.miniValue}>BDT {group.total.toLocaleString()}</div>
                   </div>
                   <div className={styles.miniBox}>
                     <div className={styles.miniLabel}>Admin Status</div>
-                    <div className={styles.miniValue}>{listing.status === 'pending' ? 'Waiting review' : listing.status}</div>
+                    <div className={styles.miniValue}>{group.status === 'pending' ? 'Waiting review' : group.status}</div>
                   </div>
                 </div>
               </article>

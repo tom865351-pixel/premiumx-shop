@@ -15,6 +15,17 @@ export default function EditCategoryModal({ category }: { category: any }) {
     defaultPrice: category.defaultPrice.toString()
   })
 
+  const handleLogoFile = (file?: File) => {
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file.')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setForm((current) => ({ ...current, icon: String(reader.result || current.icon) }))
+    reader.readAsDataURL(file)
+  }
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -49,6 +60,7 @@ export default function EditCategoryModal({ category }: { category: any }) {
                 <div className="form-group">
                   <label className="form-label">Icon / Short Label</label>
                   <input className="input" value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} />
+                  <input className="input" type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.svg" onChange={e => handleLogoFile(e.target.files?.[0])} style={{ marginTop: 8 }} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Default Price (BDT)</label>
@@ -59,6 +71,12 @@ export default function EditCategoryModal({ category }: { category: any }) {
                 <label className="form-label">Description (optional)</label>
                 <input className="input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
               </div>
+              {(form.icon?.startsWith('data:image') || form.icon?.startsWith('http') || form.icon?.startsWith('/')) && (
+                <div className="form-group">
+                  <label className="form-label">Logo Preview</label>
+                  <img src={form.icon} alt="Category logo preview" style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', border: '1px solid var(--border)' }} />
+                </div>
+              )}
               <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
                 <button className="btn btn-gold" type="submit" disabled={loading} style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center' }}>
                   {loading ? <><Spinner size={18} /> Saving...</> : 'Save Changes'}

@@ -5,6 +5,19 @@ import AddCategoryModal from './AddCategoryModal'
 import CategoryActions from './CategoryActions'
 import EditCategoryModal from './EditCategoryModal'
 
+function CategoryMark({ icon, name }: { icon?: string | null; name: string }) {
+  if (icon?.startsWith('data:image') || icon?.startsWith('http') || icon?.startsWith('/')) {
+    return (
+      <img
+        src={icon}
+        alt={`${name} logo`}
+        style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border)' }}
+      />
+    )
+  }
+  return <span style={{ fontSize: 18, fontWeight: 900 }}>{icon || name.slice(0, 2).toUpperCase()}</span>
+}
+
 export default async function AdminCategories() {
   const user = await getAuthUser()
   if (!user || user.role !== 'admin') redirect('/login')
@@ -42,7 +55,7 @@ export default async function AdminCategories() {
             ) : (
               categories.map(cat => (
                 <tr key={cat.id}>
-                  <td style={{ fontSize: 18, fontWeight: 900 }}>{cat.icon || cat.name.slice(0, 2).toUpperCase()}</td>
+                  <td><CategoryMark icon={cat.icon} name={cat.name} /></td>
                   <td>
                     <div style={{ fontWeight: 800 }}>{cat.name}</div>
                     <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>{cat.description || 'No description'}</div>

@@ -10,10 +10,10 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData()
   const name = formData.get('name') as string
-  const icon = formData.get('icon') as string || '🌐'
-  const color = formData.get('color') as string || '#9333EA'
-  const description = formData.get('description') as string || ''
-  const defaultPrice = parseFloat(formData.get('defaultPrice') as string || '0')
+  const icon = (formData.get('icon') as string) || 'PX'
+  const color = (formData.get('color') as string) || '#9333EA'
+  const description = (formData.get('description') as string) || ''
+  const defaultPrice = parseFloat((formData.get('defaultPrice') as string) || '0')
 
   if (!name) {
     return NextResponse.json({ error: 'Name is required' }, { status: 400 })

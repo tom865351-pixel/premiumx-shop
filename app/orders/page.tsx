@@ -6,7 +6,7 @@ import { getAuthUser } from '@/lib/auth'
 import styles from '@/app/dashboard/Dashboard.module.css'
 
 function statusClass(status: string) {
-  if (status === 'approved' || status === 'sold') return 'success'
+  if (status === 'approved' || status === 'sold' || status === 'bought') return 'success'
   if (status === 'rejected') return 'danger'
   return 'warning'
 }
@@ -18,6 +18,31 @@ function reviewTimer(createdAt: Date) {
   if (diff <= 0) return 'Review due now'
   const hours = Math.ceil(diff / (1000 * 60 * 60))
   return `${hours}h review target left`
+}
+
+function submissionGroups(listings: any[]) {
+  const map = new Map<string, { category: string; status: string; count: number; total: number; latest: Date; oldestPending?: Date }>()
+  for (const listing of listings) {
+    const status = listing.status === 'approved' ? 'Bought' : listing.status
+    const key = `${listing.category.name}-${status}`
+    const current = map.get(key)
+    if (current) {
+      current.count += 1
+      current.total += listing.price
+      if (listing.createdAt > current.latest) current.latest = listing.createdAt
+      if (listing.status === 'pending' && (!current.oldestPending || listing.createdAt < current.oldestPending)) current.oldestPending = listing.createdAt
+    } else {
+      map.set(key, {
+        category: listing.category.name,
+        status,
+        count: 1,
+        total: listing.price,
+        latest: listing.createdAt,
+        oldestPending: listing.status === 'pending' ? listing.createdAt : undefined,
+      })
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => b.latest.getTime() - a.latest.getTime())
 }
 
 export default async function OrdersPage() {
@@ -46,6 +71,7 @@ export default async function OrdersPage() {
   const earnedValue = user.listings
     .filter((listing) => listing.status === 'approved' || listing.status === 'sold')
     .reduce((sum, listing) => sum + listing.price, 0)
+  const groups = submissionGroups(user.listings)
 
   return (
     <div className={styles.shell}>
@@ -127,35 +153,35 @@ export default async function OrdersPage() {
           </div>
         ) : (
           <section className={styles.orders}>
-            {user.listings.map((listing) => (
-              <article key={listing.id} className={styles.orderCard}>
+            {groups.map((group) => (
+              <article key={`${group.category}-${group.status}`} className={styles.orderCard}>
                 <div className={styles.orderTop}>
                   <div>
-                    <div className={styles.orderTitle}>{listing.title}</div>
+                    <div className={styles.orderTitle}>{group.category}</div>
                     <div className={styles.orderMeta}>
-                      {listing.category.name} - {new Date(listing.createdAt).toLocaleDateString()}
+                      Latest submitted: {group.latest.toLocaleDateString()}
                     </div>
                   </div>
-                  <span className={`badge badge-${statusClass(listing.status)}`}>
-                    {listing.status === 'approved' ? 'Bought' : listing.status}
+                  <span className={`badge badge-${statusClass(group.status.toLowerCase())}`}>
+                    {group.status}
                   </span>
                 </div>
                 <div className={styles.orderGrid}>
                   <div className={styles.miniBox}>
-                    <div className={styles.miniLabel}>Username / Email</div>
-                    <div className={styles.miniValue}>{listing.username}</div>
+                    <div className={styles.miniLabel}>Submitted Pieces</div>
+                    <div className={styles.miniValue}>{group.count} pcs</div>
                   </div>
                   <div className={styles.miniBox}>
-                    <div className={styles.miniLabel}>Buying Rate</div>
-                    <div className={styles.miniValue}>BDT {listing.price.toLocaleString()}</div>
+                    <div className={styles.miniLabel}>Total Buying Rate</div>
+                    <div className={styles.miniValue}>BDT {group.total.toLocaleString()}</div>
                   </div>
                   <div className={styles.miniBox}>
                     <div className={styles.miniLabel}>Admin Status</div>
-                    <div className={styles.miniValue}>{listing.status === 'pending' ? 'Waiting review' : listing.status}</div>
+                    <div className={styles.miniValue}>{group.status === 'pending' ? 'Waiting review' : group.status}</div>
                   </div>
                   <div className={styles.miniBox}>
                     <div className={styles.miniLabel}>Review Timer</div>
-                    <div className={styles.miniValue}>{listing.status === 'pending' ? reviewTimer(listing.createdAt) : 'Processed'}</div>
+                    <div className={styles.miniValue}>{group.status === 'pending' && group.oldestPending ? reviewTimer(group.oldestPending) : 'Processed'}</div>
                   </div>
                 </div>
               </article>
