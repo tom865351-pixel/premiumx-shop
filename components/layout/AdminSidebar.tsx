@@ -7,6 +7,7 @@ const navItems = [
   { href: '/admin/dashboard', icon: '📊', label: 'Dashboard' },
   { href: '/admin/users', icon: '👥', label: 'Users' },
   { href: '/admin/accounts', icon: '📦', label: 'Accounts' },
+  { href: '/admin/add-account', icon: '➕', label: 'Add Account' },
   { href: '/admin/orders', icon: '🛒', label: 'Orders' },
   { href: '/admin/deposits', icon: '💳', label: 'Deposits', urgent: true },
   { href: '/admin/reports', icon: '🚩', label: 'Reports', urgent: true },
@@ -14,6 +15,7 @@ const navItems = [
   { href: '/admin/payments', icon: '💰', label: 'Payments' },
   { href: '/admin/withdrawals', icon: '💸', label: 'Withdrawals' },
   { href: '/admin/categories', icon: '🏷️', label: 'Categories' },
+  { href: '/admin/announcements', icon: '📢', label: 'Announcements' },
   { href: '/admin/settings', icon: '⚙️', label: 'Settings' },
 ]
 

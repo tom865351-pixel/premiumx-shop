@@ -118,12 +118,12 @@ export default function Navbar({ user }: NavbarProps) {
           <Link href="/browse" className={`${styles.navLink} ${pathname === '/browse' ? styles.active : ''}`}>
             {text.browse}
           </Link>
-          {user && user.role === 'seller' && (
+          {user && (
             <Link href="/sell" className={`${styles.navLink} ${pathname === '/sell' ? styles.active : ''}`}>
-              {text.sell}
+              📤 Sell
             </Link>
           )}
-          {user && user.role === 'admin' && (
+          {user && (user.role === 'admin' || user.role === 'sub-admin') && (
             <Link href="/admin/dashboard" className={`${styles.navLink} ${styles.adminLink}`}>
               {text.admin}
             </Link>
@@ -206,12 +206,9 @@ export default function Navbar({ user }: NavbarProps) {
                     <Link href="/settings" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       ⚙️ Settings
                     </Link>
-                    {(user.role === 'seller' || user.role === 'admin') && (
-                      <Link href="/sell" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                        📤 {text.sell}
-                      </Link>
-                    )}
-                    {(user.role === 'admin' || user.role === 'sub-admin') && (
+                    <Link href="/sell" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
+                      📤 Sell Account
+                    </Link>
                       <Link href="/admin/dashboard" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                         ⚙️ {text.admin}
                       </Link>
