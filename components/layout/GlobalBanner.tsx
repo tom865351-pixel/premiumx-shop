@@ -6,28 +6,30 @@ export default async function GlobalBanner() {
   let userRole = 'buyer'
 
   if (authUser) {
-    const user = await prisma.user.findUnique({ where: { id: authUser.userId } })
+    const user = await prisma.user.findUnique({ where: { id: authUser.userId } }).catch(() => null)
     if (user) userRole = user.role
   }
 
-  // Fetch active announcements that haven't expired
   const announcements = await prisma.announcement.findMany({
     where: {
       isActive: true,
       OR: [
         { expiresAt: null },
-        { expiresAt: { gt: new Date() } }
+        { expiresAt: { gt: new Date() } },
       ],
-      // We assume `target` can be 'all', 'buyers', 'sellers'
     },
-    orderBy: { createdAt: 'desc' }
-  })
+    orderBy: { createdAt: 'desc' },
+  }).catch(() => [])
 
-  // Filter based on role
-  const visible = announcements.filter(a => {
-    if (a.target === 'all') return true
-    if (a.target === 'buyers' && userRole === 'buyer') return true
-    if (a.target === 'sellers' && (userRole === 'seller' || userRole === 'admin' || userRole === 'sub-admin' || userRole === 'stock-manager')) return true
+  const visible = announcements.filter((announcement) => {
+    if (announcement.target === 'all') return true
+    if (announcement.target === 'buyers' && userRole === 'buyer') return true
+    if (
+      announcement.target === 'sellers' &&
+      ['seller', 'admin', 'sub-admin', 'stock-manager'].includes(userRole)
+    ) {
+      return true
+    }
     return false
   })
 
@@ -35,38 +37,52 @@ export default async function GlobalBanner() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {visible.map(ann => {
-        const bg = ann.type === 'danger' ? 'var(--danger)' :
-                   ann.type === 'warning' ? 'var(--warning)' :
-                   ann.type === 'success' ? 'var(--success)' : 'var(--gold)'
-        const color = ann.type === 'warning' || ann.type === 'gold' ? '#000' : '#fff'
+      {visible.map((announcement) => {
+        const bg = announcement.type === 'danger' ? 'var(--danger)' :
+          announcement.type === 'warning' ? 'var(--warning)' :
+          announcement.type === 'success' ? 'var(--success)' : 'var(--gold)'
+        const color = announcement.type === 'warning' || announcement.type === 'gold' ? '#000' : '#fff'
 
         return (
-          <div key={ann.id} style={{
-            background: bg,
-            color,
-            padding: '10px 20px',
-            textAlign: 'center',
-            fontSize: 14,
-            fontWeight: 500,
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 12,
-            alignItems: 'center',
-            flexWrap: 'wrap'
-          }}>
-            <span style={{ fontSize: 18 }}>
-              {ann.type === 'danger' ? '🚨' : ann.type === 'warning' ? '⚠️' : ann.type === 'success' ? '✅' : '📢'}
+          <div
+            key={announcement.id}
+            style={{
+              background: bg,
+              color,
+              padding: '10px 20px',
+              textAlign: 'center',
+              fontSize: 14,
+              fontWeight: 500,
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 12,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <span style={{ fontSize: 13, fontWeight: 800 }}>
+              {announcement.type === 'success' ? 'OK' : announcement.type === 'info' ? 'i' : '!'}
             </span>
             <span>
-              <strong>{ann.title}:</strong> {ann.message}
+              <strong>{announcement.title}:</strong> {announcement.message}
             </span>
-            {ann.link && (
-              <a href={ann.link} target="_blank" rel="noreferrer" style={{
-                background: 'rgba(0,0,0,0.2)', padding: '4px 12px', borderRadius: 20, 
-                color, textDecoration: 'none', fontWeight: 700, fontSize: 12, border: '1px solid rgba(255,255,255,0.3)'
-              }}>
-                🔗 Join Link
+            {announcement.link && (
+              <a
+                href={announcement.link}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: 'rgba(0,0,0,0.2)',
+                  padding: '4px 12px',
+                  borderRadius: 20,
+                  color,
+                  textDecoration: 'none',
+                  fontWeight: 700,
+                  fontSize: 12,
+                  border: '1px solid rgba(255,255,255,0.3)',
+                }}
+              >
+                Open Link
               </a>
             )}
           </div>

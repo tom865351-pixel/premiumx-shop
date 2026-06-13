@@ -6,37 +6,35 @@ import { getAuthUser } from '@/lib/auth'
 
 export default async function Home() {
   const authUser = await getAuthUser()
-  const user = authUser ? await prisma.user.findUnique({ where: { id: authUser.userId } }) : null
+  const user = authUser ? await prisma.user.findUnique({ where: { id: authUser.userId } }).catch(() => null) : null
 
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: 'asc' },
-  })
-  
-  const recentAccounts = await prisma.account.findMany({
-    where: { status: 'approved' },
-    orderBy: { createdAt: 'desc' },
-    take: 6,
-    include: { category: true },
-  })
-
-  const reviewStats = await prisma.review.aggregate({
-    _avg: { rating: true },
-    _count: { id: true }
-  })
+  const [categories, recentAccounts, reviewStats, recentOrders] = await Promise.all([
+    prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+    }).catch(() => []),
+    prisma.account.findMany({
+      where: { status: 'approved' },
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+      include: { category: true },
+    }).catch(() => []),
+    prisma.review.aggregate({
+      _avg: { rating: true },
+      _count: { id: true },
+    }).catch(() => ({ _avg: { rating: null }, _count: { id: 0 } })),
+    prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+      include: {
+        account: { include: { category: true } },
+        buyer: { select: { username: true } },
+      },
+    }).catch(() => []),
+  ])
   
   const avgRating = reviewStats._avg.rating ? reviewStats._avg.rating.toFixed(1) : '5.0'
   const totalReviews = reviewStats._count.id
-
-  // Real recent orders for activity ticker
-  const recentOrders = await prisma.order.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 8,
-    include: {
-      account: { include: { category: true } },
-      buyer: { select: { username: true } }
-    }
-  })
 
   const tickerItems = recentOrders.length > 0
     ? recentOrders.map(o => {
@@ -249,4 +247,3 @@ export default async function Home() {
     </main>
   )
 }
-

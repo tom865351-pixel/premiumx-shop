@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server'
 import bcrypt from 'bcryptjs'
 
 const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'fallback-secret'
+  process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-only-fallback-secret')
 )
 
 export interface JWTPayload {
@@ -16,6 +16,10 @@ export interface JWTPayload {
 }
 
 export async function signToken(payload: Omit<JWTPayload, 'iat' | 'exp'>) {
+  if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET is required in production')
+  }
+
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
