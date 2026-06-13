@@ -21,7 +21,7 @@ interface NavbarProps {
 const t: Record<string, Record<string, string>> = {
   en: {
     browse: 'Rates',
-    sell: 'Sell Account',
+    sell: 'Sell',
     wallet: 'Wallet',
     orders: 'Submissions',
     admin: 'Admin Panel',
@@ -29,19 +29,17 @@ const t: Record<string, Record<string, string>> = {
     register: 'Sign Up',
     logout: 'Logout',
     dashboard: 'Dashboard',
-    balance: 'Balance',
   },
   bn: {
-    browse: 'রেট',
-    sell: 'অ্যাকাউন্ট বিক্রি',
-    wallet: 'ওয়ালেট',
-    orders: 'জমা',
-    admin: 'অ্যাডমিন',
-    login: 'লগইন',
-    register: 'রেজিস্টার',
-    logout: 'লগআউট',
-    dashboard: 'ড্যাশবোর্ড',
-    balance: 'ব্যালেন্স',
+    browse: 'Rates',
+    sell: 'Sell',
+    wallet: 'Wallet',
+    orders: 'Submissions',
+    admin: 'Admin Panel',
+    login: 'Login',
+    register: 'Sign Up',
+    logout: 'Logout',
+    dashboard: 'Dashboard',
   },
 }
 
@@ -54,14 +52,13 @@ export default function Navbar({ user }: NavbarProps) {
   const [currency, setCurrency] = useState(user?.preferredCurrency || 'BDT')
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-
   const text = t[lang] || t.en
 
   const formatBalance = (amount?: number) => {
     const val = amount || 0
     if (currency === 'USD') return `$${(val / 110).toFixed(2)}`
-    if (currency === 'USDT') return `₮${(val / 110).toFixed(2)}`
-    return `৳${val.toLocaleString()}`
+    if (currency === 'USDT') return `USDT ${(val / 110).toFixed(2)}`
+    return `BDT ${val.toLocaleString()}`
   }
 
   const handleLogout = async () => {
@@ -106,21 +103,19 @@ export default function Navbar({ user }: NavbarProps) {
   return (
     <nav className={styles.navbar}>
       <div className={styles.inner}>
-        {/* Logo */}
         <Link href="/" className={styles.logo}>
           <span className={styles.logoText}>Premium</span>
           <span className={styles.logoX}>X</span>
           <span className={styles.logoShop}>Shop</span>
         </Link>
 
-        {/* Desktop Nav */}
         <div className={styles.navLinks}>
           <Link href="/browse" className={`${styles.navLink} ${pathname === '/browse' ? styles.active : ''}`}>
             {text.browse}
           </Link>
           {user && (
             <Link href="/sell" className={`${styles.navLink} ${pathname === '/sell' ? styles.active : ''}`}>
-              Sell
+              {text.sell}
             </Link>
           )}
           {user && (user.role === 'admin' || user.role === 'sub-admin') && (
@@ -130,34 +125,29 @@ export default function Navbar({ user }: NavbarProps) {
           )}
         </div>
 
-        {/* Right Controls */}
         <div className={styles.controls}>
-          {/* Language Toggle */}
           <button
             className={styles.langBtn}
             onClick={() => handleLangChange(lang === 'en' ? 'bn' : 'en')}
-            title={lang === 'en' ? 'Switch to বাংলা' : 'Switch to English'}
+            title={lang === 'en' ? 'Switch to Bangla' : 'Switch to English'}
           >
-            {lang === 'en' ? '🇬🇧 EN' : '🇧🇩 বা'}
+            {lang === 'en' ? 'EN' : 'BN'}
           </button>
 
-          {/* Currency Selector */}
           <select
             className={styles.currencySelect}
             value={currency}
-            onChange={e => handleCurrencyChange(e.target.value)}
+            onChange={(e) => handleCurrencyChange(e.target.value)}
           >
-            {currencies.map(c => (
+            {currencies.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
 
           {user ? (
             <>
-              {/* Balance */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Link href="/wallet" className={styles.balanceBadge}>
-                  <span className={styles.balanceIcon}>💰</span>
                   <span>{formatBalance(user.balance)}</span>
                 </Link>
                 <Link href="/wallet" className={`btn btn-blue btn-sm ${styles.addMoneyBtn}`} style={{ padding: '6px 12px', fontSize: 13, borderRadius: 20 }}>
@@ -165,12 +155,10 @@ export default function Navbar({ user }: NavbarProps) {
                 </Link>
               </div>
 
-              {/* Notifications */}
               <Link href="/notifications" className={styles.iconBtn}>
-                🔔
+                !
               </Link>
 
-              {/* User Menu */}
               <div className={styles.userMenu}>
                 <button
                   className={styles.avatar}
@@ -186,37 +174,34 @@ export default function Navbar({ user }: NavbarProps) {
                     </div>
                     <div className={styles.dropdownDivider} />
                     <Link href="/dashboard" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                      📊 {text.dashboard}
+                      {text.dashboard}
                     </Link>
                     <Link href="/wallet" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                      💰 {text.wallet}
-                    </Link>
-                    <Link href="/wallet" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)} style={{ color: 'var(--gold)', fontWeight: 600 }}>
-                      Add Money
+                      {text.wallet}
                     </Link>
                     <Link href="/orders" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       {text.orders}
                     </Link>
                     <Link href="/referral" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                      🏆 Referral Program
+                      Referral Program
                     </Link>
                     <Link href="/support" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                      🎫 Support Tickets
+                      Support Tickets
                     </Link>
                     <Link href="/settings" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                      ⚙️ Settings
+                      Settings
                     </Link>
                     <Link href="/sell" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       Sell Account
                     </Link>
                     {user && (user.role === 'admin' || user.role === 'sub-admin') && (
                       <Link href="/admin/dashboard" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                        ⚙️ {text.admin}
+                        {text.admin}
                       </Link>
                     )}
                     <div className={styles.dropdownDivider} />
                     <button className={`${styles.dropdownItem} ${styles.logoutBtn}`} onClick={handleLogout}>
-                      🚪 {text.logout}
+                      {text.logout}
                     </button>
                   </div>
                 )}
@@ -229,14 +214,12 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
           )}
 
-          {/* Mobile Menu */}
           <button className={styles.mobileMenu} onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? '✕' : '☰'}
+            {menuOpen ? 'X' : 'Menu'}
           </button>
         </div>
       </div>
 
-      {/* Mobile Nav */}
       {menuOpen && (
         <div className={styles.mobileNav}>
           <Link href="/browse" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>

@@ -4,9 +4,10 @@ import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import WithdrawModal from './WithdrawModal'
 import DepositForm from '@/app/deposit/DepositForm'
+import styles from './Wallet.module.css'
 
 function txLabel(type: string) {
-  if (type === 'topup') return 'Topup'
+  if (type === 'topup') return 'Add Money'
   if (type === 'purchase') return 'Purchase'
   if (type === 'sale') return 'Sale'
   if (type === 'refund') return 'Refund'
@@ -27,6 +28,12 @@ function statusBadge(status: string) {
   if (status === 'rejected' || status === 'cancelled') return 'danger'
   return 'warning'
 }
+
+const paymentMethods = [
+  { name: 'bKash', number: '01812-345678' },
+  { name: 'Nagad', number: '01712-345678' },
+  { name: 'Rocket', number: '01612-345678' },
+]
 
 export default async function WalletPage() {
   const authUser = await getAuthUser()
@@ -51,88 +58,95 @@ export default async function WalletPage() {
   const pendingTopups = user.topupRequests.filter((topup) => topup.status === 'pending').length
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className={styles.shell}>
       <Navbar user={user as any} />
 
-      <main className="container" style={{ padding: '32px 20px 108px', flex: 1, maxWidth: 1100 }}>
-        <div className="page-header">
+      <main className={`container ${styles.main}`}>
+        <section className={styles.hero}>
           <div>
-            <h1 className="page-title">Seller Wallet</h1>
-            <p className="page-subtitle">Add money, withdraw seller earnings, and track every wallet movement in one place.</p>
+            <div className={styles.eyebrow}>One wallet</div>
+            <h1 className={styles.title}>Wallet</h1>
+            <p className={styles.subtitle}>Add money, withdraw seller earnings, and track every request without jumping between two pages.</p>
           </div>
-        </div>
-
-        <div className="grid-3" style={{ marginBottom: 24, gap: 16 }}>
-          <div className="card card-glass" style={{ padding: 24 }}>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>Available Balance</div>
-            <div style={{ fontSize: 38, fontWeight: 800, color: 'var(--gold)', fontFamily: 'Space Grotesk', marginBottom: 14 }}>
-              BDT {user.balance.toLocaleString()}
-            </div>
-            <WithdrawModal balance={user.balance} />
+          <div className={styles.heroActions}>
+            <a href="#add-money" className="btn btn-gold">Add Money</a>
+            <a href="#withdrawals" className="btn btn-outline">History</a>
           </div>
+        </section>
 
-          <div className="card" style={{ padding: 20 }}>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>Pending Withdrawal Hold</div>
-            <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--warning)' }}>BDT {pendingHold.toLocaleString()}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>
-              {pendingWithdrawals.length} pending payout request{pendingWithdrawals.length === 1 ? '' : 's'}
+        <section className={styles.summaryGrid}>
+          <div className={styles.balanceCard}>
+            <div className={styles.label}>Available Balance</div>
+            <div className={styles.balance}>BDT {user.balance.toLocaleString()}</div>
+            <div className={styles.metricHint}>This is the money you can use or withdraw now.</div>
+            <div className={styles.balanceActions}>
+              <WithdrawModal balance={user.balance} />
             </div>
           </div>
 
-          <div className="card" style={{ padding: 20 }}>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>Paid Out</div>
-            <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--success)' }}>BDT {totalWithdrawn.toLocaleString()}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>
-              Total seller sales: BDT {totalSales.toLocaleString()}
+          <div className={styles.metricCard}>
+            <div className={styles.label}>Pending Hold</div>
+            <div className={styles.metricValue} style={{ color: 'var(--warning)' }}>BDT {pendingHold.toLocaleString()}</div>
+            <div className={styles.metricHint}>{pendingWithdrawals.length} withdrawal request{pendingWithdrawals.length === 1 ? '' : 's'} waiting</div>
+          </div>
+
+          <div className={styles.metricCard}>
+            <div className={styles.label}>Paid Out</div>
+            <div className={styles.metricValue} style={{ color: 'var(--success)' }}>BDT {totalWithdrawn.toLocaleString()}</div>
+            <div className={styles.metricHint}>Total completed withdrawals</div>
+          </div>
+
+          <div className={styles.metricCard}>
+            <div className={styles.label}>Added Money</div>
+            <div className={styles.metricValue} style={{ color: 'var(--info)' }}>BDT {totalTopup.toLocaleString()}</div>
+            <div className={styles.metricHint}>{pendingTopups} pending add money request{pendingTopups === 1 ? '' : 's'}</div>
+          </div>
+        </section>
+
+        <section id="add-money" className={styles.quickGrid}>
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <div>
+                <h2 className={styles.panelTitle}>Add Money</h2>
+                <div className={styles.panelSub}>Send money first, then submit the TrxID here.</div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="grid-2" style={{ gap: 16, marginBottom: 24 }}>
-          <div className="card" style={{ padding: 20 }}>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>Total Topped Up</div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--success)' }}>BDT {totalTopup.toLocaleString()}</div>
-            {pendingTopups > 0 && (
-              <div style={{ fontSize: 12, color: 'var(--warning)', marginTop: 8 }}>{pendingTopups} pending topup request{pendingTopups > 1 ? 's' : ''}</div>
-            )}
-          </div>
-
-          <div className="card" style={{ padding: 20 }}>
-            <h3 style={{ fontSize: 15, marginBottom: 8 }}>Payout Rules</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-              Minimum withdrawal is BDT 100. Requested amount is reserved instantly. Admin pays manually and adds a reference when approving.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid-2" style={{ gap: 18, marginBottom: 28, alignItems: 'start' }}>
-          <div>
-            <h2 style={{ fontSize: 18, marginBottom: 14 }}>Add Money</h2>
+            <div className={styles.methodGrid}>
+              {paymentMethods.map((method) => (
+                <div key={method.name} className={styles.methodCard}>
+                  <div className={styles.methodName}>{method.name}</div>
+                  <div className={styles.methodNumber}>{method.number}</div>
+                </div>
+              ))}
+            </div>
             <DepositForm />
           </div>
 
-          <div>
-            <h2 style={{ fontSize: 18, marginBottom: 14 }}>Recent Add Money Requests</h2>
-            <div className="table-container card">
-              <table className="table">
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <div>
+                <h2 className={styles.panelTitle}>Recent Add Money</h2>
+                <div className={styles.panelSub}>Manual and gateway requests appear together.</div>
+              </div>
+            </div>
+            <div className={`${styles.tableCard} ${styles.desktopTable}`}>
+              <table className={`table ${styles.table}`}>
                 <thead>
                   <tr>
                     <th>Amount</th>
                     <th>Method</th>
-                    <th>TrxID</th>
                     <th>Status</th>
                     <th>Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {user.topupRequests.length === 0 ? (
-                    <tr><td colSpan={5} className="text-center" style={{ padding: 32, color: 'var(--text-muted)' }}>No add money requests yet</td></tr>
+                    <tr><td colSpan={4} className="text-center" style={{ padding: 28, color: 'var(--text-muted)' }}>No add money requests yet</td></tr>
                   ) : (
                     user.topupRequests.map((topup) => (
                       <tr key={topup.id}>
                         <td className="font-mono text-gold" style={{ fontWeight: 800 }}>BDT {topup.amount.toLocaleString()}</td>
                         <td style={{ textTransform: 'uppercase' }}>{topup.method}</td>
-                        <td className="font-mono" style={{ fontSize: 12 }}>{topup.transactionId || '-'}</td>
                         <td><span className={`badge badge-${statusBadge(topup.status)}`}>{topup.status}</span></td>
                         <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(topup.createdAt).toLocaleDateString()}</td>
                       </tr>
@@ -141,12 +155,35 @@ export default async function WalletPage() {
                 </tbody>
               </table>
             </div>
+            <div className={styles.mobileList}>
+              {user.topupRequests.length === 0 ? (
+                <div className={styles.empty}>No add money requests yet</div>
+              ) : (
+                user.topupRequests.map((topup) => (
+                  <article key={topup.id} className={styles.miniItem}>
+                    <div className={styles.miniTop}>
+                      <div>
+                        <div className={styles.miniTitle}>BDT {topup.amount.toLocaleString()}</div>
+                        <div className={styles.miniMeta}>{topup.method.toUpperCase()} - {new Date(topup.createdAt).toLocaleDateString()}</div>
+                      </div>
+                      <span className={`badge badge-${statusBadge(topup.status)}`}>{topup.status}</span>
+                    </div>
+                    <div className={styles.miniGrid}>
+                      <div className={styles.miniBox}>
+                        <div className={styles.miniLabel}>TrxID</div>
+                        <div className={styles.miniValue}>{topup.transactionId || '-'}</div>
+                      </div>
+                    </div>
+                  </article>
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </section>
 
-        <h2 style={{ fontSize: 18, marginBottom: 14 }}>Recent Withdrawals</h2>
-        <div className="table-container card" style={{ marginBottom: 28 }}>
-          <table className="table">
+        <h2 id="withdrawals" className={styles.sectionTitle}>Withdrawals</h2>
+        <div className={`${styles.tableCard} ${styles.desktopTable}`}>
+          <table className={`table ${styles.table}`}>
             <thead>
               <tr>
                 <th>Amount</th>
@@ -185,10 +222,42 @@ export default async function WalletPage() {
             </tbody>
           </table>
         </div>
+        <div className={styles.mobileList}>
+          {user.withdrawals.length === 0 ? (
+            <div className={styles.empty}>No withdrawals yet</div>
+          ) : (
+            user.withdrawals.map((withdrawal) => (
+              <article key={withdrawal.id} className={styles.miniItem}>
+                <div className={styles.miniTop}>
+                  <div>
+                    <div className={styles.miniTitle}>BDT {withdrawal.amount.toLocaleString()}</div>
+                    <div className={styles.miniMeta}>{withdrawal.method.toUpperCase()} - {new Date(withdrawal.createdAt).toLocaleDateString()}</div>
+                  </div>
+                  <span className={`badge badge-${statusBadge(withdrawal.status)}`}>{withdrawal.status}</span>
+                </div>
+                <div className={styles.miniGrid}>
+                  <div className={styles.miniBox}>
+                    <div className={styles.miniLabel}>Account</div>
+                    <div className={styles.miniValue}>{withdrawal.accountNumber}</div>
+                  </div>
+                  <div className={styles.miniBox}>
+                    <div className={styles.miniLabel}>Reference / Note</div>
+                    <div className={styles.miniValue}>{withdrawal.reference || withdrawal.adminNote || '-'}</div>
+                  </div>
+                </div>
+                {withdrawal.status === 'pending' && (
+                  <form action={`/api/withdraw/${withdrawal.id}/cancel`} method="POST" style={{ marginTop: 10 }}>
+                    <button className="btn btn-sm btn-outline w-full" type="submit">Cancel Request</button>
+                  </form>
+                )}
+              </article>
+            ))
+          )}
+        </div>
 
-        <h2 style={{ fontSize: 18, marginBottom: 14 }}>Transaction History</h2>
-        <div className="table-container card">
-          <table className="table">
+        <h2 className={styles.sectionTitle}>Transaction History</h2>
+        <div className={`${styles.tableCard} ${styles.desktopTable}`}>
+          <table className={`table ${styles.table}`}>
             <thead>
               <tr>
                 <th>ID</th>
@@ -218,6 +287,33 @@ export default async function WalletPage() {
               )}
             </tbody>
           </table>
+        </div>
+        <div className={styles.mobileList}>
+          {user.transactions.length === 0 ? (
+            <div className={styles.empty}>No transactions yet</div>
+          ) : (
+            user.transactions.map((tx) => (
+              <article key={tx.id} className={styles.miniItem}>
+                <div className={styles.miniTop}>
+                  <div>
+                    <div className={styles.miniTitle}>{tx.amount > 0 ? '+' : '-'}BDT {Math.abs(tx.amount).toLocaleString()}</div>
+                    <div className={styles.miniMeta}>#{tx.id.slice(-6).toUpperCase()} - {new Date(tx.createdAt).toLocaleDateString()}</div>
+                  </div>
+                  <span className="badge" style={badgeColor(tx.type)}>{txLabel(tx.type)}</span>
+                </div>
+                <div className={styles.miniGrid}>
+                  <div className={styles.miniBox}>
+                    <div className={styles.miniLabel}>Balance After</div>
+                    <div className={styles.miniValue}>BDT {tx.balance.toLocaleString()}</div>
+                  </div>
+                  <div className={styles.miniBox}>
+                    <div className={styles.miniLabel}>Description</div>
+                    <div className={styles.miniValue}>{tx.description}</div>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
         </div>
       </main>
     </div>

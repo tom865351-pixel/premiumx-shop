@@ -89,7 +89,7 @@ export default function DepositForm() {
   }
 
   return (
-    <div className="card card-glass" style={{ display: 'flex', flexDirection: 'column', gap: 18, borderRadius: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       <div className="tabs" style={{ borderBottom: '1px solid var(--border)', paddingBottom: 14 }}>
         <button className={`tab ${activeTab === 'manual' ? 'active' : ''}`} onClick={() => setActiveTab('manual')}>
           Manual TrxID
