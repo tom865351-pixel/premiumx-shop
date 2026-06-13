@@ -1,6 +1,6 @@
-import AdminSidebar from '@/components/layout/AdminSidebar'
 import { getAuthUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import AdminShell from '@/components/layout/AdminShell'
 
 export default async function AdminLayout({
   children,
@@ -12,12 +12,5 @@ export default async function AdminLayout({
     redirect('/login')
   }
 
-  return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <AdminSidebar />
-      <main style={{ flex: 1, padding: '32px 40px', background: 'var(--bg)', overflowY: 'auto' }}>
-        {children}
-      </main>
-    </div>
-  )
+  return <AdminShell>{children}</AdminShell>
 }

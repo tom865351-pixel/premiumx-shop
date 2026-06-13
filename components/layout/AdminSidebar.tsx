@@ -19,16 +19,19 @@ const navItems = [
   { href: '/admin/settings', icon: '⚙️', label: 'Settings' },
 ]
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ open = false, onClose }: { open?: boolean, onClose?: () => void }) {
   const pathname = usePathname()
   return (
-    <aside className={styles.sidebar}>
+    <>
+    <div className={`${styles.backdrop} ${open ? styles.backdropOpen : ''}`} onClick={onClose} />
+    <aside className={`${styles.sidebar} ${open ? styles.open : ''}`}>
       <div className={styles.logo}>
         <Link href="/" className={styles.logoLink}>
           <span className={styles.logoText}>Premium</span>
           <span className={styles.logoX}>X</span>
         </Link>
         <span className={styles.adminBadge}>ADMIN</span>
+        <button className={styles.closeBtn} onClick={onClose}>Close</button>
       </div>
       <nav className={styles.nav}>
         {navItems.map(item => (
@@ -36,6 +39,7 @@ export default function AdminSidebar() {
             key={item.href}
             href={item.href}
             className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}
+            onClick={onClose}
           >
             <span className={styles.navIcon}>{item.icon}</span>
             <span className={styles.navLabel}>{item.label}</span>
@@ -49,5 +53,6 @@ export default function AdminSidebar() {
         </Link>
       </div>
     </aside>
+    </>
   )
 }

@@ -771,6 +771,9 @@ img {
   /* Add padding so content isn't hidden behind bottom nav */
   main { padding-bottom: 80px !important; }
   body { padding-bottom: env(safe-area-inset-bottom); }
+  body:has(.admin-layout-root) .mobile-bottom-nav {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
