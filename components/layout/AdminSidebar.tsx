@@ -5,6 +5,9 @@ import styles from './AdminSidebar.module.css'
 
 const navItems = [
   { href: '/admin/dashboard', icon: 'D', label: 'Dashboard' },
+  { href: '/admin/search', icon: 'Q', label: 'Global Search' },
+  { href: '/admin/activity', icon: 'Log', label: 'Activity' },
+  { href: '/admin/risk', icon: 'Risk', label: 'Risk Center', urgent: true },
   { href: '/admin/users', icon: 'U', label: 'Users' },
   { href: '/admin/accounts', icon: 'A', label: 'Accounts' },
   { href: '/admin/add-account', icon: '+', label: 'Add Account' },
