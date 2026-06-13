@@ -23,6 +23,7 @@ const t: Record<string, Record<string, string>> = {
     browse: 'Rates',
     sell: 'Sell',
     wallet: 'Wallet',
+    live: 'Live',
     orders: 'Submissions',
     admin: 'Admin Panel',
     login: 'Login',
@@ -34,6 +35,7 @@ const t: Record<string, Record<string, string>> = {
     browse: 'Rates',
     sell: 'Sell',
     wallet: 'Wallet',
+    live: 'Live',
     orders: 'Submissions',
     admin: 'Admin Panel',
     login: 'Login',
@@ -118,6 +120,11 @@ export default function Navbar({ user }: NavbarProps) {
               {text.sell}
             </Link>
           )}
+          {user && (
+            <Link href="/live" className={`${styles.navLink} ${pathname === '/live' ? styles.active : ''}`}>
+              {text.live}
+            </Link>
+          )}
           {user && (user.role === 'admin' || user.role === 'sub-admin') && (
             <Link href="/admin/dashboard" className={`${styles.navLink} ${styles.adminLink}`}>
               {text.admin}
@@ -179,6 +186,9 @@ export default function Navbar({ user }: NavbarProps) {
                     <Link href="/wallet" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       {text.wallet}
                     </Link>
+                    <Link href="/live" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
+                      Live Sessions
+                    </Link>
                     <Link href="/orders" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       {text.orders}
                     </Link>
@@ -235,6 +245,7 @@ export default function Navbar({ user }: NavbarProps) {
             <>
               <Link href="/dashboard" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.dashboard}</Link>
               <Link href="/sell" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)} style={{ color: 'var(--blue)', fontWeight: 'bold' }}>Sell Account</Link>
+              <Link href="/live" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>Live Sessions</Link>
               <Link href="/orders" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.orders}</Link>
               <Link href="/wallet" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.wallet}</Link>
               <button className={styles.mobileNavLink} onClick={handleLogout}>{text.logout}</button>

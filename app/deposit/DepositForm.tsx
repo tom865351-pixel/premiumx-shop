@@ -3,22 +3,30 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Spinner from '@/components/ui/Spinner'
 
-const METHOD_NUMBERS: Record<string, string> = {
-  bkash: '01812-345678',
-  nagad: '01712-345678',
-  rocket: '01612-345678',
+interface PaymentMethod {
+  value: string
+  label: string
+  number: string
 }
+
+const DEFAULT_METHODS: PaymentMethod[] = [
+  { value: 'bkash', label: 'bKash', number: '01XXXXXXXXX' },
+  { value: 'nagad', label: 'Nagad', number: '01XXXXXXXXX' },
+  { value: 'rocket', label: 'Rocket', number: '01XXXXXXXXX' },
+]
 
 const QUICK_AMOUNTS = [100, 200, 500, 1000, 2000, 5000]
 
-export default function DepositForm() {
+export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 }: { methods?: PaymentMethod[]; minAmount?: number }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [ziniLoading, setZiniLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [amount, setAmount] = useState('')
-  const [selectedMethod, setMethod] = useState('bkash')
+  const [selectedMethod, setMethod] = useState(methods[0]?.value || 'bkash')
   const [activeTab, setActiveTab] = useState<'auto' | 'manual'>('manual')
+  const selectedMethodData = methods.find((method) => method.value === selectedMethod) || methods[0] || DEFAULT_METHODS[0]
+  const quickAmounts = Array.from(new Set([minAmount, ...QUICK_AMOUNTS])).filter((value) => value >= minAmount)
 
   const handleManualSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -32,8 +40,8 @@ export default function DepositForm() {
       transactionId: String(formData.get('transactionId') || '').trim(),
     }
 
-    if (!body.amount || body.amount < 50) {
-      setMessage({ type: 'error', text: 'Minimum add money amount is BDT 50.' })
+    if (!body.amount || body.amount < minAmount) {
+      setMessage({ type: 'error', text: `Minimum add money amount is BDT ${minAmount}.` })
       setLoading(false)
       return
     }
@@ -59,8 +67,8 @@ export default function DepositForm() {
   }
 
   const handleZiniPay = async () => {
-    if (!amount || Number.parseFloat(amount) < 50) {
-      setMessage({ type: 'error', text: 'Please enter a valid amount, minimum BDT 50.' })
+    if (!amount || Number.parseFloat(amount) < minAmount) {
+      setMessage({ type: 'error', text: `Please enter a valid amount, minimum BDT ${minAmount}.` })
       return
     }
 
@@ -108,7 +116,7 @@ export default function DepositForm() {
       <div className="form-group">
         <label className="form-label">Quick Amount</label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {QUICK_AMOUNTS.map((quickAmount) => (
+          {quickAmounts.map((quickAmount) => (
             <button
               key={quickAmount}
               type="button"
@@ -126,9 +134,9 @@ export default function DepositForm() {
         <input
           type="number"
           name="amount"
-          min="50"
           required
-          placeholder="Enter amount, minimum BDT 50"
+          min={minAmount}
+          placeholder={`Enter amount, minimum BDT ${minAmount}`}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
@@ -148,12 +156,12 @@ export default function DepositForm() {
           <div className="form-group">
             <label className="form-label">Payment Method</label>
             <select name="method" required value={selectedMethod} onChange={(e) => setMethod(e.target.value)}>
-              <option value="bkash">bKash</option>
-              <option value="nagad">Nagad</option>
-              <option value="rocket">Rocket</option>
+              {methods.map((method) => (
+                <option key={method.value} value={method.value}>{method.label}</option>
+              ))}
             </select>
             <p className="form-hint" style={{ marginTop: 4 }}>
-              Send payment to: <strong>{METHOD_NUMBERS[selectedMethod]}</strong>
+              Send payment to: <strong>{selectedMethodData.number}</strong>
             </p>
           </div>
 

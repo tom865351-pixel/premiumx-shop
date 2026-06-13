@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { getSetting } from '@/lib/settings'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,8 +10,9 @@ export async function POST(req: NextRequest) {
 
     const { amount } = await req.json()
     const numAmount = Number.parseFloat(String(amount))
-    if (!numAmount || numAmount < 50) {
-      return NextResponse.json({ error: 'Minimum add money amount is BDT 50' }, { status: 400 })
+    const minTopup = Number.parseFloat(await getSetting('min_topup_bdt')) || 50
+    if (!numAmount || numAmount < minTopup) {
+      return NextResponse.json({ error: `Minimum add money amount is BDT ${minTopup}` }, { status: 400 })
     }
 
     const apiKey = process.env.ZINIPAY_API_KEY

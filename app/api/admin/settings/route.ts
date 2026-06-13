@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const keys = [
     'site_name', 'commission_rate', 'report_window_hours', 'min_topup_bdt',
-    'bkash_number', 'nagad_number', 'crypto_wallet', 'usd_rate', 'usdt_rate',
+    'bkash_number', 'nagad_number', 'rocket_number', 'crypto_wallet', 'usd_rate', 'usdt_rate',
     'maintenance_mode', 'contact_email', 'contact_telegram'
   ]
 

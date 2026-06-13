@@ -4,7 +4,7 @@ import { getAuthUser } from '@/lib/auth'
 
 function statusBadge(status: string) {
   if (status === 'approved') return 'success'
-  if (status === 'rejected') return 'danger'
+  if (status === 'rejected' || status === 'cancelled') return 'danger'
   return 'warning'
 }
 
@@ -96,7 +96,7 @@ export default async function AdminDeposits() {
                     )}
                     {deposit.status !== 'pending' && (
                       <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                        {deposit.status === 'approved' ? 'Approved' : 'Rejected'}
+                        {deposit.status === 'approved' ? 'Approved' : deposit.status === 'cancelled' ? 'Cancelled' : 'Rejected'}
                       </span>
                     )}
                   </td>

@@ -91,7 +91,7 @@ export default async function Dashboard() {
           <Link href="/sell" className={styles.quickAction}>Submit Stock</Link>
           <Link href="/browse" className={styles.quickAction}>Rates</Link>
           <Link href="/wallet" className={styles.quickAction}>Wallet</Link>
-          <Link href="/support/new" className={styles.quickAction}>Support</Link>
+          <Link href="/live" className={styles.quickAction}>Live Sessions</Link>
         </section>
 
         <section className={styles.stats}>

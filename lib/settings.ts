@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   min_topup_bdt: '100',
   bkash_number: '01XXXXXXXXX',
   nagad_number: '01XXXXXXXXX',
+  rocket_number: '01XXXXXXXXX',
   crypto_wallet: 'TXXXXXXXXXXXXXXXXXXXXXXXx',
   usd_rate: '110',
   usdt_rate: '110',

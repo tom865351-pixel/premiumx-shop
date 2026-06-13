@@ -25,9 +25,9 @@ export default function MobileBottomNav({ user }: MobileNavProps) {
           <span>Sell</span>
         </Link>
 
-        <Link href="/browse" className={`mobile-nav-item ${isActive('/browse') ? 'active' : ''}`}>
-          <span className="nav-icon">Rate</span>
-          <span>Rates</span>
+        <Link href={user ? '/live' : '/browse'} className={`mobile-nav-item ${user ? isActive('/live') ? 'active' : '' : isActive('/browse') ? 'active' : ''}`}>
+          <span className="nav-icon">{user ? 'Live' : 'Rate'}</span>
+          <span>{user ? 'Live' : 'Rates'}</span>
         </Link>
 
         <Link href={user ? '/wallet' : '/login'} className={`mobile-nav-item ${isActive('/wallet') ? 'active' : ''}`}>

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { getSettings } from '@/lib/settings'
 import WithdrawModal from './WithdrawModal'
 import DepositForm from '@/app/deposit/DepositForm'
 import styles from './Wallet.module.css'
@@ -29,12 +30,6 @@ function statusBadge(status: string) {
   return 'warning'
 }
 
-const paymentMethods = [
-  { name: 'bKash', number: '01812-345678' },
-  { name: 'Nagad', number: '01712-345678' },
-  { name: 'Rocket', number: '01612-345678' },
-]
-
 export default async function WalletPage() {
   const authUser = await getAuthUser()
   if (!authUser) redirect('/login')
@@ -49,6 +44,14 @@ export default async function WalletPage() {
   })
 
   if (!user) redirect('/login')
+
+  const walletSettings = await getSettings(['min_topup_bdt', 'bkash_number', 'nagad_number', 'rocket_number'])
+  const minTopup = Number.parseFloat(walletSettings.min_topup_bdt || '50') || 50
+  const paymentMethods = [
+    { value: 'bkash', label: 'bKash', name: 'bKash', number: walletSettings.bkash_number },
+    { value: 'nagad', label: 'Nagad', name: 'Nagad', number: walletSettings.nagad_number },
+    { value: 'rocket', label: 'Rocket', name: 'Rocket', number: walletSettings.rocket_number },
+  ]
 
   const totalTopup = user.transactions.filter((tx) => tx.type === 'topup').reduce((sum, tx) => sum + tx.amount, 0)
   const totalSales = user.transactions.filter((tx) => tx.type === 'sale').reduce((sum, tx) => sum + tx.amount, 0)
@@ -119,7 +122,7 @@ export default async function WalletPage() {
                 </div>
               ))}
             </div>
-            <DepositForm />
+            <DepositForm methods={paymentMethods} minAmount={minTopup} />
           </div>
 
           <div className={styles.panel}>
@@ -137,11 +140,12 @@ export default async function WalletPage() {
                     <th>Method</th>
                     <th>Status</th>
                     <th>Date</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {user.topupRequests.length === 0 ? (
-                    <tr><td colSpan={4} className="text-center" style={{ padding: 28, color: 'var(--text-muted)' }}>No add money requests yet</td></tr>
+                    <tr><td colSpan={5} className="text-center" style={{ padding: 28, color: 'var(--text-muted)' }}>No add money requests yet</td></tr>
                   ) : (
                     user.topupRequests.map((topup) => (
                       <tr key={topup.id}>
@@ -149,6 +153,15 @@ export default async function WalletPage() {
                         <td style={{ textTransform: 'uppercase' }}>{topup.method}</td>
                         <td><span className={`badge badge-${statusBadge(topup.status)}`}>{topup.status}</span></td>
                         <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(topup.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          {topup.status === 'pending' ? (
+                            <form action={`/api/deposit/${topup.id}/cancel`} method="POST">
+                              <button className="btn btn-sm btn-outline" type="submit">Cancel</button>
+                            </form>
+                          ) : (
+                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Done</span>
+                          )}
+                        </td>
                       </tr>
                     ))
                   )}
@@ -174,6 +187,11 @@ export default async function WalletPage() {
                         <div className={styles.miniValue}>{topup.transactionId || '-'}</div>
                       </div>
                     </div>
+                    {topup.status === 'pending' && (
+                      <form action={`/api/deposit/${topup.id}/cancel`} method="POST" style={{ marginTop: 10 }}>
+                        <button className="btn btn-sm btn-outline w-full" type="submit">Cancel Request</button>
+                      </form>
+                    )}
                   </article>
                 ))
               )}

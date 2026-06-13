@@ -13,6 +13,7 @@ export default async function AdminSettings() {
     'min_topup_bdt',
     'bkash_number',
     'nagad_number',
+    'rocket_number',
     'crypto_wallet',
     'usd_rate',
     'usdt_rate',
@@ -26,17 +27,15 @@ export default async function AdminSettings() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Site Settings</h1>
-          <p className="page-subtitle">Configure your marketplace settings</p>
+          <p className="page-subtitle">Configure wallet, payout, contact, and marketplace settings.</p>
         </div>
       </div>
 
       <form action="/api/admin/settings" method="POST">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-          
-          {/* General Settings */}
-          <div className="card" style={{ padding: 24 }}>
-            <h3 style={{ marginBottom: 20, fontSize: 16, fontWeight: 600 }}>⚙️ General</h3>
-            
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+          <div className="card" style={{ padding: 22 }}>
+            <h3 style={{ marginBottom: 18, fontSize: 16, fontWeight: 800 }}>General</h3>
+
             <div className="form-group">
               <label className="form-label">Site Name</label>
               <input className="input" name="site_name" defaultValue={settings.site_name} placeholder="PremiumX Shop" />
@@ -55,15 +54,14 @@ export default async function AdminSettings() {
             <div className="form-group">
               <label className="form-label">Maintenance Mode</label>
               <select className="select" name="maintenance_mode" defaultValue={settings.maintenance_mode}>
-                <option value="false">🟢 Off (Site is Live)</option>
-                <option value="true">🔴 On (Maintenance)</option>
+                <option value="false">Off - site is live</option>
+                <option value="true">On - maintenance</option>
               </select>
             </div>
           </div>
 
-          {/* Financial Settings */}
-          <div className="card" style={{ padding: 24 }}>
-            <h3 style={{ marginBottom: 20, fontSize: 16, fontWeight: 600 }}>💰 Financial</h3>
+          <div className="card" style={{ padding: 22 }}>
+            <h3 style={{ marginBottom: 18, fontSize: 16, fontWeight: 800 }}>Financial</h3>
 
             <div className="form-group">
               <label className="form-label">Commission Rate (%)</label>
@@ -76,8 +74,8 @@ export default async function AdminSettings() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Min Topup Amount (BDT)</label>
-              <input className="input" name="min_topup_bdt" type="number" defaultValue={settings.min_topup_bdt} placeholder="100" />
+              <label className="form-label">Min Add Money Amount (BDT)</label>
+              <input className="input" name="min_topup_bdt" type="number" min="1" defaultValue={settings.min_topup_bdt} placeholder="100" />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -92,11 +90,10 @@ export default async function AdminSettings() {
             </div>
           </div>
 
-          {/* Payment Methods */}
-          <div className="card" style={{ padding: 24, gridColumn: 'span 2' }}>
-            <h3 style={{ marginBottom: 20, fontSize: 16, fontWeight: 600 }}>💳 Payment Methods</h3>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          <div className="card" style={{ padding: 22, gridColumn: '1 / -1' }}>
+            <h3 style={{ marginBottom: 18, fontSize: 16, fontWeight: 800 }}>Wallet Payment Numbers</h3>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16 }}>
               <div className="form-group">
                 <label className="form-label">bKash Number</label>
                 <input className="input" name="bkash_number" defaultValue={settings.bkash_number} placeholder="01XXXXXXXXX" />
@@ -106,6 +103,10 @@ export default async function AdminSettings() {
                 <input className="input" name="nagad_number" defaultValue={settings.nagad_number} placeholder="01XXXXXXXXX" />
               </div>
               <div className="form-group">
+                <label className="form-label">Rocket Number</label>
+                <input className="input" name="rocket_number" defaultValue={settings.rocket_number} placeholder="01XXXXXXXXX" />
+              </div>
+              <div className="form-group">
                 <label className="form-label">Crypto Wallet (USDT TRC20)</label>
                 <input className="input" name="crypto_wallet" defaultValue={settings.crypto_wallet} placeholder="TXXXXXXXXXXX" />
               </div>
@@ -113,9 +114,9 @@ export default async function AdminSettings() {
           </div>
         </div>
 
-        <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ marginTop: 22, display: 'flex', justifyContent: 'flex-end' }}>
           <button className="btn btn-primary" type="submit" style={{ padding: '12px 32px', fontSize: 15 }}>
-            💾 Save All Settings
+            Save All Settings
           </button>
         </div>
       </form>

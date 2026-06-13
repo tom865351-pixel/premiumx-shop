@@ -1,5 +1,19 @@
+import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+
+function visibleForRole(target: string, role: string) {
+  if (target === 'all') return true
+  if (target === 'buyers' && role === 'buyer') return true
+  if (target === 'sellers' && ['seller', 'admin', 'sub-admin', 'stock-manager'].includes(role)) return true
+  return false
+}
+
+function scheduleLabel(scheduledAt: Date | null) {
+  if (!scheduledAt) return 'Live now'
+  if (scheduledAt > new Date()) return `Starts ${new Date(scheduledAt).toLocaleString()}`
+  return 'Live now'
+}
 
 export default async function GlobalBanner() {
   const authUser = await getAuthUser()
@@ -18,21 +32,11 @@ export default async function GlobalBanner() {
         { expiresAt: { gt: new Date() } },
       ],
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ scheduledAt: 'asc' }, { createdAt: 'desc' }],
+    take: 3,
   }).catch(() => [])
 
-  const visible = announcements.filter((announcement) => {
-    if (announcement.target === 'all') return true
-    if (announcement.target === 'buyers' && userRole === 'buyer') return true
-    if (
-      announcement.target === 'sellers' &&
-      ['seller', 'admin', 'sub-admin', 'stock-manager'].includes(userRole)
-    ) {
-      return true
-    }
-    return false
-  })
-
+  const visible = announcements.filter((announcement) => visibleForRole(announcement.target, userRole))
   if (visible.length === 0) return null
 
   return (
@@ -49,19 +53,19 @@ export default async function GlobalBanner() {
             style={{
               background: bg,
               color,
-              padding: '10px 20px',
+              padding: '10px 14px',
               textAlign: 'center',
               fontSize: 14,
-              fontWeight: 500,
+              fontWeight: 600,
               display: 'flex',
               justifyContent: 'center',
-              gap: 12,
+              gap: 10,
               alignItems: 'center',
               flexWrap: 'wrap',
             }}
           >
-            <span style={{ fontSize: 13, fontWeight: 800 }}>
-              {announcement.type === 'success' ? 'OK' : announcement.type === 'info' ? 'i' : '!'}
+            <span style={{ fontSize: 12, fontWeight: 900, background: 'rgba(0,0,0,0.16)', borderRadius: 999, padding: '4px 9px' }}>
+              {scheduleLabel(announcement.scheduledAt)}
             </span>
             <span>
               <strong>{announcement.title}:</strong> {announcement.message}
@@ -73,18 +77,29 @@ export default async function GlobalBanner() {
                 rel="noreferrer"
                 style={{
                   background: 'rgba(0,0,0,0.2)',
-                  padding: '4px 12px',
-                  borderRadius: 20,
+                  padding: '5px 12px',
+                  borderRadius: 999,
                   color,
                   textDecoration: 'none',
-                  fontWeight: 700,
+                  fontWeight: 800,
                   fontSize: 12,
-                  border: '1px solid rgba(255,255,255,0.3)',
+                  border: '1px solid rgba(255,255,255,0.35)',
                 }}
               >
-                Open Link
+                Join
               </a>
             )}
+            <Link
+              href="/live"
+              style={{
+                color,
+                textDecoration: 'underline',
+                fontWeight: 800,
+                fontSize: 12,
+              }}
+            >
+              Details
+            </Link>
           </div>
         )
       })}

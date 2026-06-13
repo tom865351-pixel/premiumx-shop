@@ -1,20 +1,19 @@
 export default function NoticeBoard() {
   const notices = [
-    '📢 Welcome to PremiumX Shop — The #1 Digital Account Marketplace in Bangladesh!',
-    '🎉 New accounts added daily! Browse our latest Netflix, Instagram, Facebook listings!',
-    '💳 Add balance via bKash, Nagad, or Rocket — instant approval!',
-    '🛡️ 100% secure transactions with admin verification on every account.',
-    '🔥 Sellers: Upload bulk accounts via Excel and get paid instantly upon approval!',
-    '⚡ Support 24/7 — open a ticket anytime from your dashboard.',
+    'PremiumX wallet, submissions, withdrawals, and live sessions are now in one clean flow.',
+    'Sellers can submit Instagram, Facebook, Gmail, TikTok and other stock for admin review.',
+    'Live classes and support sessions appear in the Live page with direct join links.',
+    'Wallet add money requests, pending holds, and withdrawal history are visible from one screen.',
+    'Admin verifies every account and payout before balance changes are completed.',
   ]
 
-  const text = notices.join('  •  ')
+  const text = notices.join('  -  ')
 
   return (
     <div className="notice-board">
       <div className="notice-board-inner">
         {text}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         {text}
       </div>
     </div>

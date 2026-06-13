@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { getSetting } from '@/lib/settings'
 
 export async function POST(req: Request) {
   try {
@@ -13,9 +14,10 @@ export async function POST(req: Request) {
     const amount = Number.parseFloat(String(data.amount || '0'))
     const paymentMethod = String(data.paymentMethod || data.method || '').toLowerCase()
     const transactionId = String(data.transactionId || '').trim()
+    const minTopup = Number.parseFloat(await getSetting('min_topup_bdt')) || 50
 
-    if (!amount || amount < 50) {
-      return NextResponse.json({ error: 'Minimum add money amount is BDT 50' }, { status: 400 })
+    if (!amount || amount < minTopup) {
+      return NextResponse.json({ error: `Minimum add money amount is BDT ${minTopup}` }, { status: 400 })
     }
 
     if (!['bkash', 'nagad', 'rocket', 'binance'].includes(paymentMethod)) {

@@ -51,6 +51,7 @@ async function main() {
     { key: 'min_topup_bdt', value: '100' },
     { key: 'bkash_number', value: '01XXXXXXXXX' },
     { key: 'nagad_number', value: '01XXXXXXXXX' },
+    { key: 'rocket_number', value: '01XXXXXXXXX' },
     { key: 'crypto_wallet', value: 'TXXXXXXXXXXXXXXXXXXXXXXXx' },
     { key: 'usd_rate', value: '110' },
     { key: 'usdt_rate', value: '110' },
