@@ -11,9 +11,9 @@ import FloatingSupport from '@/components/layout/FloatingSupport'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'PremiumX Shop - Buy & Sell Digital Accounts',
-  description: 'The most trusted marketplace for buying and selling premium digital accounts. Instagram, Facebook, Gmail, TikTok and more.',
-  keywords: 'buy accounts, sell accounts, instagram accounts, facebook accounts, digital marketplace',
+  title: 'PremiumX Shop - Sell Digital Accounts',
+  description: 'Submit Instagram, Facebook, Gmail, TikTok and other digital accounts to PremiumX for admin review and seller payouts.',
+  keywords: 'sell accounts, seller payouts, instagram accounts, facebook accounts, digital account submissions',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'PremiumX' },
 }
 

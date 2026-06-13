@@ -20,10 +20,10 @@ interface NavbarProps {
 
 const t: Record<string, Record<string, string>> = {
   en: {
-    browse: 'Buy',
+    browse: 'Rates',
     sell: 'Sell Account',
     wallet: 'Wallet',
-    orders: 'My Orders',
+    orders: 'Submissions',
     admin: 'Admin Panel',
     login: 'Login',
     register: 'Sign Up',
@@ -32,10 +32,10 @@ const t: Record<string, Record<string, string>> = {
     balance: 'Balance',
   },
   bn: {
-    browse: 'কিনুন',
+    browse: 'রেট',
     sell: 'অ্যাকাউন্ট বিক্রি',
     wallet: 'ওয়ালেট',
-    orders: 'আমার অর্ডার',
+    orders: 'জমা',
     admin: 'অ্যাডমিন',
     login: 'লগইন',
     register: 'রেজিস্টার',
@@ -120,7 +120,7 @@ export default function Navbar({ user }: NavbarProps) {
           </Link>
           {user && (
             <Link href="/sell" className={`${styles.navLink} ${pathname === '/sell' ? styles.active : ''}`}>
-              📤 Sell
+              Sell
             </Link>
           )}
           {user && (user.role === 'admin' || user.role === 'sub-admin') && (
@@ -161,7 +161,7 @@ export default function Navbar({ user }: NavbarProps) {
                   <span>{formatBalance(user.balance)}</span>
                 </Link>
                 <Link href="/deposit" className={`btn btn-blue btn-sm ${styles.addMoneyBtn}`} style={{ padding: '6px 12px', fontSize: 13, borderRadius: 20 }}>
-                  ➕ Add Money
+                  Wallet
                 </Link>
               </div>
 
@@ -192,10 +192,10 @@ export default function Navbar({ user }: NavbarProps) {
                       💰 {text.wallet}
                     </Link>
                     <Link href="/deposit" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)} style={{ color: 'var(--gold)', fontWeight: 600 }}>
-                      💳 Add Money
+                      Wallet
                     </Link>
                     <Link href="/orders" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                      📦 {text.orders}
+                      {text.orders}
                     </Link>
                     <Link href="/referral" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       🏆 Referral Program
@@ -207,7 +207,7 @@ export default function Navbar({ user }: NavbarProps) {
                       ⚙️ Settings
                     </Link>
                     <Link href="/sell" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
-                      📤 Sell Account
+                      Sell Account
                     </Link>
                     {user && (user.role === 'admin' || user.role === 'sub-admin') && (
                       <Link href="/admin/dashboard" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
@@ -251,7 +251,7 @@ export default function Navbar({ user }: NavbarProps) {
           {user && (
             <>
               <Link href="/dashboard" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.dashboard}</Link>
-              <Link href="/deposit" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)} style={{ color: 'var(--blue)', fontWeight: 'bold' }}>➕ Add Money</Link>
+              <Link href="/sell" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)} style={{ color: 'var(--blue)', fontWeight: 'bold' }}>Sell Account</Link>
               <Link href="/orders" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.orders}</Link>
               <Link href="/wallet" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.wallet}</Link>
               <button className={styles.mobileNavLink} onClick={handleLogout}>{text.logout}</button>

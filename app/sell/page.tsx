@@ -27,9 +27,9 @@ export default async function SellPage() {
       
       <main className="container" style={{ padding: '40px 20px', flex: 1, maxWidth: 800 }}>
         <div className="page-header" style={{ marginBottom: 30, textAlign: 'center' }}>
-          <h1 className="page-title">Sell Digital Accounts</h1>
+          <h1 className="page-title">Submit Accounts to PremiumX</h1>
           <p className="page-subtitle" style={{ maxWidth: 600, margin: '10px auto 0' }}>
-            List your premium accounts on our marketplace. You can upload them one by one, or use the bulk excel upload feature.
+            Send your stock to admin for review. Valid accounts are bought by PremiumX and the payout is added to your seller wallet.
           </p>
         </div>
 
