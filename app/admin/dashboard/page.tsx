@@ -45,6 +45,7 @@ export default async function AdminDashboard() {
   ])
 
   const tasks = [
+    { label: 'Upload result Excel', value: pendingAccounts, href: '/admin/result-batches', tone: 'success' },
     { label: 'Review seller stock', value: pendingAccounts, href: '/admin/accounts', tone: 'warning' },
     { label: 'Approve deposits', value: pendingDeposits, href: '/admin/deposits', tone: 'warning' },
     { label: 'Pay withdrawals', value: pendingWithdrawals, href: '/admin/withdrawals', tone: 'danger' },
@@ -60,8 +61,9 @@ export default async function AdminDashboard() {
           <p className="page-subtitle">Everything urgent for PremiumX operations in one clean screen.</p>
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <Link href="/admin/result-batches" className="btn btn-gold">Upload Result Report</Link>
           <Link href="/admin/search" className="btn btn-outline">Global Search</Link>
-          <Link href="/admin/risk" className="btn btn-gold">Risk Center</Link>
+          <Link href="/admin/risk" className="btn btn-outline">Risk Center</Link>
         </div>
       </div>
 

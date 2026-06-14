@@ -10,7 +10,7 @@ const navItems = [
   { href: '/admin/risk', icon: 'Risk', label: 'Risk Center', urgent: true },
   { href: '/admin/users', icon: 'U', label: 'Users' },
   { href: '/admin/accounts', icon: 'A', label: 'Accounts' },
-  { href: '/admin/result-batches', icon: 'RB', label: 'Result Batches' },
+  { href: '/admin/result-batches', icon: 'XL', label: 'Upload Result' },
   { href: '/admin/add-account', icon: '+', label: 'Add Account' },
   { href: '/admin/orders', icon: 'O', label: 'Orders' },
   { href: '/admin/deposits', icon: 'BDT', label: 'Wallet Deposits', urgent: true },

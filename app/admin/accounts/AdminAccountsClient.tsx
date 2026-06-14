@@ -187,9 +187,14 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
           <h1 className="page-title">Seller Submissions</h1>
           <p className="page-subtitle">Users sell accounts here. Review each seller group, buy approved stock, and export seller-wise files.</p>
         </div>
-        <a href={`/api/admin/accounts/export?status=${activeTab}`} target="_blank" className="btn btn-outline" style={{ color: '#10b981', borderColor: '#10b981' }}>
-          Export All {STATUS_CONFIG[activeTab].label}
-        </a>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <a href="/admin/result-batches" className="btn btn-gold">
+            Upload Result Report
+          </a>
+          <a href={`/api/admin/accounts/export?status=${activeTab}`} target="_blank" className="btn btn-outline" style={{ color: '#10b981', borderColor: '#10b981' }}>
+            Export All {STATUS_CONFIG[activeTab].label}
+          </a>
+        </div>
       </div>
 
       <div className={styles.toolbar}>
