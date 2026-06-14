@@ -16,7 +16,8 @@ export async function POST(req: NextRequest) {
     'homepage_badges', 'homepage_hero_badge', 'homepage_hero_title', 'homepage_hero_highlight',
     'homepage_hero_subtitle', 'live_resources', 'reject_templates', 'support_reply_templates',
     'fraud_rules', 'payout_min_bdt', 'payout_limit_daily_bdt', 'next_payout_time',
-    'subadmin_permissions'
+    'subadmin_permissions', 'bulk_result_auto_credit', 'bulk_result_credit_mode',
+    'bulk_result_reason_mode', 'bulk_result_default_reason', 'bulk_result_allow_color'
   ]
 
   for (const key of keys) {

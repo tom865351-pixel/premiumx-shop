@@ -41,6 +41,7 @@ model User {
   reviews       Review[]
   ticketsCreated Ticket[] @relation("TicketCreator")
   ticketReplies  TicketReply[]
+  resultBatches ResultBatch[] @relation("ResultBatchAdmin")
 }
 
 model Category {
@@ -88,6 +89,7 @@ model Account {
   order         Order?
   reports       Report[]
   review        Review?
+  resultRows    ResultRow[]
 }
 
 model Order {
@@ -261,4 +263,46 @@ model Announcement {
   scheduledAt DateTime? // for scheduled broadcasts
   expiresAt   DateTime?
   createdAt   DateTime  @default(now())
+}
+
+model ResultBatch {
+  id              String      @id @default(cuid())
+  adminId         String
+  fileName        String
+  fileHash        String?
+  status          String      @default("applied") // applied, rolled_back
+  creditMode      String      @default("instant") // instant, pending
+  reasonMode      String      @default("same") // same, row
+  defaultReason   String?
+  note            String?
+  totalRows       Int         @default(0)
+  matchedRows     Int         @default(0)
+  validRows       Int         @default(0)
+  invalidRows     Int         @default(0)
+  reviewRows      Int         @default(0)
+  creditedAmount  Float       @default(0)
+  pendingAmount   Float       @default(0)
+  createdAt       DateTime    @default(now())
+  rolledBackAt    DateTime?
+
+  admin           User        @relation("ResultBatchAdmin", fields: [adminId], references: [id])
+  rows            ResultRow[]
+}
+
+model ResultRow {
+  id             String      @id @default(cuid())
+  batchId        String
+  accountId      String?
+  sellerId       String?
+  username       String
+  status         String      // valid, invalid, review, unmatched
+  previousStatus String?
+  price          Float       @default(0)
+  reason         String?
+  credited       Boolean     @default(false)
+  pending        Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+
+  batch          ResultBatch @relation(fields: [batchId], references: [id])
+  account        Account?    @relation(fields: [accountId], references: [id])
 }

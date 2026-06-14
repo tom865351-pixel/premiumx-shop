@@ -34,6 +34,11 @@ export default async function AdminSettings() {
     'payout_limit_daily_bdt',
     'next_payout_time',
     'subadmin_permissions',
+    'bulk_result_auto_credit',
+    'bulk_result_credit_mode',
+    'bulk_result_reason_mode',
+    'bulk_result_default_reason',
+    'bulk_result_allow_color',
   ])
 
   return (
@@ -166,6 +171,44 @@ export default async function AdminSettings() {
               <div className="form-group">
                 <label className="form-label">Fraud Rules JSON</label>
                 <textarea className="input" name="fraud_rules" defaultValue={settings.fraud_rules} rows={4} placeholder='{"highRejectRate":40}' />
+              </div>
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: 22, gridColumn: '1 / -1' }}>
+            <h3 style={{ marginBottom: 18, fontSize: 16, fontWeight: 800 }}>Bulk Result Auto Report</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+              <div className="form-group">
+                <label className="form-label">Auto Credit</label>
+                <select className="select" name="bulk_result_auto_credit" defaultValue={settings.bulk_result_auto_credit}>
+                  <option value="true">On - process valid rows</option>
+                  <option value="false">Off - preview/report only</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Default Credit Mode</label>
+                <select className="select" name="bulk_result_credit_mode" defaultValue={settings.bulk_result_credit_mode}>
+                  <option value="instant">Instant wallet credit</option>
+                  <option value="pending">Pending payout first</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Default Reject Reason Mode</label>
+                <select className="select" name="bulk_result_reason_mode" defaultValue={settings.bulk_result_reason_mode}>
+                  <option value="same">Same reason</option>
+                  <option value="row">Row-wise reason column</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Color Detection</label>
+                <select className="select" name="bulk_result_allow_color" defaultValue={settings.bulk_result_allow_color}>
+                  <option value="true">On - blue/red/yellow cells</option>
+                  <option value="false">Off - status column only</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Default Reject Reason</label>
+                <input className="input" name="bulk_result_default_reason" defaultValue={settings.bulk_result_default_reason} />
               </div>
             </div>
           </div>

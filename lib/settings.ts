@@ -29,6 +29,11 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   payout_min_bdt: '100',
   payout_limit_daily_bdt: '50000',
   next_payout_time: 'Every day at 10:00 PM',
+  bulk_result_auto_credit: 'true',
+  bulk_result_credit_mode: 'instant',
+  bulk_result_reason_mode: 'same',
+  bulk_result_default_reason: 'Invalid or not working account',
+  bulk_result_allow_color: 'true',
 }
 
 export async function getSetting(key: string): Promise<string> {
