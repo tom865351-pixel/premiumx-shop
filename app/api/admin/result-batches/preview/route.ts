@@ -14,11 +14,13 @@ export async function POST(req: NextRequest) {
   const form = await req.formData()
   const file = form.get('file') as File | null
   if (!file) return NextResponse.json({ error: 'Excel file is required' }, { status: 400 })
+  const requestedFallback = String(form.get('unknownStatus') || 'review')
+  const unknownStatus = ['valid', 'invalid', 'review'].includes(requestedFallback) ? requestedFallback as 'valid' | 'invalid' | 'review' : 'review'
 
   const buffer = Buffer.from(await file.arrayBuffer())
   const hash = hashBuffer(buffer)
   const settings = await getSettings(['bulk_result_allow_color'])
-  const parsed = parseResultWorkbook(buffer, settings.bulk_result_allow_color !== 'false')
+  const parsed = await parseResultWorkbook(buffer, settings.bulk_result_allow_color !== 'false', unknownStatus)
   const ids = parsed.map((row) => row.accountId).filter(Boolean)
   const usernames = parsed.map((row) => row.username).filter(Boolean)
 

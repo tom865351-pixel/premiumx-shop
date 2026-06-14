@@ -31,6 +31,7 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
   const [reasonMode, setReasonMode] = useState(settings.bulk_result_reason_mode || 'same')
   const [defaultReason, setDefaultReason] = useState(settings.bulk_result_default_reason || 'Invalid or not working account')
   const [note, setNote] = useState('')
+  const [unknownStatus, setUnknownStatus] = useState<'review' | 'valid' | 'invalid'>('review')
 
   const preview = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -39,6 +40,7 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
     setMessage('')
     const formData = new FormData()
     formData.append('file', file)
+    formData.append('unknownStatus', unknownStatus)
     try {
       const res = await fetch('/api/admin/result-batches/preview', { method: 'POST', body: formData })
       const data = await res.json()
@@ -120,6 +122,14 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
             <select className="select" value={reasonMode} onChange={(e) => setReasonMode(e.target.value)}>
               <option value="same">Same reason for all invalid</option>
               <option value="row">Row-wise reason column</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">If Color/Status Not Found</label>
+            <select className="select" value={unknownStatus} onChange={(e) => setUnknownStatus(e.target.value as 'review' | 'valid' | 'invalid')}>
+              <option value="review">Keep as review</option>
+              <option value="valid">Mark unknown rows valid</option>
+              <option value="invalid">Mark unknown rows invalid</option>
             </select>
           </div>
         </div>
