@@ -104,23 +104,14 @@ export default function SellForm({ categories }: { categories: Category[] }) {
                 onClick={() => setSelectedCategory(cat)}
                 className="sell-category-btn"
                 style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  padding: 24,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 12,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
+                  borderColor: 'var(--border)',
                 }}
                 onMouseOver={(e) => (e.currentTarget.style.borderColor = cat.color)}
                 onMouseOut={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
               >
-                <CategoryLogo icon={cat.icon} name={cat.name} color={cat.color} size={48} radius={8} />
-                <span style={{ fontWeight: 700, fontSize: 16 }}>{cat.name}</span>
-                <span style={{ color: 'var(--gold)', fontSize: 13, fontWeight: 800 }}>BDT {cat.defaultPrice} each</span>
+                <CategoryLogo className="sell-category-logo" icon={cat.icon} name={cat.name} color={cat.color} size={48} radius={8} />
+                <span className="sell-category-title">{cat.name}</span>
+                <span className="sell-category-price">BDT {cat.defaultPrice} each</span>
               </button>
             ))}
           </div>
