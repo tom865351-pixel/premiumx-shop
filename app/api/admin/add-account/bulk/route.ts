@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import * as xlsx from 'xlsx'
+import { parseAccountExcel } from '@/lib/accountExcel'
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,12 +22,11 @@ export async function POST(req: NextRequest) {
     if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 })
 
     const buffer = await file.arrayBuffer()
-    const workbook = xlsx.read(buffer, { type: 'buffer' })
-    const sheet = workbook.Sheets[workbook.SheetNames[0]]
-    const rows: any[] = xlsx.utils.sheet_to_json(sheet, { defval: '' })
+    const parsed = parseAccountExcel(Buffer.from(buffer))
+    const rows = parsed.rows
 
     if (rows.length === 0) {
-      return NextResponse.json({ error: 'No data found in file.' }, { status: 400 })
+      return NextResponse.json({ error: 'No valid rows found. Use Username and Password columns, or first column username and second column password.' }, { status: 400 })
     }
 
     if (rows.length > 500) {
@@ -36,19 +35,13 @@ export async function POST(req: NextRequest) {
 
     const accounts = []
     for (const row of rows) {
-      const username = String(row['Username'] || row['username'] || row['Email'] || row['email'] || '').trim()
-      const password = String(row['Password'] || row['password'] || '').trim()
-      const twoFA = String(row['2FA'] || row['twofa'] || row['TwoFA'] || row['2fa'] || '').trim()
-
-      if (!username || !password) continue
-
       accounts.push({
         sellerId: authUser.userId,
         categoryId,
         title: `${category.name} Account`,
-        username,
-        password,
-        twoFASecret: twoFA || null,
+        username: row.username,
+        password: row.password,
+        twoFASecret: row.twoFA || null,
         price: (category as any).defaultPrice || 0,
         status: 'approved', // Admin bulk = auto approved and live
       })

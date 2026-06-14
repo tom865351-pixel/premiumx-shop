@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
-import * as xlsx from 'xlsx'
+import { parseAccountExcel } from '@/lib/accountExcel'
 
 export async function POST(req: Request) {
   try {
@@ -27,47 +27,27 @@ export async function POST(req: Request) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    // Parse Excel/CSV
-    const workbook = xlsx.read(buffer, { type: 'buffer' })
-    const sheetName = workbook.SheetNames[0]
-    const sheet = workbook.Sheets[sheetName]
-    const rows = xlsx.utils.sheet_to_json<any>(sheet)
+    const parsed = parseAccountExcel(buffer)
+    const rows = parsed.rows
 
     if (rows.length === 0) {
-      return NextResponse.json({ error: 'The file is empty' }, { status: 400 })
+      return NextResponse.json({
+        error: parsed.skippedMissing > 0
+          ? 'Could not read account rows. Put username in the first column and password in the second column, or use headers: Username, Password.'
+          : 'The file is empty',
+      }, { status: 400 })
     }
 
     if (rows.length > 500) {
       return NextResponse.json({ error: 'Maximum 500 accounts can be uploaded at once' }, { status: 400 })
     }
 
-    let missingRows = 0
+    let missingRows = parsed.skippedMissing
     const seen = new Set<string>()
     let duplicateRows = 0
 
-    const accountsData = rows.map((row: any) => {
-      // Handle different possible column names (case-insensitive mapping)
-      const getVal = (keys: string[]) => {
-        for (const k of Object.keys(row)) {
-          if (keys.includes(k.toLowerCase().trim())) return String(row[k])
-        }
-        return ''
-      }
-
-      const username = getVal(['username', 'email', 'user', 'account'])
-      const password = getVal(['password', 'pass', 'pw'])
-      const twoFA = getVal(['2fa', 'twofa', 'secret', '2fa secret'])
-      const recoveryEmail = getVal(['recoveryemail', 'recovery email', 'recovery_email'])
-      const recoveryPhone = getVal(['recoveryphone', 'recovery phone', 'recovery_phone'])
-      const accountAge = getVal(['age', 'account age', 'accountage'])
-      const proofLink = getVal(['proof', 'screenshot', 'proof link', 'prooflink'])
-
-      if (!username || !password) {
-        missingRows += 1
-        return null
-      }
-
-      const duplicateKey = username.toLowerCase().trim()
+    const accountsData = rows.map((row) => {
+      const duplicateKey = row.username.toLowerCase().trim()
       if (seen.has(duplicateKey)) {
         duplicateRows += 1
         return null
@@ -78,20 +58,20 @@ export async function POST(req: Request) {
         sellerId: authUser.userId,
         categoryId: category.id,
         title: `${category.name} Account`,
-        username: username,
-        password: password,
-        twoFASecret: twoFA || null,
-        recoveryEmail: recoveryEmail || null,
-        recoveryPhone: recoveryPhone || null,
-        accountAge: accountAge || null,
-        screenshots: proofLink ? JSON.stringify([proofLink]) : '[]',
+        username: row.username,
+        password: row.password,
+        twoFASecret: row.twoFA || null,
+        recoveryEmail: row.recoveryEmail || null,
+        recoveryPhone: row.recoveryPhone || null,
+        accountAge: row.accountAge || null,
+        screenshots: row.proofLink ? JSON.stringify([row.proofLink]) : '[]',
         price: (category as any).defaultPrice || 0,
         status: 'pending'
       }
     }).filter(Boolean) as any[]
 
     if (accountsData.length === 0) {
-      return NextResponse.json({ error: 'Could not find Username and Password columns in the file' }, { status: 400 })
+      return NextResponse.json({ error: 'No valid accounts found. Use Username and Password columns, or first column username and second column password.' }, { status: 400 })
     }
 
     // Insert accounts in bulk
@@ -104,7 +84,7 @@ export async function POST(req: Request) {
       count: accountsData.length,
       skippedMissing: missingRows,
       skippedDuplicates: duplicateRows,
-      message: `Imported ${accountsData.length} accounts. Skipped ${missingRows} missing rows and ${duplicateRows} duplicate rows.`,
+      message: `Imported ${accountsData.length} accounts. Skipped ${missingRows} missing rows and ${duplicateRows} duplicate rows.${parsed.headerFound ? '' : ' Used first two columns as username/password.'}`,
     })
 
   } catch (error: any) {

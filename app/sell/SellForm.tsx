@@ -234,7 +234,7 @@ export default function SellForm({ categories }: { categories: Category[] }) {
               <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--gold)', marginBottom: 16 }}>EXCEL</div>
               <h3 style={{ marginBottom: 8, color: 'var(--text)' }}>Upload Excel or CSV</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 24 }}>
-                Make sure your file has columns named: <strong>Username</strong>, <strong>Password</strong>, and optionally <strong>2FA</strong>.
+                Use columns named <strong>Username</strong> and <strong>Password</strong>, or put username in column A and password in column B. Optional: 2FA, recovery email, recovery phone.
               </p>
 
               <form onSubmit={handleBulkSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
