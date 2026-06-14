@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { headers } from 'next/headers'
 import GlobalBanner from '@/components/layout/GlobalBanner'
 import MobileBottomNav from '@/components/layout/MobileBottomNav'
 import FloatingSupport from '@/components/layout/FloatingSupport'
@@ -34,6 +35,8 @@ export default async function RootLayout({
   let themeClass = 'theme-buyer'
   let authUserData = null
   const maintenance = await getSettings(['maintenance_mode', 'maintenance_message'])
+  const pathname = headers().get('x-pathname') || ''
+  const authPathAllowed = ['/login', '/register', '/forgot-password'].some((path) => pathname === path || pathname.startsWith(`${path}/`))
 
   if (authUser) {
     try {
@@ -62,7 +65,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={themeClass}>
-        {maintenance.maintenance_mode === 'true' && authUserData?.role !== 'admin' ? (
+        {maintenance.maintenance_mode === 'true' && authUserData?.role !== 'admin' && !authPathAllowed ? (
           <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24, background: 'var(--bg)' }}>
             <div className="card" style={{ maxWidth: 520, padding: 32, textAlign: 'center' }}>
               <div className="badge badge-warning" style={{ marginBottom: 16 }}>Maintenance Mode</div>

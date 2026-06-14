@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
+function validateIcon(icon: string) {
+  if (icon.startsWith('data:image/') && icon.length > 500_000) {
+    return 'Logo image is too large. Please use a compressed image under 350KB.'
+  }
+  return null
+}
+
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user || user.role !== 'admin') {
@@ -17,6 +24,11 @@ export async function POST(req: NextRequest) {
 
   if (!name) {
     return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+  }
+
+  const iconError = validateIcon(icon)
+  if (iconError) {
+    return NextResponse.json({ error: iconError }, { status: 400 })
   }
 
   await prisma.category.create({
