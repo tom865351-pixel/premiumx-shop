@@ -2,20 +2,29 @@ import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
+import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 import ResultBatchUploader from './ResultBatchUploader'
 
 export default async function ResultBatchesPage() {
   const user = await getAuthUser()
   if (!user || user.role !== 'admin') redirect('/login')
 
-  const [settings, batches] = await Promise.all([
-    getSettings(['bulk_result_credit_mode', 'bulk_result_reason_mode', 'bulk_result_default_reason', 'bulk_result_allow_color']),
-    prisma.resultBatch.findMany({
+  const settings = await getSettings(['bulk_result_credit_mode', 'bulk_result_reason_mode', 'bulk_result_default_reason', 'bulk_result_allow_color'])
+  let setupError = ''
+  let batches: any[] = []
+
+  try {
+    batches = await prisma.resultBatch.findMany({
       orderBy: { createdAt: 'desc' },
       take: 30,
       include: { admin: { select: { username: true } }, rows: { take: 5 } },
-    }),
-  ])
+    })
+  } catch (error) {
+    console.error('Result batch history failed to load', error)
+    setupError = isMissingResultBatchTables(error)
+      ? RESULT_BATCH_SETUP_MESSAGE
+      : 'Result upload history could not be loaded right now. Please try again after a refresh.'
+  }
 
   return (
     <div>
@@ -26,7 +35,18 @@ export default async function ResultBatchesPage() {
         </div>
       </div>
 
-      <ResultBatchUploader settings={settings} />
+      {setupError ? (
+        <section className="card" style={{ padding: 20, marginBottom: 18, borderColor: 'var(--warning)', background: 'rgba(245,158,11,0.08)' }}>
+          <h2 style={{ fontSize: 20, marginBottom: 8, color: 'var(--warning)' }}>Result Upload Setup Needed</h2>
+          <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 14 }}>{setupError}</p>
+          <div style={{ display: 'grid', gap: 8, color: 'var(--text)', fontSize: 14 }}>
+            <div><strong>Where this page is:</strong> Admin Panel - Upload Result</div>
+            <div><strong>After setup:</strong> upload the blue/red Excel report here to auto-send seller reports.</div>
+          </div>
+        </section>
+      ) : (
+        <ResultBatchUploader settings={settings} />
+      )}
 
       <section className="card" style={{ padding: 20 }}>
         <h2 style={{ fontSize: 18, marginBottom: 14 }}>Result History</h2>

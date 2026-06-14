@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 
 type IncomingRow = {
   accountId?: string
@@ -31,7 +32,15 @@ export async function POST(req: NextRequest) {
   }
 
   if (fileHash) {
-    const existing = await prisma.resultBatch.findFirst({ where: { fileHash, status: { not: 'rolled_back' } } })
+    let existing = null
+    try {
+      existing = await prisma.resultBatch.findFirst({ where: { fileHash, status: { not: 'rolled_back' } } })
+    } catch (error) {
+      if (isMissingResultBatchTables(error)) {
+        return NextResponse.json({ error: RESULT_BATCH_SETUP_MESSAGE }, { status: 503 })
+      }
+      throw error
+    }
     if (existing) return NextResponse.json({ error: 'This result file was already applied.' }, { status: 400 })
   }
 
@@ -48,16 +57,26 @@ export async function POST(req: NextRequest) {
   })
   const byId = new Map(accounts.map((account) => [account.id, account]))
   const byUsername = new Map(accounts.map((account) => [account.username.toLowerCase(), account]))
-  const alreadyCreditedRows = await prisma.resultRow.findMany({
-    where: {
-      accountId: { in: accounts.map((account) => account.id) },
-      credited: true,
-    },
-    select: { accountId: true },
-  })
+  let alreadyCreditedRows: { accountId: string | null }[] = []
+  try {
+    alreadyCreditedRows = await prisma.resultRow.findMany({
+      where: {
+        accountId: { in: accounts.map((account) => account.id) },
+        credited: true,
+      },
+      select: { accountId: true },
+    })
+  } catch (error) {
+    if (isMissingResultBatchTables(error)) {
+      return NextResponse.json({ error: RESULT_BATCH_SETUP_MESSAGE }, { status: 503 })
+    }
+    throw error
+  }
   const alreadyCreditedIds = new Set(alreadyCreditedRows.map((row) => row.accountId).filter(Boolean))
 
-  const summary = await prisma.$transaction(async (tx) => {
+  let summary
+  try {
+    summary = await prisma.$transaction(async (tx) => {
     const batch = await tx.resultBatch.create({
       data: {
         adminId: user.userId,
@@ -167,7 +186,13 @@ export async function POST(req: NextRequest) {
     })
 
     return { batchId: batch.id, matchedRows, validRows, invalidRows, reviewRows, creditedAmount, pendingAmount }
-  })
+    })
+  } catch (error) {
+    if (isMissingResultBatchTables(error)) {
+      return NextResponse.json({ error: RESULT_BATCH_SETUP_MESSAGE }, { status: 503 })
+    }
+    throw error
+  }
 
   return NextResponse.json({ success: true, ...summary })
 }

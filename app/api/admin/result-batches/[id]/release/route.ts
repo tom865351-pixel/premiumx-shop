@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
@@ -8,14 +9,23 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const batch = await prisma.resultBatch.findUnique({
-    where: { id: params.id },
-    include: { rows: true },
-  })
+  let batch
+  try {
+    batch = await prisma.resultBatch.findUnique({
+      where: { id: params.id },
+      include: { rows: true },
+    })
+  } catch (error) {
+    if (isMissingResultBatchTables(error)) {
+      return NextResponse.json({ error: RESULT_BATCH_SETUP_MESSAGE }, { status: 503 })
+    }
+    throw error
+  }
   if (!batch || batch.status === 'rolled_back') return NextResponse.json({ error: 'Batch not found' }, { status: 404 })
 
   const pendingRows = batch.rows.filter((row) => row.pending && !row.credited && row.accountId && row.sellerId)
-  await prisma.$transaction(async (tx) => {
+  try {
+    await prisma.$transaction(async (tx) => {
     for (const row of pendingRows) {
       const updatedSeller = await tx.user.update({
         where: { id: row.sellerId! },
@@ -38,7 +48,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         data: { creditedAmount: { increment: pendingRows.reduce((sum, row) => sum + row.price, 0) }, pendingAmount: 0 },
       })
     }
-  })
+    })
+  } catch (error) {
+    if (isMissingResultBatchTables(error)) {
+      return NextResponse.json({ error: RESULT_BATCH_SETUP_MESSAGE }, { status: 503 })
+    }
+    throw error
+  }
 
   return NextResponse.redirect(new URL('/admin/result-batches', req.url))
 }

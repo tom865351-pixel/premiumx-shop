@@ -3,6 +3,7 @@ import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { getSettings } from '@/lib/settings'
 import { hashBuffer, parseResultWorkbook } from '@/lib/bulkResults'
+import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
@@ -33,10 +34,18 @@ export async function POST(req: NextRequest) {
 
   const byId = new Map(accounts.map((account) => [account.id, account]))
   const byUsername = new Map(accounts.map((account) => [account.username.toLowerCase(), account]))
-  const existingRows = await prisma.resultRow.findMany({
-    where: { accountId: { in: accounts.map((account) => account.id) }, credited: true },
-    select: { accountId: true },
-  })
+  let existingRows: { accountId: string | null }[] = []
+  try {
+    existingRows = await prisma.resultRow.findMany({
+      where: { accountId: { in: accounts.map((account) => account.id) }, credited: true },
+      select: { accountId: true },
+    })
+  } catch (error) {
+    if (isMissingResultBatchTables(error)) {
+      return NextResponse.json({ error: RESULT_BATCH_SETUP_MESSAGE }, { status: 503 })
+    }
+    throw error
+  }
   const creditedIds = new Set(existingRows.map((row) => row.accountId))
 
   const rows = parsed.map((row) => {
