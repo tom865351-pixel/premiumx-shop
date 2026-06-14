@@ -144,6 +144,7 @@ export default function Navbar({ user }: NavbarProps) {
 
         <div className={styles.controls}>
           <button
+            type="button"
             className={styles.langBtn}
             onClick={() => handleLangChange(lang === 'en' ? 'bn' : 'en')}
             title={lang === 'en' ? 'Switch to Bangla' : 'Switch to English'}
@@ -178,6 +179,7 @@ export default function Navbar({ user }: NavbarProps) {
 
               <div className={styles.userMenu}>
                 <button
+                  type="button"
                   className={styles.avatar}
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
@@ -223,7 +225,7 @@ export default function Navbar({ user }: NavbarProps) {
                       </Link>
                     )}
                     <div className={styles.dropdownDivider} />
-                    <button className={`${styles.dropdownItem} ${styles.logoutBtn}`} onClick={handleLogout}>
+                    <button type="button" className={`${styles.dropdownItem} ${styles.logoutBtn}`} onClick={handleLogout}>
                       {text.logout}
                     </button>
                   </div>
@@ -237,7 +239,7 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
           )}
 
-          <button className={styles.mobileMenu} onClick={() => setMenuOpen(!menuOpen)}>
+          <button type="button" className={styles.mobileMenu} onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? 'X' : 'Menu'}
           </button>
         </div>
@@ -261,7 +263,7 @@ export default function Navbar({ user }: NavbarProps) {
               <Link href="/live" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>Live Sessions</Link>
               <Link href="/orders" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.orders}</Link>
               <Link href="/wallet" className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>{text.wallet}</Link>
-              <button className={styles.mobileNavLink} onClick={handleLogout}>{text.logout}</button>
+              <button type="button" className={styles.mobileNavLink} onClick={handleLogout}>{text.logout}</button>
             </>
           )}
         </div>

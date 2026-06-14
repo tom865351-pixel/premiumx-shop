@@ -9,10 +9,21 @@ export default function FloatingSupport() {
   useEffect(() => setMounted(true), [])
   if (!mounted) return null
 
+  const chipStyle = {
+    padding: '10px 16px',
+    borderRadius: '30px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontWeight: 600,
+    fontSize: '14px',
+    textDecoration: 'none',
+  }
+
   return (
     <div style={{
       position: 'fixed',
-      bottom: '90px', // Above mobile bottom nav
+      bottom: '90px',
       right: '20px',
       zIndex: 9998,
       display: 'flex',
@@ -20,7 +31,6 @@ export default function FloatingSupport() {
       alignItems: 'flex-end',
       gap: '12px'
     }}>
-      {/* Menu Options */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -32,43 +42,55 @@ export default function FloatingSupport() {
         transformOrigin: 'bottom right'
       }}>
         <a href="https://wa.me/8801234567890" target="_blank" rel="noreferrer" style={{
-          background: '#25D366', color: '#fff', padding: '10px 16px', borderRadius: '30px',
-          display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '14px',
-          boxShadow: '0 4px 15px rgba(37, 211, 102, 0.4)', textDecoration: 'none'
+          ...chipStyle,
+          background: '#25D366',
+          color: '#fff',
+          boxShadow: '0 4px 15px rgba(37, 211, 102, 0.4)',
         }}>
-          <span style={{ fontSize: '20px' }}>💬</span> WhatsApp
+          <span style={{ fontSize: '13px', fontWeight: 900 }}>WA</span> WhatsApp
         </a>
         <a href="https://t.me/premiumxshop" target="_blank" rel="noreferrer" style={{
-          background: '#0088cc', color: '#fff', padding: '10px 16px', borderRadius: '30px',
-          display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '14px',
-          boxShadow: '0 4px 15px rgba(0, 136, 204, 0.4)', textDecoration: 'none'
+          ...chipStyle,
+          background: '#0088cc',
+          color: '#fff',
+          boxShadow: '0 4px 15px rgba(0, 136, 204, 0.4)',
         }}>
-          <span style={{ fontSize: '20px' }}>✈️</span> Telegram
+          <span style={{ fontSize: '13px', fontWeight: 900 }}>TG</span> Telegram
         </a>
         <Link href="/support" style={{
-          background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text)', 
-          padding: '10px 16px', borderRadius: '30px',
-          display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '14px',
-          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)', textDecoration: 'none'
+          ...chipStyle,
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
+          color: 'var(--text)',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)',
         }}>
-          <span style={{ fontSize: '20px' }}>🎫</span> Open Ticket
+          <span style={{ fontSize: '13px', fontWeight: 900 }}>TKT</span> Open Ticket
         </Link>
       </div>
 
-      {/* Main Button */}
-      <button 
+      <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Open support menu"
         style={{
-          width: '56px', height: '56px', borderRadius: '50%',
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
           background: 'linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%)',
-          border: 'none', color: '#000', fontSize: '28px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(212, 175, 55, 0.5)', cursor: 'pointer',
+          border: 'none',
+          color: '#000',
+          fontSize: isOpen ? 22 : 13,
+          fontWeight: 900,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(212, 175, 55, 0.5)',
+          cursor: 'pointer',
           transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           transform: isOpen ? 'rotate(45deg)' : 'rotate(0)'
         }}
       >
-        {isOpen ? '✖' : '🎧'}
+        {isOpen ? 'x' : 'Help'}
       </button>
     </div>
   )

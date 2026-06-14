@@ -44,7 +44,7 @@ export default function AdminSidebar({ open = false, onClose }: { open?: boolean
             </span>
           </Link>
           <span className={styles.adminBadge}>ADMIN</span>
-          <button className={styles.closeBtn} onClick={onClose}>Close</button>
+          <button type="button" className={styles.closeBtn} onClick={onClose}>Close</button>
         </div>
         <nav className={styles.nav}>
           {navItems.map((item) => (

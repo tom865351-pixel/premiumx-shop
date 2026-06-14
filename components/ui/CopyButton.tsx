@@ -16,12 +16,13 @@ export default function CopyButton({ text }: { text: string }) {
   }
 
   return (
-    <button 
-      className={`btn ${copied ? 'btn-gold' : 'btn-outline'}`} 
+    <button
+      type="button"
+      className={`btn ${copied ? 'btn-gold' : 'btn-outline'}`}
       style={{ whiteSpace: 'nowrap' }}
       onClick={handleCopy}
     >
-      {copied ? '✅ Copied!' : 'Copy Link'}
+      {copied ? 'Copied' : 'Copy Link'}
     </button>
   )
 }

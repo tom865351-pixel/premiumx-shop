@@ -14,7 +14,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           <span className={styles.brandTitle}>PremiumX Admin</span>
           <span className={styles.brandSub}>Full control panel</span>
         </div>
-        <button className="btn btn-sm btn-gold" onClick={() => setOpen(true)}>
+        <button type="button" className="btn btn-sm btn-gold" onClick={() => setOpen(true)}>
           Menu
         </button>
       </div>

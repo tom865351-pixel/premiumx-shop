@@ -48,12 +48,13 @@ export default function PurchaseButton({ accountId, price, isAvailable, isLogged
   }
 
   if (!isAvailable) {
-    return <button className="btn btn-outline w-full" disabled>Not Available</button>
+    return <button type="button" className="btn btn-outline w-full" disabled>Not Available</button>
   }
 
   return (
     <div style={{ marginTop: 24 }}>
       <button
+        type="button"
         className="btn btn-gold w-full"
         onClick={initiatePurchase}
         style={{ fontSize: 16, padding: '16px' }}
@@ -81,6 +82,7 @@ export default function PurchaseButton({ accountId, price, isAvailable, isLogged
 
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                   <button
+                    type="button"
                     className="btn btn-gold"
                     onClick={handlePurchase}
                     disabled={loading}
@@ -89,6 +91,7 @@ export default function PurchaseButton({ accountId, price, isAvailable, isLogged
                     {loading ? <><Spinner size={18} /> Processing...</> : 'Confirm Payment'}
                   </button>
                   <button
+                    type="button"
                     className="btn btn-outline"
                     onClick={() => { setShowModal(false); setError(''); }}
                     disabled={loading}

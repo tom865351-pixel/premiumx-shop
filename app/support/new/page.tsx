@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Navbar from '@/components/layout/Navbar'
 
 export default function NewTicketPage() {
   const router = useRouter()
@@ -32,9 +31,9 @@ export default function NewTicketPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <main className="container" style={{ padding: '40px 20px', flex: 1, maxWidth: 700 }}>
         <div style={{ marginBottom: 24 }}>
-          <button onClick={() => router.back()} className="btn btn-sm btn-outline">← Back</button>
+          <button type="button" onClick={() => router.back()} className="btn btn-sm btn-outline">Back</button>
         </div>
-        <h1 className="page-title" style={{ marginBottom: 8 }}>🎫 Create Support Ticket</h1>
+        <h1 className="page-title" style={{ marginBottom: 8 }}>Create Support Ticket</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 32 }}>Describe your issue and we&apos;ll get back to you shortly.</p>
 
         {error && (
@@ -52,10 +51,10 @@ export default function NewTicketPage() {
           <div className="form-group">
             <label className="form-label">Priority</label>
             <select className="select" value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}>
-              <option value="low">🟢 Low — General questions</option>
-              <option value="normal">🔵 Normal — Account issues</option>
-              <option value="high">🟡 High — Payment problems</option>
-              <option value="urgent">🔴 Urgent — Account lost/hacked</option>
+              <option value="low">Low - General questions</option>
+              <option value="normal">Normal - Account issues</option>
+              <option value="high">High - Payment problems</option>
+              <option value="urgent">Urgent - Account lost/hacked</option>
             </select>
           </div>
           <div className="form-group">
@@ -65,7 +64,7 @@ export default function NewTicketPage() {
               style={{ resize: 'vertical', fontFamily: 'inherit' }} />
           </div>
           <button className="btn btn-gold" type="submit" disabled={loading}>
-            {loading ? 'Submitting...' : '📩 Submit Ticket'}
+            {loading ? 'Submitting...' : 'Submit Ticket'}
           </button>
         </form>
       </main>
