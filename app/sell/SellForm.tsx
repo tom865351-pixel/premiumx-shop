@@ -236,6 +236,9 @@ export default function SellForm({ categories }: { categories: Category[] }) {
               <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 24 }}>
                 Use columns named <strong>Username</strong> and <strong>Password</strong>, or put username in column A and password in column B. Optional: 2FA, recovery email, recovery phone.
               </p>
+              <a href="/api/sell/bulk/template" className="btn btn-outline w-full text-center" style={{ marginBottom: 14 }}>
+                Download Excel Template
+              </a>
 
               <form onSubmit={handleBulkSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
                 <input
