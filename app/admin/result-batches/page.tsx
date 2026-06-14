@@ -41,8 +41,12 @@ export default async function ResultBatchesPage() {
           <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 14 }}>{setupError}</p>
           <div style={{ display: 'grid', gap: 8, color: 'var(--text)', fontSize: 14 }}>
             <div><strong>Where this page is:</strong> Admin Panel - Upload Result</div>
+            <div><strong>Upload box:</strong> ei card-er jaygay setup complete hole file choose + Preview Excel button ashbe.</div>
             <div><strong>After setup:</strong> upload the blue/red Excel report here to auto-send seller reports.</div>
           </div>
+          <form action="/api/admin/result-batches/setup" method="POST" style={{ marginTop: 16 }}>
+            <button className="btn btn-gold" type="submit">Fix Database & Show Upload</button>
+          </form>
         </section>
       ) : (
         <ResultBatchUploader settings={settings} />
