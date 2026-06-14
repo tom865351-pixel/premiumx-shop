@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import CategoryLogo from '@/components/ui/CategoryLogo'
 
 export default async function AdminReports() {
   const user = await getAuthUser()
@@ -9,7 +10,7 @@ export default async function AdminReports() {
   const reports = await prisma.report.findMany({
     include: {
       buyer: { select: { username: true, email: true } },
-      account: { select: { title: true, username: true, category: { select: { name: true, icon: true } } } },
+      account: { select: { title: true, username: true, category: { select: { name: true, icon: true, color: true } } } },
       order: { select: { amount: true, createdAt: true } },
     },
     orderBy: { createdAt: 'desc' },
@@ -58,7 +59,10 @@ export default async function AdminReports() {
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{report.buyer.email}</div>
                   </td>
                   <td>
-                    <div>{report.account.category.icon} {report.account.title}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <CategoryLogo icon={report.account.category.icon} name={report.account.category.name} color={report.account.category.color} size={24} radius={6} />
+                      <span>{report.account.title}</span>
+                    </div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{report.account.category.name} - {report.account.username}</div>
                   </td>
                   <td className="text-gold font-mono">BDT {report.order.amount.toLocaleString()}</td>

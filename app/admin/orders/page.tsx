@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import CategoryLogo from '@/components/ui/CategoryLogo'
 
 export default async function AdminOrders() {
   const user = await getAuthUser()
@@ -9,7 +10,7 @@ export default async function AdminOrders() {
   const orders = await prisma.order.findMany({
     include: {
       buyer: { select: { username: true, email: true } },
-      account: { select: { title: true, category: { select: { name: true, icon: true } } } },
+      account: { select: { title: true, category: { select: { name: true, icon: true, color: true } } } },
     },
     orderBy: { createdAt: 'desc' },
   })
@@ -75,7 +76,10 @@ export default async function AdminOrders() {
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{order.buyer.email}</div>
                   </td>
                   <td>
-                    <div>{order.account.category.icon} {order.account.title}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <CategoryLogo icon={order.account.category.icon} name={order.account.category.name} color={order.account.category.color} size={24} radius={6} />
+                      <span>{order.account.title}</span>
+                    </div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{order.account.category.name}</div>
                   </td>
                   <td className="text-gold font-mono">BDT {order.amount.toLocaleString()}</td>

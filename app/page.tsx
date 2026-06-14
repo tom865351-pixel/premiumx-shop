@@ -4,18 +4,7 @@ import styles from './page.module.css'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
-
-function platformLogo(name = '') {
-  const key = name.toLowerCase()
-  if (key.includes('instagram')) return { text: 'IG', bg: 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4)' }
-  if (key.includes('facebook')) return { text: 'f', bg: '#1877f2' }
-  if (key.includes('gmail') || key.includes('google')) return { text: 'G', bg: '#ea4335' }
-  if (key.includes('tiktok')) return { text: 'TT', bg: '#111827' }
-  if (key.includes('netflix')) return { text: 'N', bg: '#e50914' }
-  if (key.includes('youtube')) return { text: 'YT', bg: '#ff0000' }
-  if (key.includes('telegram')) return { text: 'TG', bg: '#229ed9' }
-  return { text: name.slice(0, 2).toUpperCase() || 'PX', bg: 'linear-gradient(135deg,#0ea5e9,#9333ea)' }
-}
+import CategoryLogo from '@/components/ui/CategoryLogo'
 
 export default async function Home() {
   const authUser = await getAuthUser()
@@ -82,18 +71,13 @@ export default async function Home() {
             <Link href="/sell" className="btn btn-gold">Submit Stock</Link>
           </div>
           <div className={styles.categories}>
-            {categories.map((cat) => {
-              const logo = platformLogo(cat.name)
-              return (
-                <Link href="/sell" key={cat.id} className={styles.categoryCard} style={{ '--hover-color': cat.color } as any}>
-                  <span style={{ width: 42, height: 42, borderRadius: 12, display: 'grid', placeItems: 'center', color: '#fff', fontWeight: 900, background: logo.bg }}>
-                    {logo.text}
-                  </span>
-                  <span className={styles.catName}>{cat.name}</span>
-                  <span style={{ color: 'var(--gold)', fontSize: 13, fontWeight: 800 }}>BDT {cat.defaultPrice}</span>
-                </Link>
-              )
-            })}
+            {categories.map((cat) => (
+              <Link href="/sell" key={cat.id} className={styles.categoryCard} style={{ '--hover-color': cat.color } as any}>
+                <CategoryLogo icon={cat.icon} name={cat.name} color={cat.color} size={42} radius={12} />
+                <span className={styles.catName}>{cat.name}</span>
+                <span style={{ color: 'var(--gold)', fontSize: 13, fontWeight: 800 }}>BDT {cat.defaultPrice}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

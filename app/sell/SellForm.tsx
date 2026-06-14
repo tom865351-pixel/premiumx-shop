@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import CategoryLogo from '@/components/ui/CategoryLogo'
 
 interface Category {
   id: string
@@ -8,18 +9,6 @@ interface Category {
   icon: string
   color: string
   defaultPrice: number
-}
-
-function platformLogo(name: string) {
-  const lower = name.toLowerCase()
-  if (lower.includes('instagram')) return 'IG'
-  if (lower.includes('facebook')) return 'f'
-  if (lower.includes('gmail') || lower.includes('google')) return 'G'
-  if (lower.includes('tiktok')) return 'TT'
-  if (lower.includes('netflix')) return 'N'
-  if (lower.includes('youtube')) return 'YT'
-  if (lower.includes('telegram')) return 'TG'
-  return name.slice(0, 2).toUpperCase()
 }
 
 export default function SellForm({ categories }: { categories: Category[] }) {
@@ -129,21 +118,7 @@ export default function SellForm({ categories }: { categories: Category[] }) {
                 onMouseOver={(e) => (e.currentTarget.style.borderColor = cat.color)}
                 onMouseOut={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
               >
-                <span
-                  style={{
-                    minWidth: 48,
-                    height: 48,
-                    borderRadius: 8,
-                    display: 'grid',
-                    placeItems: 'center',
-                    background: cat.color || 'var(--surface)',
-                    color: '#fff',
-                    fontWeight: 900,
-                    fontSize: 18,
-                  }}
-                >
-                  {platformLogo(cat.name)}
-                </span>
+                <CategoryLogo icon={cat.icon} name={cat.name} color={cat.color} size={48} radius={8} />
                 <span style={{ fontWeight: 700, fontSize: 16 }}>{cat.name}</span>
                 <span style={{ color: 'var(--gold)', fontSize: 13, fontWeight: 800 }}>BDT {cat.defaultPrice} each</span>
               </button>
@@ -155,21 +130,7 @@ export default function SellForm({ categories }: { categories: Category[] }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
             <button type="button" onClick={() => setSelectedCategory(null)} className="btn btn-sm btn-outline" style={{ padding: '4px 8px' }}>Back</button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-              <span
-                style={{
-                  minWidth: 36,
-                  height: 36,
-                  borderRadius: 8,
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: selectedCategory.color || 'var(--surface)',
-                  color: '#fff',
-                  fontWeight: 900,
-                  fontSize: 13,
-                }}
-              >
-                {platformLogo(selectedCategory.name)}
-              </span>
+              <CategoryLogo icon={selectedCategory.icon} name={selectedCategory.name} color={selectedCategory.color} size={36} radius={8} />
               <h2 style={{ fontSize: 18, lineHeight: 1.2 }}>Sell {selectedCategory.name} Account</h2>
             </div>
           </div>

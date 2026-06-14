@@ -3,6 +3,7 @@ import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import PurchaseButton from './PurchaseButton'
+import CategoryLogo from '@/components/ui/CategoryLogo'
 
 export default async function AccountDetailsPage({ params }: { params: { id: string } }) {
   const account = await prisma.account.findUnique({
@@ -39,7 +40,8 @@ export default async function AccountDetailsPage({ params }: { params: { id: str
                     backdropFilter: 'blur(8px)',
                     fontWeight: 600
                   }}>
-                    {account.category.icon} {account.category.name}
+                    <CategoryLogo icon={account.category.icon} name={account.category.name} color={account.category.color} size={20} radius={5} style={{ border: 0 }} />
+                    {account.category.name}
                   </div>
                   <h1 style={{ fontSize: 28, marginBottom: 8, fontWeight: 800, lineHeight: 1.2 }}>{account.title}</h1>
                   <p style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>

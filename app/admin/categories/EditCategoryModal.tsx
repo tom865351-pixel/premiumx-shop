@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Spinner from '@/components/ui/Spinner'
+import CategoryLogo, { isImageIcon } from '@/components/ui/CategoryLogo'
 
 export default function EditCategoryModal({ category }: { category: any }) {
   const router = useRouter()
@@ -24,6 +25,11 @@ export default function EditCategoryModal({ category }: { category: any }) {
     const reader = new FileReader()
     reader.onload = () => setForm((current) => ({ ...current, icon: String(reader.result || current.icon) }))
     reader.readAsDataURL(file)
+  }
+
+  const useTextLabel = () => {
+    const label = form.name.trim().slice(0, 2).toUpperCase() || 'PX'
+    setForm((current) => ({ ...current, icon: label }))
   }
 
   const submit = async (e: React.FormEvent) => {
@@ -59,8 +65,18 @@ export default function EditCategoryModal({ category }: { category: any }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
                 <div className="form-group">
                   <label className="form-label">Icon / Short Label</label>
-                  <input className="input" value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} />
+                  <input
+                    className="input"
+                    value={isImageIcon(form.icon) ? '' : form.icon}
+                    onChange={e => setForm({ ...form, icon: e.target.value })}
+                    placeholder={isImageIcon(form.icon) ? 'Image logo selected' : 'IG, FB, PX...'}
+                  />
                   <input className="input" type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.svg" onChange={e => handleLogoFile(e.target.files?.[0])} style={{ marginTop: 8 }} />
+                  {isImageIcon(form.icon) && (
+                    <button type="button" className="btn btn-sm btn-outline" onClick={useTextLabel} style={{ marginTop: 8 }}>
+                      Use Text Label
+                    </button>
+                  )}
                 </div>
                 <div className="form-group">
                   <label className="form-label">Default Price (BDT)</label>
@@ -71,10 +87,10 @@ export default function EditCategoryModal({ category }: { category: any }) {
                 <label className="form-label">Description (optional)</label>
                 <input className="input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
               </div>
-              {(form.icon?.startsWith('data:image') || form.icon?.startsWith('http') || form.icon?.startsWith('/')) && (
+              {isImageIcon(form.icon) && (
                 <div className="form-group">
                   <label className="form-label">Logo Preview</label>
-                  <img src={form.icon} alt="Category logo preview" style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', border: '1px solid var(--border)' }} />
+                  <CategoryLogo icon={form.icon} name={form.name} color={form.color} size={56} radius={10} />
                 </div>
               )}
               <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>

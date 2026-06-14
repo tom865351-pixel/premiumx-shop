@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Spinner from '@/components/ui/Spinner'
+import CategoryLogo from '@/components/ui/CategoryLogo'
 import styles from './AdminAccounts.module.css'
 
 type Status = 'pending' | 'approved' | 'sold' | 'rejected'
@@ -23,18 +24,6 @@ function formatDate(dateStr: string) {
     hour: '2-digit',
     minute: '2-digit',
   })
-}
-
-function platformLogo(name = '') {
-  const key = name.toLowerCase()
-  if (key.includes('instagram')) return { text: 'IG', bg: 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4)' }
-  if (key.includes('facebook')) return { text: 'f', bg: '#1877f2' }
-  if (key.includes('gmail') || key.includes('google')) return { text: 'G', bg: '#ea4335' }
-  if (key.includes('tiktok')) return { text: 'TT', bg: '#111827' }
-  if (key.includes('netflix')) return { text: 'N', bg: '#e50914' }
-  if (key.includes('youtube')) return { text: 'YT', bg: '#ff0000' }
-  if (key.includes('telegram')) return { text: 'TG', bg: '#229ed9' }
-  return { text: name.slice(0, 2).toUpperCase() || 'PX', bg: 'linear-gradient(135deg,#0ea5e9,#9333ea)' }
 }
 
 function qualityScore(account: any) {
@@ -298,7 +287,6 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
                 {isOpen && (
                   <div className={styles.accounts}>
                     {group.accounts.map((account: any) => {
-                      const logo = platformLogo(account.category?.name)
                       return (
                         <article key={account.id} className={styles.accountCard}>
                           {activeTab === 'pending' && (
@@ -323,7 +311,7 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
                             {account.recoveryPhone && <div className={styles.credential}>Recovery phone: {account.recoveryPhone}</div>}
                             {account.accountAge && <div className={styles.credential}>Age: {account.accountAge}</div>}
                             <div className={styles.platform} style={{ marginTop: 8 }}>
-                              <span className={styles.logo} style={{ background: logo.bg }}>{logo.text}</span>
+                              <CategoryLogo icon={account.category?.icon} name={account.category?.name} color={account.category?.color} size={26} radius={7} />
                               <span>{account.category?.name}</span>
                               <span className={`badge ${STATUS_CONFIG[account.status as Status]?.badge || 'badge-muted'}`}>{account.status}</span>
                               <span className="text-gold">BDT {Number(account.price).toLocaleString()}</span>

@@ -2,18 +2,7 @@ import Link from 'next/link'
 import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
-
-function platformLogo(name = '') {
-  const key = name.toLowerCase()
-  if (key.includes('instagram')) return { text: 'IG', bg: 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4)' }
-  if (key.includes('facebook')) return { text: 'f', bg: '#1877f2' }
-  if (key.includes('gmail') || key.includes('google')) return { text: 'G', bg: '#ea4335' }
-  if (key.includes('tiktok')) return { text: 'TT', bg: '#111827' }
-  if (key.includes('netflix')) return { text: 'N', bg: '#e50914' }
-  if (key.includes('youtube')) return { text: 'YT', bg: '#ff0000' }
-  if (key.includes('telegram')) return { text: 'TG', bg: '#229ed9' }
-  return { text: name.slice(0, 2).toUpperCase() || 'PX', bg: 'linear-gradient(135deg,#0ea5e9,#9333ea)' }
-}
+import CategoryLogo from '@/components/ui/CategoryLogo'
 
 export default async function Browse() {
   const authUser = await getAuthUser()
@@ -34,27 +23,22 @@ export default async function Browse() {
         </div>
 
         <div className="grid-4">
-          {categories.map((cat) => {
-            const logo = platformLogo(cat.name)
-            return (
-              <div key={cat.id} className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ width: 44, height: 44, borderRadius: 12, display: 'grid', placeItems: 'center', color: '#fff', fontWeight: 900, background: logo.bg }}>
-                    {logo.text}
-                  </span>
-                  <div>
-                    <div style={{ fontWeight: 900 }}>{cat.name}</div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Fixed buying rate</div>
-                  </div>
+          {categories.map((cat) => (
+            <div key={cat.id} className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <CategoryLogo icon={cat.icon} name={cat.name} color={cat.color} size={44} radius={12} />
+                <div>
+                  <div style={{ fontWeight: 900 }}>{cat.name}</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Fixed buying rate</div>
                 </div>
-                <div style={{ color: 'var(--gold)', fontSize: 24, fontWeight: 900 }}>BDT {cat.defaultPrice.toLocaleString()}</div>
-                <p style={{ color: 'var(--text-muted)', fontSize: 13, lineHeight: 1.6, minHeight: 44 }}>
-                  {cat.description || 'Submit username, password, and 2FA if available. Bulk Excel upload is supported.'}
-                </p>
-                <Link href="/sell" className="btn btn-outline w-full text-center">Sell {cat.name}</Link>
               </div>
-            )
-          })}
+              <div style={{ color: 'var(--gold)', fontSize: 24, fontWeight: 900 }}>BDT {cat.defaultPrice.toLocaleString()}</div>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13, lineHeight: 1.6, minHeight: 44 }}>
+                {cat.description || 'Submit username, password, and 2FA if available. Bulk Excel upload is supported.'}
+              </p>
+              <Link href="/sell" className="btn btn-outline w-full text-center">Sell {cat.name}</Link>
+            </div>
+          ))}
         </div>
 
         <section className="card" style={{ marginTop: 28, padding: 24 }}>
