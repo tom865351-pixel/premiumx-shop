@@ -68,15 +68,6 @@ export default function Login() {
           </button>
         </form>
 
-        <div style={{ display: 'grid', gap: 10, marginTop: 16 }}>
-          <a href="/api/auth/google" className="btn btn-outline w-full">
-            Continue with Google
-          </a>
-          <a href="/api/auth/facebook" className="btn btn-outline w-full">
-            Continue with Facebook
-          </a>
-        </div>
-
         <div style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--text-secondary)' }}>
           Don&apos;t have an account? <Link href="/register" className="text-gold">Sign up</Link>
         </div>
