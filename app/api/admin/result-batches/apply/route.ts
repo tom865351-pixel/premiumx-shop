@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 type IncomingRow = {
   accountId?: string
@@ -13,7 +14,7 @@ type IncomingRow = {
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
-  if (!user || user.role !== 'admin') {
+  if (!user || !(await canAccessAdminArea(user.role, 'results'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

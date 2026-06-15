@@ -14,14 +14,14 @@ export default function Login() {
     setError('')
 
     const formData = new FormData(e.currentTarget)
-    const email = formData.get('email')
+    const identifier = formData.get('identifier')
     const password = formData.get('password')
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, password }),
       })
 
       const data = await res.json()
@@ -52,8 +52,8 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="form-group">
-            <label className="form-label">Email Address</label>
-            <input type="email" name="email" required placeholder="name@example.com" />
+            <label className="form-label">Username, Email or Phone</label>
+            <input type="text" name="identifier" required placeholder="username, name@example.com or 01700000000" autoComplete="username" />
           </div>
           <div className="form-group">
             <div className="flex justify-between items-center">
@@ -67,6 +67,15 @@ export default function Login() {
             {loading ? <div className="spinner" /> : 'Sign In'}
           </button>
         </form>
+
+        <div style={{ display: 'grid', gap: 10, marginTop: 16 }}>
+          <a href="/api/auth/google" className="btn btn-outline w-full">
+            Continue with Google
+          </a>
+          <a href="/api/auth/facebook" className="btn btn-outline w-full">
+            Continue with Facebook
+          </a>
+        </div>
 
         <div style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--text-secondary)' }}>
           Don&apos;t have an account? <Link href="/register" className="text-gold">Sign up</Link>

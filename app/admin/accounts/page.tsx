@@ -3,10 +3,11 @@ import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import AdminAccountsClient from './AdminAccountsClient'
 import { getSetting } from '@/lib/settings'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminAccounts() {
   const user = await getAuthUser()
-  if (!user || user.role !== 'admin') redirect('/login')
+  if (!user || !(await canAccessAdminArea(user.role, 'accounts'))) redirect('/login')
 
   const accounts = await prisma.account.findMany({
     orderBy: { createdAt: 'desc' },

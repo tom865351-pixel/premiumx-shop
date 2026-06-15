@@ -4,10 +4,11 @@ import { getAuthUser } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
 import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 import ResultBatchUploader from './ResultBatchUploader'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function ResultBatchesPage() {
   const user = await getAuthUser()
-  if (!user || user.role !== 'admin') redirect('/login')
+  if (!user || !(await canAccessAdminArea(user.role, 'results'))) redirect('/login')
 
   const settings = await getSettings(['bulk_result_credit_mode', 'bulk_result_reason_mode', 'bulk_result_default_reason', 'bulk_result_allow_color'])
   let setupError = ''
@@ -90,6 +91,8 @@ export default async function ResultBatchesPage() {
                   <td>@{batch.admin.username}</td>
                   <td>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <a className="btn btn-sm btn-outline" href={`/admin/result-batches/${batch.id}`}>View</a>
+                      <a className="btn btn-sm btn-outline" href={`/api/admin/result-batches/${batch.id}/export?format=seller`}>Export</a>
                       {batch.pendingAmount > 0 && batch.status !== 'rolled_back' && (
                         <form action={`/api/admin/result-batches/${batch.id}/release`} method="POST">
                           <button className="btn btn-sm btn-gold" type="submit">Release Pending</button>

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { parseAccountExcel } from '@/lib/accountExcel'
+import { findExistingAccounts, normalizeUsername } from '@/lib/duplicateAccount'
+import { fetchPublicSheetBuffer } from '@/lib/sheetLinks'
 
 export async function POST(req: Request) {
   try {
@@ -12,10 +14,11 @@ export async function POST(req: Request) {
 
     const formData = await req.formData()
     const categoryId = formData.get('categoryId') as string
-    const file = formData.get('file') as File
+    const file = formData.get('file') as File | null
+    const sheetUrl = String(formData.get('sheetUrl') || '').trim()
 
-    if (!categoryId || !file) {
-      return NextResponse.json({ error: 'Missing category or file' }, { status: 400 })
+    if (!categoryId || (!file?.size && !sheetUrl)) {
+      return NextResponse.json({ error: 'Missing category and Excel file or public Sheet link' }, { status: 400 })
     }
 
     const category = await prisma.category.findUnique({ where: { id: categoryId } })
@@ -23,9 +26,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid category' }, { status: 400 })
     }
 
-    // Read the file buffer
-    const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
+    const buffer = sheetUrl
+      ? await fetchPublicSheetBuffer(sheetUrl)
+      : Buffer.from(await file!.arrayBuffer())
 
     const parsed = parseAccountExcel(buffer)
     const rows = parsed.rows
@@ -46,9 +49,13 @@ export async function POST(req: Request) {
     const seen = new Set<string>()
     let duplicateRows = 0
 
+    const candidateUsernames = rows.map((row) => row.username).filter(Boolean)
+    const existingAccounts = await findExistingAccounts(candidateUsernames, category.id)
+    const existingUsernames = new Set(existingAccounts.map((account) => normalizeUsername(account.username)))
+
     const accountsData = rows.map((row) => {
-      const duplicateKey = row.username.toLowerCase().trim()
-      if (seen.has(duplicateKey)) {
+      const duplicateKey = normalizeUsername(row.username)
+      if (seen.has(duplicateKey) || existingUsernames.has(duplicateKey)) {
         duplicateRows += 1
         return null
       }
@@ -84,11 +91,11 @@ export async function POST(req: Request) {
       count: accountsData.length,
       skippedMissing: missingRows,
       skippedDuplicates: duplicateRows,
-      message: `Imported ${accountsData.length} accounts. Skipped ${missingRows} missing rows and ${duplicateRows} duplicate rows.${parsed.headerFound ? '' : ' Used first two columns as username/password.'}`,
+      message: `Imported ${accountsData.length} accounts${sheetUrl ? ' from public Sheet link' : ''}. Skipped ${missingRows} missing rows and ${duplicateRows} duplicate rows.${parsed.headerFound ? '' : ' Used first two columns as username/password.'}`,
     })
 
   } catch (error: any) {
     console.error('Bulk Sell API error:', error)
-    return NextResponse.json({ error: 'Failed to process file. Make sure it is a valid Excel or CSV.' }, { status: 500 })
+    return NextResponse.json({ error: error.message || 'Failed to process file. Make sure it is a valid Excel, CSV, or public Sheet link.' }, { status: 500 })
   }
 }

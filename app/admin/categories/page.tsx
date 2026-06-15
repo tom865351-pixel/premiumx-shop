@@ -5,10 +5,11 @@ import AddCategoryModal from './AddCategoryModal'
 import CategoryActions from './CategoryActions'
 import EditCategoryModal from './EditCategoryModal'
 import CategoryLogo from '@/components/ui/CategoryLogo'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminCategories() {
   const user = await getAuthUser()
-  if (!user || user.role !== 'admin') redirect('/login')
+  if (!user || !(await canAccessAdminArea(user.role, 'categories'))) redirect('/login')
 
   const categories = await prisma.category.findMany({
     orderBy: { sortOrder: 'asc' },

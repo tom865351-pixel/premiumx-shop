@@ -60,6 +60,12 @@ export default async function WalletPage() {
   const pendingHold = pendingWithdrawals.reduce((sum, withdrawal) => sum + withdrawal.amount, 0)
   const pendingTopups = user.topupRequests.filter((topup) => topup.status === 'pending').length
 
+  const pendingAccounts = await prisma.account.findMany({
+    where: { sellerId: user.id, status: 'pending' },
+    select: { price: true },
+  })
+  const pendingSalesValue = pendingAccounts.reduce((sum, account) => sum + account.price, 0)
+
   return (
     <div className={styles.shell}>
       <Navbar user={user as any} />
@@ -97,6 +103,12 @@ export default async function WalletPage() {
             <div className={styles.label}>Paid Out</div>
             <div className={styles.metricValue} style={{ color: 'var(--success)' }}>BDT {totalWithdrawn.toLocaleString()}</div>
             <div className={styles.metricHint}>Total completed withdrawals</div>
+          </div>
+
+          <div className={styles.metricCard}>
+            <div className={styles.label}>Pending Sales</div>
+            <div className={styles.metricValue} style={{ color: 'var(--info)' }}>BDT {pendingSalesValue.toLocaleString()}</div>
+            <div className={styles.metricHint}>{pendingAccounts.length} account{pendingAccounts.length === 1 ? '' : 's'} waiting admin review</div>
           </div>
 
           <div className={styles.metricCard}>

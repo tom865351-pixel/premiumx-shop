@@ -29,6 +29,10 @@ export default async function AdminWithdrawals() {
           <h1 className="page-title">Withdrawal Requests</h1>
           <p className="page-subtitle">Pay sellers, save references, and return rejected payout holds safely.</p>
         </div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <a className="btn btn-gold" href="/api/admin/withdrawals/export?status=pending">Export Pending Payouts</a>
+          <a className="btn btn-outline" href="/api/admin/withdrawals/export?status=approved">Export Paid Payouts</a>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>

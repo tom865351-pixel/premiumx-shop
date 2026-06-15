@@ -184,9 +184,9 @@ export default function SellForm({ categories }: { categories: Category[] }) {
           ) : (
             <div style={{ padding: 20, textAlign: 'center', border: '2px dashed var(--border)', borderRadius: 8, background: 'var(--surface)', marginBottom: 20 }}>
               <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--gold)', marginBottom: 16 }}>EXCEL</div>
-              <h3 style={{ marginBottom: 8, color: 'var(--text)' }}>Upload Excel or CSV</h3>
+              <h3 style={{ marginBottom: 8, color: 'var(--text)' }}>Upload Excel/CSV or Paste Sheet Link</h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 24 }}>
-                Use columns named <strong>Username</strong> and <strong>Password</strong>, or put username in column A and password in column B. Optional: 2FA, recovery email, recovery phone.
+                Use public Google Sheets or Excel links. Columns: <strong>Username</strong> and <strong>Password</strong>, or username in A and password in B.
               </p>
               <a href="/api/sell/bulk/template" className="btn btn-outline w-full text-center" style={{ marginBottom: 14 }}>
                 Download Excel Template
@@ -197,8 +197,14 @@ export default function SellForm({ categories }: { categories: Category[] }) {
                   type="file"
                   name="file"
                   accept=".xlsx, .xls, .csv"
-                  required
                   style={{ background: 'var(--bg)', padding: 10, borderRadius: 8, border: '1px solid var(--border)', width: '100%' }}
+                />
+                <input
+                  type="url"
+                  name="sheetUrl"
+                  placeholder="Or paste public Google Sheet / Excel link"
+                  className="form-input"
+                  style={{ width: '100%' }}
                 />
                 <button type="submit" className="btn btn-gold w-full" disabled={loading}>
                   {loading ? <div className="spinner" /> : 'Upload Bulk Accounts'}

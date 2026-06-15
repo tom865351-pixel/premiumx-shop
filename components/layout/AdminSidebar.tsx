@@ -2,33 +2,46 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import styles from './AdminSidebar.module.css'
+import type { StaffPermissionKey } from '@/lib/permissions'
 
 const navItems = [
-  { href: '/admin/dashboard', icon: 'D', label: 'Dashboard' },
-  { href: '/admin/search', icon: 'Q', label: 'Global Search' },
-  { href: '/admin/activity', icon: 'Log', label: 'Activity' },
-  { href: '/admin/risk', icon: 'Risk', label: 'Risk Center', urgent: true },
-  { href: '/admin/users', icon: 'U', label: 'Users' },
-  { href: '/admin/accounts', icon: 'A', label: 'Accounts' },
-  { href: '/admin/result-batches', icon: 'XL', label: 'Upload Result' },
-  { href: '/admin/add-account', icon: '+', label: 'Add Account' },
-  { href: '/admin/orders', icon: 'O', label: 'Orders' },
-  { href: '/admin/deposits', icon: 'BDT', label: 'Wallet Deposits', urgent: true },
-  { href: '/admin/payments', icon: 'Pay', label: 'Payment Monitor' },
-  { href: '/admin/notifications', icon: 'Msg', label: 'Notify Users' },
-  { href: '/admin/daily-report', icon: 'Rpt', label: 'Daily Report' },
-  { href: '/admin/audit', icon: 'Fix', label: 'Site Audit' },
-  { href: '/admin/permissions', icon: 'Perm', label: 'Permissions' },
-  { href: '/admin/withdrawals', icon: 'W', label: 'Withdrawals' },
-  { href: '/admin/reports', icon: 'R', label: 'Reports', urgent: true },
-  { href: '/admin/support', icon: 'S', label: 'Support', urgent: true },
-  { href: '/admin/categories', icon: 'C', label: 'Categories' },
-  { href: '/admin/announcements', icon: 'N', label: 'Announcements' },
-  { href: '/admin/settings', icon: 'Set', label: 'Settings' },
-]
+  { href: '/admin/dashboard', icon: 'D', label: 'Dashboard', permission: 'dashboard' },
+  { href: '/admin/search', icon: 'S', label: 'Global Search', permission: 'search' },
+  { href: '/admin/activity', icon: 'A', label: 'Activity', permission: 'activity' },
+  { href: '/admin/risk', icon: '!', label: 'Risk Center', permission: 'risk', urgent: true },
+  { href: '/admin/users', icon: 'U', label: 'Users', permission: 'users' },
+  { href: '/admin/accounts', icon: '#', label: 'Accounts', permission: 'accounts' },
+  { href: '/admin/result-batches', icon: 'R', label: 'Upload Result', permission: 'results' },
+  { href: '/admin/add-account', icon: '+', label: 'Add Account', permission: 'addAccount' },
+  { href: '/admin/orders', icon: 'O', label: 'Orders', permission: 'orders' },
+  { href: '/admin/deposits', icon: 'BDT', label: 'Wallet Deposits', permission: 'deposits', urgent: true },
+  { href: '/admin/payments', icon: 'P', label: 'Payment Monitor', permission: 'payments' },
+  { href: '/admin/notifications', icon: 'N', label: 'Notify Users', permission: 'notifications' },
+  { href: '/admin/daily-report', icon: 'DR', label: 'Daily Report', permission: 'dailyReport' },
+  { href: '/admin/audit', icon: 'QA', label: 'Site Audit', permission: 'audit' },
+  { href: '/admin/permissions', icon: 'AC', label: 'Permissions', permission: 'permissions' },
+  { href: '/admin/withdrawals', icon: 'W', label: 'Withdrawals', permission: 'withdrawals' },
+  { href: '/admin/reports', icon: 'RP', label: 'Reports', permission: 'reports', urgent: true },
+  { href: '/admin/support', icon: '?', label: 'Support', permission: 'support', urgent: true },
+  { href: '/admin/categories', icon: 'C', label: 'Categories', permission: 'categories' },
+  { href: '/admin/announcements', icon: 'AN', label: 'Announcements', permission: 'announcements' },
+  { href: '/admin/settings', icon: 'ST', label: 'Settings', permission: 'settings' },
+] satisfies Array<{ href: string; icon: string; label: string; permission: StaffPermissionKey; urgent?: boolean }>
 
-export default function AdminSidebar({ open = false, onClose }: { open?: boolean, onClose?: () => void }) {
+export default function AdminSidebar({
+  open = false,
+  onClose,
+  role,
+  permissions,
+}: {
+  open?: boolean
+  onClose?: () => void
+  role: string
+  permissions: Record<StaffPermissionKey, boolean>
+}) {
   const pathname = usePathname()
+  const visibleItems = navItems.filter((item) => permissions[item.permission])
+
   return (
     <>
       <div className={`${styles.backdrop} ${open ? styles.backdropOpen : ''}`} onClick={onClose} />
@@ -44,11 +57,11 @@ export default function AdminSidebar({ open = false, onClose }: { open?: boolean
               <span className={styles.logoShop}>Shop</span>
             </span>
           </Link>
-          <span className={styles.adminBadge}>ADMIN</span>
+          <span className={styles.adminBadge}>{role === 'admin' ? 'ADMIN' : role === 'stock-manager' ? 'STOCK' : 'SUB'}</span>
           <button type="button" className={styles.closeBtn} onClick={onClose}>Close</button>
         </div>
         <nav className={styles.nav}>
-          {navItems.map((item) => (
+          {visibleItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}

@@ -1,6 +1,7 @@
 import { getAuthUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import AdminShell from '@/components/layout/AdminShell'
+import { getPermissionsForRole } from '@/lib/permissions'
 
 export default async function AdminLayout({
   children,
@@ -12,5 +13,7 @@ export default async function AdminLayout({
     redirect('/login')
   }
 
-  return <AdminShell>{children}</AdminShell>
+  const permissions = await getPermissionsForRole(user.role)
+
+  return <AdminShell role={user.role} permissions={permissions}>{children}</AdminShell>
 }

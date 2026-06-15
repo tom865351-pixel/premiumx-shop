@@ -108,8 +108,21 @@
   color: var(--gold);
   border: 1px solid rgba(212,175,55,0.2);
 }
-.navIcon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
-.navLabel { flex: 1; }
+.navIcon {
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 24px;
+  min-width: 24px;
+  text-align: center;
+  line-height: 1;
+}
+.navLabel {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .urgentDot {
   width: 6px;
   height: 6px;
@@ -193,7 +206,29 @@
 
   .navItem {
     min-height: 44px;
-    padding: 11px 12px;
-    font-size: 14px;
+    padding: 10px 12px;
+    font-size: 13px;
+    gap: 12px;
+  }
+
+  .navIcon {
+    width: 22px;
+    min-width: 22px;
+    font-size: 13px;
+  }
+
+  .navLabel {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.25;
+  }
+
+  .logoWords {
+    min-width: 0;
+  }
+
+  .adminBadge {
+    flex-shrink: 0;
   }
 }

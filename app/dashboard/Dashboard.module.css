@@ -46,6 +46,52 @@
   justify-content: flex-end;
 }
 
+.tierPanel {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.tierPremium {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.tierLabel {
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.tierText {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.tierMetrics {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.tierMetrics span {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -205,6 +251,15 @@
   }
 
   .heroActions {
+    justify-content: flex-start;
+  }
+
+  .tierPanel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tierMetrics {
     justify-content: flex-start;
   }
 

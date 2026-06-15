@@ -4,13 +4,22 @@ import { verifyPassword, signToken } from '@/lib/auth'
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json()
+    const { email, identifier, password } = await req.json()
+    const loginId = String(identifier || email || '').trim()
 
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Missing email or password' }, { status: 400 })
+    if (!loginId || !password) {
+      return NextResponse.json({ error: 'Missing username, email, phone or password' }, { status: 400 })
     }
 
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: loginId.toLowerCase() },
+          { username: loginId },
+          { phone: loginId },
+        ],
+      },
+    })
 
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })

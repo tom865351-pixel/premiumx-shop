@@ -60,6 +60,16 @@ export default async function Dashboard() {
   const paidVolume = dbUser.listings
     .filter((listing) => listing.status === 'approved' || listing.status === 'sold')
     .reduce((sum, listing) => sum + listing.price, 0)
+  const isPremiumSeller = paidVolume >= 10000 || boughtByAdmin >= 25 || dbUser.role === 'admin'
+  const accountTier = dbUser.role === 'admin'
+    ? 'Premium Admin'
+    : dbUser.role === 'stock-manager'
+      ? 'Stock Manager'
+      : dbUser.role === 'sub-admin'
+        ? 'Sub Admin'
+        : isPremiumSeller
+          ? 'Premium Seller'
+          : 'Seller'
   const groups = submissionGroups(dbUser.listings).slice(0, 8)
 
   return (
@@ -69,13 +79,28 @@ export default async function Dashboard() {
       <main className={`container ${styles.main}`}>
         <section className={styles.hero}>
           <div>
-            <div className={styles.eyebrow}>Seller dashboard</div>
+            <div className={styles.eyebrow}>{accountTier} dashboard</div>
             <h1 className={styles.title}>Welcome back, {dbUser.username}</h1>
             <p className={styles.subtitle}>Submit accounts, track admin review, and manage your seller wallet from one screen.</p>
           </div>
           <div className={styles.heroActions}>
             <Link href="/sell" className="btn btn-gold">Submit Accounts</Link>
             <Link href="/browse" className="btn btn-outline">View Rates</Link>
+          </div>
+        </section>
+
+        <section className={`${styles.tierPanel} ${isPremiumSeller || dbUser.role === 'admin' ? styles.tierPremium : ''}`}>
+          <div>
+            <div className={styles.tierLabel}>{accountTier}</div>
+            <div className={styles.tierText}>
+              {isPremiumSeller
+                ? 'Premium status active from paid stock volume and successful approvals.'
+                : 'Premium unlocks automatically after strong paid volume or enough approved stock.'}
+            </div>
+          </div>
+          <div className={styles.tierMetrics}>
+            <span>Paid BDT {paidVolume.toLocaleString()}</span>
+            <span>{boughtByAdmin} approved</span>
           </div>
         </section>
 

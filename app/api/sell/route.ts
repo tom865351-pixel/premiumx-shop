@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { checkDuplicateUsername } from '@/lib/duplicateAccount'
 
 export async function POST(req: Request) {
   try {
@@ -23,7 +24,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid category' }, { status: 400 })
     }
 
-    // Insert account
+    const duplicate = await checkDuplicateUsername(username, categoryId)
+    if (duplicate) {
+      return NextResponse.json({
+        error: `This account username already exists in ${duplicate.category.name} (${duplicate.status}). Duplicate submissions are blocked.`,
+      }, { status: 409 })
+    }
+
     const account = await prisma.account.create({
       data: {
         sellerId: authUser.userId,

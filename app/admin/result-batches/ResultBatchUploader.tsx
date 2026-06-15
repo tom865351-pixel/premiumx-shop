@@ -21,6 +21,7 @@ type PreviewRow = {
 export default function ResultBatchUploader({ settings }: { settings: Record<string, string> }) {
   const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
+  const [sheetUrl, setSheetUrl] = useState('')
   const [rows, setRows] = useState<PreviewRow[]>([])
   const [fileName, setFileName] = useState('')
   const [fileHash, setFileHash] = useState('')
@@ -33,13 +34,25 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
   const [note, setNote] = useState('')
   const [unknownStatus, setUnknownStatus] = useState<'review' | 'valid' | 'invalid'>('review')
 
+  const updateRow = (index: number, patch: Partial<PreviewRow>) => {
+    setRows((current) => current.map((row, i) => (i === index ? { ...row, ...patch } : row)))
+  }
+
+  const bulkSetStatus = (status: PreviewRow['status']) => {
+    setRows((current) => current.map((row) => (row.matched && !row.alreadyCredited ? { ...row, status } : row)))
+  }
+
   const preview = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!file) return
+    if (!file && !sheetUrl.trim()) {
+      setMessage('Choose an Excel file or paste a public Sheet link.')
+      return
+    }
     setLoading(true)
     setMessage('')
     const formData = new FormData()
-    formData.append('file', file)
+    if (file) formData.append('file', file)
+    if (sheetUrl.trim()) formData.append('sheetUrl', sheetUrl.trim())
     formData.append('unknownStatus', unknownStatus)
     try {
       const res = await fetch('/api/admin/result-batches/preview', { method: 'POST', body: formData })
@@ -48,7 +61,7 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
       setRows(data.rows || [])
       setFileName(data.fileName)
       setFileHash(data.fileHash)
-      setMessage(`Preview ready: ${data.matchedRows}/${data.totalRows} rows matched.`)
+      setMessage(`Preview ready: ${data.matchedRows}/${data.totalRows} rows matched. You can edit status and reason before applying.`)
     } catch (err: any) {
       setMessage(err.message)
     } finally {
@@ -73,6 +86,7 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
       setRows([])
       setFile(null)
       router.refresh()
+      if (data.batchId) router.push(`/admin/result-batches/${data.batchId}`)
     } catch (err: any) {
       setMessage(err.message)
     } finally {
@@ -92,7 +106,7 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
         <div>
           <h2 style={{ fontSize: 18, marginBottom: 6 }}>Bulk Result Upload</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Blue/nil = valid, red/lal = invalid, yellow = review. Status column also works.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Blue/nil = valid, red/lal = invalid, yellow = review. Edit any row before apply.</p>
         </div>
         <a className="btn btn-outline" href="/api/admin/accounts/export?status=pending" target="_blank">Download Pending Excel</a>
       </div>
@@ -101,7 +115,11 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
         <div className="grid-3">
           <div className="form-group">
             <label className="form-label">Result Excel</label>
-            <input className="input" type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setFile(e.target.files?.[0] || null)} required />
+            <input className="input" type="file" accept=".xlsx,.xls,.csv" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Public Sheet/Excel Link</label>
+            <input className="input" type="url" value={sheetUrl} onChange={(e) => setSheetUrl(e.target.value)} placeholder="Google Sheet or Excel link" />
           </div>
           <div className="form-group">
             <label className="form-label">Auto Processing</label>
@@ -161,6 +179,14 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
             <Mini label="Review" value={counts.review} tone="warning" />
             <Mini label="Unmatched/Duplicate" value={`${counts.unmatched}/${counts.duplicate}`} tone="info" />
           </div>
+
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: 12, alignSelf: 'center' }}>Bulk edit matched rows:</span>
+            <button className="btn btn-sm btn-outline" type="button" onClick={() => bulkSetStatus('valid')}>Mark matched valid</button>
+            <button className="btn btn-sm btn-outline" type="button" onClick={() => bulkSetStatus('invalid')}>Mark matched invalid</button>
+            <button className="btn btn-sm btn-outline" type="button" onClick={() => bulkSetStatus('review')}>Mark matched review</button>
+          </div>
+
           <div className="table-container">
             <table className="table">
               <thead>
@@ -175,10 +201,22 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
                 </tr>
               </thead>
               <tbody>
-                {rows.slice(0, 80).map((row) => (
+                {rows.slice(0, 80).map((row, index) => (
                   <tr key={`${row.rowNumber}-${row.accountId}-${row.username}`}>
                     <td>{row.rowNumber}</td>
-                    <td><span className={`badge badge-${row.status === 'valid' ? 'success' : row.status === 'invalid' ? 'danger' : 'warning'}`}>{row.status}</span></td>
+                    <td>
+                      <select
+                        className="select"
+                        style={{ minWidth: 110, height: 34, fontSize: 12 }}
+                        value={row.status}
+                        onChange={(e) => updateRow(index, { status: e.target.value as PreviewRow['status'] })}
+                      >
+                        <option value="valid">valid</option>
+                        <option value="invalid">invalid</option>
+                        <option value="review">review</option>
+                        <option value="unmatched">unmatched</option>
+                      </select>
+                    </td>
                     <td>
                       <div style={{ fontWeight: 800 }}>{row.title || row.username || row.accountId}</div>
                       <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>{row.matched ? row.currentStatus : 'Unmatched'} {row.alreadyCredited ? '- already paid' : ''}</div>
@@ -186,13 +224,21 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
                     <td>{row.seller || '-'}</td>
                     <td>{row.category || '-'}</td>
                     <td>BDT {Number(row.price || 0).toLocaleString()}</td>
-                    <td>{reasonMode === 'row' ? row.reason || defaultReason : defaultReason}</td>
+                    <td>
+                      <input
+                        className="input"
+                        style={{ minWidth: 160, height: 34, fontSize: 12 }}
+                        value={row.reason || ''}
+                        placeholder={reasonMode === 'row' ? 'Row reason' : defaultReason}
+                        onChange={(e) => updateRow(index, { reason: e.target.value })}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {rows.length > 80 && <p style={{ color: 'var(--text-muted)', marginTop: 10 }}>Showing first 80 rows only. All rows will be processed.</p>}
+          {rows.length > 80 && <p style={{ color: 'var(--text-muted)', marginTop: 10 }}>Showing first 80 rows for editing. All {rows.length} rows will be processed on apply.</p>}
         </div>
       )}
     </section>

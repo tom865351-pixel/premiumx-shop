@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface AdminUser {
@@ -14,10 +14,27 @@ interface AdminUser {
   banReason: string | null
 }
 
+type SellerSummary = {
+  stats: {
+    pending: number
+    approved: number
+    rejected: number
+    sold: number
+    pendingValue: number
+    totalEarnings: number
+    approvalRate: number | null
+    qualityLabel: string
+  }
+  recentTransactions: Array<{ id: string; type: string; amount: number; description: string; createdAt: string }>
+  recentListings: Array<{ id: string; title: string; username: string; status: string; price: number; createdAt: string; category: { name: string } }>
+}
+
 export default function UserActions({ user }: { user: AdminUser }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
+  const [summary, setSummary] = useState<SellerSummary | null>(null)
+  const [summaryLoading, setSummaryLoading] = useState(false)
   const [profile, setProfile] = useState({
     email: user.email,
     username: user.username,
@@ -26,6 +43,16 @@ export default function UserActions({ user }: { user: AdminUser }) {
     banReason: user.banReason || '',
   })
   const [newPassword, setNewPassword] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    setSummaryLoading(true)
+    fetch(`/api/admin/users/${user.id}/summary`)
+      .then((res) => res.json())
+      .then((data) => setSummary(data))
+      .catch(() => setSummary(null))
+      .finally(() => setSummaryLoading(false))
+  }, [open, user.id])
 
   const refresh = () => {
     router.refresh()
@@ -134,14 +161,79 @@ export default function UserActions({ user }: { user: AdminUser }) {
 
       {open && (
         <div className="modal-overlay" onClick={() => !loading && setOpen(false)}>
-          <div className="modal" onClick={(event) => event.stopPropagation()} style={{ maxWidth: 720 }}>
+          <div className="modal" onClick={(event) => event.stopPropagation()} style={{ maxWidth: 820, maxHeight: '90vh', overflow: 'auto' }}>
             <div className="modal-header">
               <div>
-                <div className="modal-title">Manage User</div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Full user profile and control panel</div>
+                <div className="modal-title">Seller Profile · @{user.username}</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Full user profile, quality score, and control panel</div>
               </div>
               <button className="btn btn-sm btn-outline" onClick={() => setOpen(false)} disabled={loading}>Close</button>
             </div>
+
+            {summaryLoading ? (
+              <div style={{ color: 'var(--text-muted)', padding: '8px 0 16px' }}>Loading seller stats...</div>
+            ) : summary ? (
+              <>
+                <div className="grid-4" style={{ gap: 10, marginBottom: 16 }}>
+                  <div className="card" style={{ padding: 12 }}>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Quality</div>
+                    <div style={{ fontWeight: 900, color: summary.stats.qualityLabel === 'Needs review' ? 'var(--danger)' : 'var(--gold)' }}>
+                      {summary.stats.qualityLabel}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      {summary.stats.approvalRate === null ? 'No decided accounts yet' : `${summary.stats.approvalRate}% approval`}
+                    </div>
+                  </div>
+                  <div className="card" style={{ padding: 12 }}>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Pending Stock</div>
+                    <div style={{ fontWeight: 900 }}>{summary.stats.pending}</div>
+                    <div style={{ fontSize: 11, color: 'var(--warning)' }}>BDT {summary.stats.pendingValue.toLocaleString()}</div>
+                  </div>
+                  <div className="card" style={{ padding: 12 }}>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Approved / Rejected</div>
+                    <div style={{ fontWeight: 900 }}>{summary.stats.approved + summary.stats.sold} / {summary.stats.rejected}</div>
+                  </div>
+                  <div className="card" style={{ padding: 12 }}>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Total Earnings</div>
+                    <div style={{ fontWeight: 900, color: 'var(--success)' }}>BDT {summary.stats.totalEarnings.toLocaleString()}</div>
+                  </div>
+                </div>
+
+                <div className="grid-2" style={{ gap: 14, marginBottom: 16 }}>
+                  <div className="card" style={{ padding: 14 }}>
+                    <div style={{ fontWeight: 700, marginBottom: 8 }}>Recent Listings</div>
+                    {summary.recentListings.length === 0 ? (
+                      <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>No listings yet</div>
+                    ) : summary.recentListings.map((listing) => (
+                      <div key={listing.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12, padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                        <div>
+                          <div style={{ fontWeight: 700 }}>{listing.category.name}</div>
+                          <div style={{ color: 'var(--text-muted)' }}>{listing.username}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <span className={`badge badge-${listing.status === 'rejected' ? 'danger' : listing.status === 'pending' ? 'warning' : 'success'}`}>{listing.status}</span>
+                          <div style={{ color: 'var(--gold)', marginTop: 4 }}>BDT {listing.price.toLocaleString()}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="card" style={{ padding: 14 }}>
+                    <div style={{ fontWeight: 700, marginBottom: 8 }}>Wallet Audit Trail</div>
+                    {summary.recentTransactions.length === 0 ? (
+                      <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>No transactions yet</div>
+                    ) : summary.recentTransactions.map((tx) => (
+                      <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12, padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                        <div style={{ color: 'var(--text-secondary)' }}>{tx.description}</div>
+                        <div style={{ color: tx.amount >= 0 ? 'var(--success)' : 'var(--danger)', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                          {tx.amount >= 0 ? '+' : '-'}BDT {Math.abs(tx.amount).toLocaleString()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : null}
 
             <div className="grid-2" style={{ gap: 14 }}>
               <label>
