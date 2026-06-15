@@ -78,6 +78,7 @@ export default function AdminAddAccountClient({ categories }: { categories: Cate
           { id: 'bulk', label: '📊 Bulk Excel Upload', icon: '📊' },
         ].map(tab => (
           <button
+            type="button"
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             style={{
@@ -112,6 +113,7 @@ export default function AdminAddAccountClient({ categories }: { categories: Cate
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           {categories.map(c => (
             <button
+              type="button"
               key={c.id}
               onClick={() => setSelectedCategory(c.id)}
               style={{

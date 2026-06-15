@@ -106,8 +106,6 @@ export default function SellForm({ categories }: { categories: Category[] }) {
                 style={{
                   borderColor: 'var(--border)',
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.borderColor = cat.color)}
-                onMouseOut={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
               >
                 <CategoryLogo className="sell-category-logo" icon={cat.icon} name={cat.name} color={cat.color} size={48} radius={8} />
                 <span className="sell-category-title">{cat.name}</span>
