@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Spinner from '@/components/ui/Spinner'
 
 export default function TicketReplyForm({ ticketId, isAdmin, templates = [] }: { ticketId: string, isAdmin: boolean, templates?: string[] }) {
   const router = useRouter()
@@ -55,7 +56,7 @@ export default function TicketReplyForm({ ticketId, isAdmin, templates = [] }: {
         )}
         <div style={{ flex: 1 }} />
         <button className="btn btn-gold" type="submit" disabled={loading || !message.trim()}>
-          {loading ? 'Sending...' : 'Send Reply'}
+          {loading ? <><Spinner size={18} /> Sending...</> : 'Send Reply'}
         </button>
       </div>
     </form>

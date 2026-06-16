@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Spinner from '@/components/ui/Spinner'
 
 export default function ReviewModal({ orderId }: { orderId: string }) {
   const router = useRouter()
@@ -22,9 +23,12 @@ export default function ReviewModal({ orderId }: { orderId: string }) {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to submit review')
-      
+
       setMsg({ type: 'success', text: 'Thank you! Your review has been submitted.' })
-      setTimeout(() => { setOpen(false); router.refresh() }, 1500)
+      setTimeout(() => {
+        setOpen(false)
+        router.refresh()
+      }, 900)
     } catch (err: any) {
       setMsg({ type: 'error', text: err.message })
       setLoading(false)
@@ -34,15 +38,15 @@ export default function ReviewModal({ orderId }: { orderId: string }) {
   return (
     <>
       <button className="btn btn-sm btn-outline" style={{ borderColor: 'var(--gold)', color: 'var(--gold)' }} onClick={() => setOpen(true)}>
-        ⭐ Leave Review
+        Leave Review
       </button>
 
       {open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div className="card" style={{ width: '100%', maxWidth: 440, padding: 32 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 700 }}>⭐ Rate your purchase</h2>
-              <button onClick={() => { setOpen(false); setMsg(null) }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 22, cursor: 'pointer' }}>✕</button>
+              <h2 style={{ fontSize: 20, fontWeight: 700 }}>Rate your purchase</h2>
+              <button onClick={() => { setOpen(false); setMsg(null) }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 22, cursor: 'pointer' }}>X</button>
             </div>
 
             {msg && (
@@ -58,9 +62,9 @@ export default function ReviewModal({ orderId }: { orderId: string }) {
                     key={star}
                     type="button"
                     onClick={() => setRating(star)}
-                    style={{ background: 'none', border: 'none', fontSize: 36, cursor: 'pointer', filter: rating >= star ? 'none' : 'grayscale(100%) opacity(30%)', transition: 'all 0.2s' }}
+                    style={{ background: rating >= star ? 'rgba(212,175,55,0.18)' : 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, color: rating >= star ? 'var(--gold)' : 'var(--text-muted)', width: 44, height: 44, cursor: 'pointer', transition: 'all 0.2s', fontWeight: 900 }}
                   >
-                    ⭐
+                    {star}
                   </button>
                 ))}
               </div>
@@ -72,7 +76,7 @@ export default function ReviewModal({ orderId }: { orderId: string }) {
 
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 <button className="btn btn-gold" type="submit" disabled={loading} style={{ flex: 1 }}>
-                  {loading ? 'Submitting...' : 'Submit Review'}
+                  {loading ? <><Spinner size={18} /> Submitting...</> : 'Submit Review'}
                 </button>
                 <button type="button" className="btn btn-outline" onClick={() => setOpen(false)}>Cancel</button>
               </div>

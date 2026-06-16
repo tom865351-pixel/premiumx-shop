@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Spinner from '@/components/ui/Spinner'
 
 interface PaymentMethod {
@@ -18,7 +17,6 @@ const DEFAULT_METHODS: PaymentMethod[] = [
 const QUICK_AMOUNTS = [100, 200, 500, 1000, 2000, 5000]
 
 export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 }: { methods?: PaymentMethod[]; minAmount?: number }) {
-  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [ziniLoading, setZiniLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -58,7 +56,6 @@ export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 
       setAmount('')
       ;(e.target as HTMLFormElement).reset()
       setMethod('bkash')
-      router.refresh()
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message })
     } finally {

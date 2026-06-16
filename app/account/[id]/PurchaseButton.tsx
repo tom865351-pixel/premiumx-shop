@@ -31,7 +31,6 @@ export default function PurchaseButton({ accountId, price, isAvailable, isLogged
       setSuccess(true)
       setTimeout(() => {
         router.push('/orders')
-        router.refresh()
       }, 2500)
     } catch (err: any) {
       setError(err.message)
