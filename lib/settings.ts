@@ -1,4 +1,5 @@
 import prisma from './prisma'
+import { revalidateTag, unstable_cache } from 'next/cache'
 
 const DEFAULT_SETTINGS: Record<string, string> = {
   site_name: 'PremiumX Shop',
@@ -37,17 +38,17 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   bulk_result_allow_color: 'true',
 }
 
-export async function getSetting(key: string): Promise<string> {
-  try {
+const getCachedSetting = unstable_cache(
+  async (key: string) => {
     const setting = await prisma.siteSetting.findUnique({ where: { key } })
     return setting?.value ?? DEFAULT_SETTINGS[key] ?? ''
-  } catch {
-    return DEFAULT_SETTINGS[key] ?? ''
-  }
-}
+  },
+  ['site-setting'],
+  { revalidate: 60, tags: ['site-settings'] },
+)
 
-export async function getSettings(keys: string[]): Promise<Record<string, string>> {
-  try {
+const getCachedSettings = unstable_cache(
+  async (keys: string[]) => {
     const settings = await prisma.siteSetting.findMany({
       where: { key: { in: keys } },
     })
@@ -57,6 +58,22 @@ export async function getSettings(keys: string[]): Promise<Record<string, string
       result[key] = found?.value ?? DEFAULT_SETTINGS[key] ?? ''
     }
     return result
+  },
+  ['site-settings'],
+  { revalidate: 60, tags: ['site-settings'] },
+)
+
+export async function getSetting(key: string): Promise<string> {
+  try {
+    return await getCachedSetting(key)
+  } catch {
+    return DEFAULT_SETTINGS[key] ?? ''
+  }
+}
+
+export async function getSettings(keys: string[]): Promise<Record<string, string>> {
+  try {
+    return await getCachedSettings([...keys].sort())
   } catch {
     const result: Record<string, string> = {}
     for (const key of keys) result[key] = DEFAULT_SETTINGS[key] ?? ''
@@ -65,9 +82,11 @@ export async function getSettings(keys: string[]): Promise<Record<string, string
 }
 
 export async function setSetting(key: string, value: string) {
-  return prisma.siteSetting.upsert({
+  const setting = await prisma.siteSetting.upsert({
     where: { key },
     update: { value },
     create: { key, value },
   })
+  revalidateTag('site-settings')
+  return setting
 }

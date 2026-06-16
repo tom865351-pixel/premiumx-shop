@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Spinner from '@/components/ui/Spinner'
 
 const methods = [
   { value: 'bkash', label: 'bKash', hint: '01XXXXXXXXX' },
@@ -117,7 +118,7 @@ export default function WithdrawModal({ balance }: { balance: number }) {
 
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <button className="btn btn-gold" type="submit" disabled={loading || balance < 100} style={{ flex: '1 1 180px' }}>
-                  {loading ? 'Submitting...' : 'Submit Request'}
+                  {loading ? <><Spinner size={18} /> Submitting...</> : 'Submit Request'}
                 </button>
                 <button type="button" className="btn btn-outline" onClick={() => setOpen(false)} style={{ flex: '1 1 120px' }}>Cancel</button>
               </div>

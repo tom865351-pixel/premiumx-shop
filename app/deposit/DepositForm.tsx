@@ -172,7 +172,7 @@ export default function DepositForm({ methods = DEFAULT_METHODS, minAmount = 50 
               name="transactionId"
               required
               placeholder="e.g. 8GH3K2A91B"
-              style={{ fontFamily: 'JetBrains Mono' }}
+              style={{ fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace' }}
             />
             <div className="form-hint">Send money first, then submit the exact TrxID from your payment SMS.</div>
           </div>

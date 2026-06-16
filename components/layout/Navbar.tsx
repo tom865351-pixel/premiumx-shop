@@ -65,34 +65,31 @@ export default function Navbar({ user }: NavbarProps) {
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' })
-    router.push('/')
-    router.refresh()
+    router.replace('/')
   }
 
   const handleCurrencyChange = async (c: string) => {
     setCurrency(c)
     localStorage.setItem('px_currency', c)
     if (user) {
-      await fetch('/api/user/preferences', {
+      fetch('/api/user/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ preferredCurrency: c }),
-      })
+      }).catch(() => {})
     }
-    router.refresh()
   }
 
   const handleLangChange = async (l: string) => {
     setLang(l)
     localStorage.setItem('px_lang', l)
     if (user) {
-      await fetch('/api/user/preferences', {
+      fetch('/api/user/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ preferredLanguage: l }),
-      })
+      }).catch(() => {})
     }
-    router.refresh()
   }
 
   useEffect(() => {
