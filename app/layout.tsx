@@ -7,6 +7,7 @@ import { headers } from 'next/headers'
 import GlobalBanner from '@/components/layout/GlobalBanner'
 import MobileBottomNav from '@/components/layout/MobileBottomNav'
 import FloatingSupport from '@/components/layout/FloatingSupport'
+import GlobalActivity from '@/components/ui/GlobalActivity'
 import { getSettings } from '@/lib/settings'
 
 export const dynamic = 'force-dynamic'
@@ -82,6 +83,7 @@ export default async function RootLayout({
           </main>
         ) : (
           <>
+            <GlobalActivity />
             <GlobalBanner />
             {children}
             {!authPathAllowed && <FloatingSupport />}

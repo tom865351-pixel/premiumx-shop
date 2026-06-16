@@ -36,8 +36,7 @@ export default function Register() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Registration failed')
 
-      router.push('/dashboard')
-      router.refresh()
+      router.replace('/dashboard')
     } catch (err: any) {
       setError(err.message)
     } finally {
