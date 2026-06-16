@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
@@ -9,6 +10,10 @@ import FloatingSupport from '@/components/layout/FloatingSupport'
 import { getSettings } from '@/lib/settings'
 
 export const dynamic = 'force-dynamic'
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap' })
+const jetBrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains-mono', display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'PremiumX Shop - Sell Digital Accounts',
@@ -64,7 +69,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={themeClass}>
+      <body className={`${themeClass} ${inter.variable} ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}>
         {maintenance.maintenance_mode === 'true' && authUserData?.role !== 'admin' && !authPathAllowed ? (
           <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24, background: 'var(--bg)' }}>
             <div className="card" style={{ maxWidth: 520, padding: 32, textAlign: 'center' }}>
@@ -79,8 +84,8 @@ export default async function RootLayout({
           <>
             <GlobalBanner />
             {children}
-            <FloatingSupport />
-            <MobileBottomNav user={authUserData} />
+            {!authPathAllowed && <FloatingSupport />}
+            {!authPathAllowed && <MobileBottomNav user={authUserData} />}
           </>
         )}
       </body>

@@ -50,8 +50,8 @@ export default function Register() {
       <div className="card card-glass" style={{ width: '100%', maxWidth: 400 }}>
         <div style={{ textAlign: 'center', marginBottom: 30 }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
-            <span style={{ fontFamily: 'Space Grotesk', fontSize: 24, fontWeight: 700, color: 'var(--gold)' }}>Premium</span>
-            <span style={{ fontFamily: 'Space Grotesk', fontSize: 24, fontWeight: 800, color: 'var(--purple)' }}>X</span>
+            <span style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif', fontSize: 24, fontWeight: 700, color: 'var(--gold)' }}>Premium</span>
+            <span style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif', fontSize: 24, fontWeight: 800, color: 'var(--purple)' }}>X</span>
           </Link>
           <h1 style={{ fontSize: 20, marginTop: 16 }}>Create Account</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Join the trusted seller marketplace</p>
@@ -82,12 +82,12 @@ export default function Register() {
           </div>
 
           <button type="submit" className="btn btn-gold w-full" disabled={loading} style={{ marginTop: 8 }}>
-            {loading ? <div className="spinner" /> : 'Create Account'}
+            {loading ? <><div className="spinner" /> Creating...</> : 'Create Account'}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--text-secondary)' }}>
-          Already have an account? <Link href="/login" className="text-gold">Sign in</Link>
+          Already have an account? <Link href="/login" className="auth-inline-link">Sign in</Link>
         </div>
       </div>
     </div>

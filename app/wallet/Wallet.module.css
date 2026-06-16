@@ -80,7 +80,7 @@
 .balance {
   margin-top: 8px;
   color: var(--gold);
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
   font-size: 34px;
   font-weight: 900;
   word-break: break-word;
@@ -88,7 +88,7 @@
 
 .metricValue {
   margin-top: 12px;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
   font-size: 24px;
   font-weight: 900;
   word-break: break-word;

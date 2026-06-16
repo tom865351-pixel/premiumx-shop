@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import CategoryLogo from '@/components/ui/CategoryLogo'
+import { getYouTubeEmbedUrl, parseCategoryFieldConfig, SELLER_FIELD_OPTIONS, type SellerFieldKey } from '@/lib/categoryFields'
 
 interface Category {
   id: string
@@ -9,6 +10,7 @@ interface Category {
   icon: string
   color: string
   defaultPrice: number
+  fields: string
 }
 
 export default function SellForm({ categories }: { categories: Category[] }) {
@@ -17,6 +19,9 @@ export default function SellForm({ categories }: { categories: Category[] }) {
   const [activeTab, setActiveTab] = useState<'single' | 'bulk'>('single')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const selectedConfig = parseCategoryFieldConfig(selectedCategory?.fields)
+  const enabledFields = new Set<SellerFieldKey>(['username', 'password', ...selectedConfig.enabledFields])
+  const videoEmbedUrl = getYouTubeEmbedUrl(selectedConfig.videoUrl)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -124,6 +129,23 @@ export default function SellForm({ categories }: { categories: Category[] }) {
             </div>
           </div>
 
+          {selectedConfig.videoUrl && (
+            <div className="sell-guide-video">
+              {videoEmbedUrl ? (
+                <iframe
+                  src={videoEmbedUrl}
+                  title={`${selectedCategory.name} seller guide`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              ) : (
+                <a href={selectedConfig.videoUrl} target="_blank" rel="noreferrer" className="btn btn-outline w-full">
+                  Watch {selectedCategory.name} Seller Guide
+                </a>
+              )}
+            </div>
+          )}
+
           <div className="tabs" style={{ marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
             <button type="button" className={`tab ${activeTab === 'single' ? 'active' : ''}`} onClick={() => setActiveTab('single')}>Single Upload</button>
             <button type="button" className={`tab ${activeTab === 'bulk' ? 'active' : ''}`} onClick={() => setActiveTab('bulk')}>Bulk Excel Upload</button>
@@ -137,46 +159,28 @@ export default function SellForm({ categories }: { categories: Category[] }) {
 
           <div style={{ background: 'rgba(212,175,55,0.1)', border: '1px solid var(--gold)', borderRadius: 8, padding: 12, marginBottom: 20, textAlign: 'center' }}>
             <div style={{ fontSize: 13, color: 'var(--gold)' }}>PremiumX Buying Rate (Per Account)</div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--gold)', fontFamily: 'Space Grotesk' }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--gold)', fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif' }}>
               BDT {selectedCategory.defaultPrice}
             </div>
           </div>
 
           {activeTab === 'single' ? (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div className="form-group">
-                <label className="form-label">Username / Email</label>
-                <input type="text" name="username" required placeholder="Account username or email" className="form-input" />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <input type="text" name="password" required placeholder="Account password" className="form-input" />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">2FA Secret Code (Optional)</label>
-                <input type="text" name="twoFASecret" placeholder="Paste 2FA secret or recovery code here" className="form-input" />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Recovery Email (Optional)</label>
-                <input type="text" name="recoveryEmail" placeholder="Recovery email if available" className="form-input" />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Recovery Phone (Optional)</label>
-                <input type="text" name="recoveryPhone" placeholder="Recovery phone if available" className="form-input" />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Account Age / Proof Link (Optional)</label>
-                <input type="text" name="accountAge" placeholder="Example: 2 years old" className="form-input" style={{ marginBottom: 10 }} />
-                <input type="url" name="proofLink" placeholder="Screenshot/proof link" className="form-input" />
-              </div>
+              {SELLER_FIELD_OPTIONS.filter((field) => enabledFields.has(field.key)).map((field) => (
+                <div className="form-group" key={field.key}>
+                  <label className="form-label">{field.label}{field.required ? '' : ' (Optional)'}</label>
+                  <input
+                    type={field.key === 'proofLink' ? 'url' : 'text'}
+                    name={field.key}
+                    required={field.required}
+                    placeholder={field.placeholder}
+                    className="form-input"
+                  />
+                </div>
+              ))}
 
               <button type="submit" className="btn btn-gold w-full" disabled={loading} style={{ marginTop: 8 }}>
-                {loading ? <div className="spinner" /> : 'Submit for Review'}
+                {loading ? <><div className="spinner" /> Submitting...</> : 'Submit for Review'}
               </button>
             </form>
           ) : (

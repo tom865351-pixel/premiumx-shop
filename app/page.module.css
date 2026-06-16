@@ -117,7 +117,7 @@
 }
 
 .statValue {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
   font-size: 32px;
   font-weight: 700;
   color: var(--text);

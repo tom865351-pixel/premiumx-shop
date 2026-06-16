@@ -2,12 +2,31 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import CategoryLogo, { isImageIcon } from '@/components/ui/CategoryLogo'
+import { DEFAULT_SELLER_FIELDS, SELLER_FIELD_OPTIONS, type SellerFieldKey } from '@/lib/categoryFields'
 
 export default function AddCategoryModal() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({ name: '', icon: 'PX', color: '#9333EA', description: '', defaultPrice: '0' })
+  const [form, setForm] = useState({
+    name: '',
+    icon: 'PX',
+    color: '#9333EA',
+    description: '',
+    defaultPrice: '0',
+    videoUrl: '',
+    enabledFields: DEFAULT_SELLER_FIELDS,
+  })
+
+  const toggleField = (field: SellerFieldKey) => {
+    if (field === 'username' || field === 'password') return
+    setForm((current) => ({
+      ...current,
+      enabledFields: current.enabledFields.includes(field)
+        ? current.enabledFields.filter((item) => item !== field)
+        : [...current.enabledFields, field],
+    }))
+  }
 
   const handleLogoFile = (file?: File) => {
     if (!file) return
@@ -29,12 +48,15 @@ export default function AddCategoryModal() {
     e.preventDefault()
     setLoading(true)
     const fd = new FormData()
-    Object.entries(form).forEach(([k, v]) => fd.append(k, v))
+    Object.entries(form).forEach(([k, v]) => {
+      if (k !== 'enabledFields') fd.append(k, String(v))
+    })
+    form.enabledFields.forEach((field) => fd.append('enabledFields', field))
     await fetch('/api/admin/categories/create', { method: 'POST', body: fd })
     setOpen(false)
     router.refresh()
     setLoading(false)
-    setForm({ name: '', icon: 'PX', color: '#9333EA', description: '', defaultPrice: '0' })
+    setForm({ name: '', icon: 'PX', color: '#9333EA', description: '', defaultPrice: '0', videoUrl: '', enabledFields: DEFAULT_SELLER_FIELDS })
   }
 
   return (
@@ -43,7 +65,7 @@ export default function AddCategoryModal() {
 
       {open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 12 }}>
-          <div className="card" style={{ width: '100%', maxWidth: 480, padding: 24 }}>
+          <div className="card modal-scroll-card" style={{ width: '100%', maxWidth: 560, padding: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
               <h2 style={{ fontSize: 20, fontWeight: 700 }}>Add New Category</h2>
               <button onClick={() => setOpen(false)} aria-label="Close" style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 24, cursor: 'pointer' }}>x</button>
@@ -77,6 +99,32 @@ export default function AddCategoryModal() {
               <div className="form-group">
                 <label className="form-label">Description (optional)</label>
                 <input className="input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Short description..." />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Guide Video URL (optional)</label>
+                <input className="input" type="url" value={form.videoUrl} onChange={e => setForm({ ...form, videoUrl: e.target.value })} placeholder="YouTube or video link for this category" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Seller Form Fields</label>
+                <div className="category-field-grid">
+                  {SELLER_FIELD_OPTIONS.map((field) => {
+                    const locked = field.required
+                    const checked = locked || form.enabledFields.includes(field.key)
+                    return (
+                      <label key={field.key} className="category-field-toggle">
+                        <input
+                          type="checkbox"
+                          name="enabledFields"
+                          value={field.key}
+                          checked={checked}
+                          disabled={locked}
+                          onChange={() => toggleField(field.key)}
+                        />
+                        <span>{field.label}{locked ? ' *' : ''}</span>
+                      </label>
+                    )
+                  })}
+                </div>
               </div>
               {isImageIcon(form.icon) && (
                 <div className="form-group">

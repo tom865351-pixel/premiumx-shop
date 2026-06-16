@@ -31,10 +31,11 @@ export default function FloatingSupport() {
       alignItems: 'flex-end',
       gap: '12px'
     }}>
-      <div style={{
+      <div aria-hidden={!isOpen} style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
+        visibility: isOpen ? 'visible' : 'hidden',
         opacity: isOpen ? 1 : 0,
         transform: isOpen ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.9)',
         pointerEvents: isOpen ? 'auto' : 'none',
@@ -71,7 +72,8 @@ export default function FloatingSupport() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Open support menu"
+        aria-label={isOpen ? 'Close support menu' : 'Open support menu'}
+        aria-expanded={isOpen}
         style={{
           width: '56px',
           height: '56px',

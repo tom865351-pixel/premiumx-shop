@@ -6,6 +6,7 @@ import CategoryActions from './CategoryActions'
 import EditCategoryModal from './EditCategoryModal'
 import CategoryLogo from '@/components/ui/CategoryLogo'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { parseCategoryFieldConfig } from '@/lib/categoryFields'
 
 export default async function AdminCategories() {
   const user = await getAuthUser()
@@ -33,6 +34,7 @@ export default async function AdminCategories() {
               <th>Mark</th>
               <th>Platform Name</th>
               <th>Buying Rate</th>
+              <th>Seller Form</th>
               <th>Active Accounts</th>
               <th>Status</th>
               <th>Actions</th>
@@ -40,33 +42,42 @@ export default async function AdminCategories() {
           </thead>
           <tbody>
             {categories.length === 0 ? (
-              <tr><td colSpan={6} className="text-center">No categories found</td></tr>
+              <tr><td colSpan={7} className="text-center">No categories found</td></tr>
             ) : (
-              categories.map(cat => (
-                <tr key={cat.id}>
-                  <td><CategoryLogo icon={cat.icon} name={cat.name} color={cat.color} size={38} radius={8} /></td>
-                  <td>
-                    <div style={{ fontWeight: 800 }}>{cat.name}</div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>{cat.description || 'No description'}</div>
-                  </td>
-                  <td>
-                    <div className="font-mono text-gold">BDT {cat.defaultPrice.toLocaleString()}</div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>10 pcs: BDT {(cat.defaultPrice * 10).toLocaleString()}</div>
-                  </td>
-                  <td>{cat._count.accounts}</td>
-                  <td>
-                    <span className={`badge badge-${cat.isActive ? 'success' : 'danger'}`}>
-                      {cat.isActive ? 'Active' : 'Disabled'}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      <EditCategoryModal category={cat} />
-                      <CategoryActions id={cat.id} isActive={cat.isActive} category={cat} />
-                    </div>
-                  </td>
-                </tr>
-              ))
+              categories.map(cat => {
+                const config = parseCategoryFieldConfig(cat.fields)
+                return (
+                  <tr key={cat.id}>
+                    <td><CategoryLogo icon={cat.icon} name={cat.name} color={cat.color} size={38} radius={8} /></td>
+                    <td>
+                      <div style={{ fontWeight: 800 }}>{cat.name}</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>{cat.description || 'No description'}</div>
+                    </td>
+                    <td>
+                      <div className="font-mono text-gold">BDT {cat.defaultPrice.toLocaleString()}</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>10 pcs: BDT {(cat.defaultPrice * 10).toLocaleString()}</div>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 800, color: 'var(--text)' }}>{config.enabledFields.length} fields</div>
+                      <div style={{ color: config.videoUrl ? 'var(--success)' : 'var(--text-muted)', fontSize: 11 }}>
+                        {config.videoUrl ? 'Video guide added' : 'No video guide'}
+                      </div>
+                    </td>
+                    <td>{cat._count.accounts}</td>
+                    <td>
+                      <span className={`badge badge-${cat.isActive ? 'success' : 'danger'}`}>
+                        {cat.isActive ? 'Active' : 'Disabled'}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <EditCategoryModal category={cat} />
+                        <CategoryActions id={cat.id} isActive={cat.isActive} category={cat} />
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })
             )}
           </tbody>
         </table>
