@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
 const MIN_VISIBLE_MS = 450
-const SLOW_REQUEST_MS = 180
+const SLOW_REQUEST_MS = 650
+const SLOW_NAV_MS = 420
 const MAX_LINK_WAIT_MS = 6000
 
 function isPlainLeftClick(event: MouseEvent) {
@@ -14,18 +15,23 @@ function isPlainLeftClick(event: MouseEvent) {
 export default function GlobalActivity() {
   const pathname = usePathname()
   const [active, setActive] = useState(false)
+  const [compact, setCompact] = useState(true)
   const [label, setLabel] = useState('Working...')
   const startedAt = useRef(0)
   const pendingRequests = useRef(0)
-  const fallbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const showTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const endTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const clearTimers = () => {
-    if (fallbackTimer.current) clearTimeout(fallbackTimer.current)
-    fallbackTimer.current = null
+    if (showTimer.current) clearTimeout(showTimer.current)
+    if (endTimer.current) clearTimeout(endTimer.current)
+    showTimer.current = null
+    endTimer.current = null
   }
 
-  const begin = (nextLabel = 'Working...') => {
+  const begin = (nextLabel = 'Working...', nextCompact = true) => {
     setLabel(nextLabel)
+    setCompact(nextCompact)
     startedAt.current = Date.now()
     setActive(true)
   }
@@ -39,6 +45,7 @@ export default function GlobalActivity() {
   }
 
   useEffect(() => {
+    clearTimers()
     end()
   }, [pathname])
 
@@ -50,7 +57,7 @@ export default function GlobalActivity() {
       const requestDelayTimer = setTimeout(() => {
         shown = true
         pendingRequests.current += 1
-        begin('Working...')
+        begin('Working...', true)
       }, SLOW_REQUEST_MS)
 
       try {
@@ -78,14 +85,15 @@ export default function GlobalActivity() {
       if (url.pathname === window.location.pathname && url.search === window.location.search) return
 
       clearTimers()
-      begin('Loading...')
-      fallbackTimer.current = setTimeout(end, MAX_LINK_WAIT_MS)
+      showTimer.current = setTimeout(() => begin('Loading...', true), SLOW_NAV_MS)
+      endTimer.current = setTimeout(end, MAX_LINK_WAIT_MS)
     }
 
     const onSubmit = (event: SubmitEvent) => {
       if (event.defaultPrevented) return
-      begin('Submitting...')
-      fallbackTimer.current = setTimeout(end, MAX_LINK_WAIT_MS)
+      clearTimers()
+      showTimer.current = setTimeout(() => begin('Submitting...', false), SLOW_NAV_MS)
+      endTimer.current = setTimeout(end, MAX_LINK_WAIT_MS)
     }
 
     window.addEventListener('click', onClick, true)
@@ -100,7 +108,7 @@ export default function GlobalActivity() {
   }, [])
 
   return (
-    <div className={`global-activity ${active ? 'is-active' : ''}`} aria-live="polite" aria-hidden={!active}>
+    <div className={`global-activity ${active ? 'is-active' : ''} ${compact ? 'is-compact' : ''}`} aria-live="polite" aria-hidden={!active}>
       <div className="global-activity-bar" />
       <div className="global-activity-pill">
         <span className="global-activity-dot" />
