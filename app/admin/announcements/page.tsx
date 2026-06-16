@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import AnnouncementForm from './AnnouncementForm'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function statusLabel(ann: { isActive: boolean; scheduledAt: Date | null; expiresAt: Date | null }) {
   const now = new Date()
@@ -13,7 +14,7 @@ function statusLabel(ann: { isActive: boolean; scheduledAt: Date | null; expires
 
 export default async function AdminAnnouncementsPage() {
   const authUser = await getAuthUser()
-  if (!authUser || (authUser.role !== 'admin' && authUser.role !== 'sub-admin')) redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'announcements'))) redirect('/login')
 
   const announcements = await prisma.announcement.findMany({
     orderBy: [{ isActive: 'desc' }, { scheduledAt: 'desc' }, { createdAt: 'desc' }],

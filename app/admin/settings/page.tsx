@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminSettings() {
   const user = await getAuthUser()
-  if (!user || user.role !== 'admin') redirect('/login')
+  if (!user || !(await canAccessAdminArea(user.role, 'settings'))) redirect('/login')
 
   const settings = await getSettings([
     'site_name',

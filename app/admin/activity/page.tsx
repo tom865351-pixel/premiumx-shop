@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function money(amount = 0) {
   return `BDT ${Number(amount).toLocaleString()}`
@@ -12,7 +13,7 @@ function when(date: Date) {
 
 export default async function AdminActivityPage() {
   const authUser = await getAuthUser()
-  if (!authUser || !['admin', 'sub-admin', 'stock-manager'].includes(authUser.role)) redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'activity'))) redirect('/login')
 
   const [transactions, accounts, topups, withdrawals, tickets, logins] = await Promise.all([
     prisma.transaction.findMany({ take: 12, orderBy: { createdAt: 'desc' }, include: { user: true } }),

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 async function readFormValue(req: NextRequest, key: string) {
   const contentType = req.headers.get('content-type') || ''
@@ -11,7 +12,7 @@ async function readFormValue(req: NextRequest, key: string) {
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
-  if (!user || user.role !== 'admin') {
+  if (!user || !(await canAccessAdminArea(user.role, 'withdrawals'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

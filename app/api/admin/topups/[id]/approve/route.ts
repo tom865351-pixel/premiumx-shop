@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
-  if (!user || user.role !== 'admin') {
+  if (!user || !(await canAccessAdminArea(user.role, 'deposits'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

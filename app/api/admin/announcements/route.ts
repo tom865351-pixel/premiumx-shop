@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function parseDate(value?: string | null) {
   if (!value) return null
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
   if (!authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const user = await prisma.user.findUnique({ where: { id: authUser.userId } })
-  if (!user || (user.role !== 'admin' && user.role !== 'sub-admin')) {
+  if (!user || !(await canAccessAdminArea(user.role, 'announcements'))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

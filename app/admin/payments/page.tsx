@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function money(amount = 0) {
   return `BDT ${Number(amount).toLocaleString()}`
@@ -15,7 +16,7 @@ function statusTone(status: string) {
 
 export default async function AdminPayments() {
   const authUser = await getAuthUser()
-  if (!authUser || authUser.role !== 'admin') redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'payments'))) redirect('/login')
 
   const [topups, withdrawals, transactions] = await Promise.all([
     prisma.topupRequest.findMany({ take: 20, orderBy: { createdAt: 'desc' }, include: { user: true } }),

@@ -2,10 +2,11 @@ import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import UserActions from './UserActions'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminUsers() {
   const user = await getAuthUser()
-  if (!user || user.role !== 'admin') redirect('/login')
+  if (!user || !(await canAccessAdminArea(user.role, 'users'))) redirect('/login')
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },

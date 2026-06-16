@@ -3,10 +3,11 @@ import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { getSetting } from '@/lib/settings'
 import TicketReplyForm from '@/app/support/[id]/TicketReplyForm'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminTicketDetail({ params }: { params: { id: string } }) {
   const authUser = await getAuthUser()
-  if (!authUser || (authUser.role !== 'admin' && authUser.role !== 'sub-admin')) redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'support'))) redirect('/login')
 
   const user = await prisma.user.findUnique({ where: { id: authUser.userId } })
   if (!user) redirect('/login')

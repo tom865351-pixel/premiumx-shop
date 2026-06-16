@@ -3,10 +3,11 @@ import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminRiskPage() {
   const authUser = await getAuthUser()
-  if (!authUser || !['admin', 'sub-admin', 'stock-manager'].includes(authUser.role)) redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'risk'))) redirect('/login')
 
   const [accounts, withdrawals, sellers] = await Promise.all([
     prisma.account.findMany({

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { getPermissionsForRole } from '@/lib/permissions'
 
 function money(amount = 0) {
   return `BDT ${Number(amount).toLocaleString()}`
@@ -13,6 +14,8 @@ export default async function AdminDashboard() {
   if (!user || (user.role !== 'admin' && user.role !== 'sub-admin' && user.role !== 'stock-manager')) {
     redirect('/login')
   }
+  const permissions = await getPermissionsForRole(user.role)
+  if (!permissions.dashboard) redirect('/login')
 
   const [
     userCount,
@@ -45,13 +48,19 @@ export default async function AdminDashboard() {
   ])
 
   const tasks = [
-    { label: 'Upload result Excel', value: pendingAccounts, href: '/admin/result-batches', tone: 'success' },
-    { label: 'Review seller stock', value: pendingAccounts, href: '/admin/accounts', tone: 'warning' },
-    { label: 'Approve deposits', value: pendingDeposits, href: '/admin/deposits', tone: 'warning' },
-    { label: 'Pay withdrawals', value: pendingWithdrawals, href: '/admin/withdrawals', tone: 'danger' },
-    { label: 'Solve support tickets', value: openTickets, href: '/admin/support', tone: 'info' },
-    { label: 'Check reports', value: pendingReports, href: '/admin/reports', tone: 'danger' },
-  ]
+    { label: 'Upload result Excel', value: pendingAccounts, href: '/admin/result-batches', tone: 'success', permission: 'results' },
+    { label: 'Review seller stock', value: pendingAccounts, href: '/admin/accounts', tone: 'warning', permission: 'accounts' },
+    { label: 'Approve deposits', value: pendingDeposits, href: '/admin/deposits', tone: 'warning', permission: 'deposits' },
+    { label: 'Pay withdrawals', value: pendingWithdrawals, href: '/admin/withdrawals', tone: 'danger', permission: 'withdrawals' },
+    { label: 'Solve support tickets', value: openTickets, href: '/admin/support', tone: 'info', permission: 'support' },
+    { label: 'Check reports', value: pendingReports, href: '/admin/reports', tone: 'danger', permission: 'reports' },
+  ].filter((task) => permissions[task.permission as keyof typeof permissions])
+
+  const quickLinks = [
+    { href: '/admin/result-batches', label: 'Upload Result Report', className: 'btn btn-gold', permission: 'results' },
+    { href: '/admin/search', label: 'Global Search', className: 'btn btn-outline', permission: 'search' },
+    { href: '/admin/risk', label: 'Risk Center', className: 'btn btn-outline', permission: 'risk' },
+  ].filter((link) => permissions[link.permission as keyof typeof permissions])
 
   return (
     <div>
@@ -61,9 +70,9 @@ export default async function AdminDashboard() {
           <p className="page-subtitle">Everything urgent for PremiumX operations in one clean screen.</p>
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <Link href="/admin/result-batches" className="btn btn-gold">Upload Result Report</Link>
-          <Link href="/admin/search" className="btn btn-outline">Global Search</Link>
-          <Link href="/admin/risk" className="btn btn-outline">Risk Center</Link>
+          {quickLinks.map((link) => (
+            <Link key={link.href} href={link.href} className={link.className}>{link.label}</Link>
+          ))}
         </div>
       </div>
 
@@ -85,7 +94,9 @@ export default async function AdminDashboard() {
         <section className="card" style={{ padding: 20 }}>
           <h2 style={{ fontSize: 18, marginBottom: 14 }}>Admin To-do</h2>
           <div style={{ display: 'grid', gap: 10 }}>
-            {tasks.map((task) => (
+            {tasks.length === 0 ? (
+              <div style={{ color: 'var(--text-muted)', padding: 12 }}>No assigned admin tasks for this role.</div>
+            ) : tasks.map((task) => (
               <Link key={task.label} href={task.href} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: 12, border: '1px solid var(--border)', borderRadius: 8, textDecoration: 'none', color: 'var(--text)' }}>
                 <span>
                   <strong>{task.label}</strong>

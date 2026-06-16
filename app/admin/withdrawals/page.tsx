@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function statusBadge(status: string) {
   if (status === 'approved') return 'success'
@@ -10,7 +11,7 @@ function statusBadge(status: string) {
 
 export default async function AdminWithdrawals() {
   const user = await getAuthUser()
-  if (!user || user.role !== 'admin') redirect('/login')
+  if (!user || !(await canAccessAdminArea(user.role, 'withdrawals'))) redirect('/login')
 
   const withdrawals = await prisma.withdrawal.findMany({
     include: { user: { select: { username: true, email: true, phone: true, balance: true } } },

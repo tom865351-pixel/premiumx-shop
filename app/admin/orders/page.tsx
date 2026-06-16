@@ -2,10 +2,11 @@ import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import CategoryLogo from '@/components/ui/CategoryLogo'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminOrders() {
   const user = await getAuthUser()
-  if (!user || user.role !== 'admin') redirect('/login')
+  if (!user || !(await canAccessAdminArea(user.role, 'orders'))) redirect('/login')
 
   const orders = await prisma.order.findMany({
     include: {

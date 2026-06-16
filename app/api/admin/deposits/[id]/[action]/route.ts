@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export async function POST(
   req: NextRequest,
@@ -8,7 +9,7 @@ export async function POST(
 ) {
   try {
     const authUser = await getAuthUser(req)
-    if (!authUser || authUser.role !== 'admin') {
+    if (!authUser || !(await canAccessAdminArea(authUser.role, 'deposits'))) {
       // Because this is a form submission, let's redirect back with error or just redirect
       return NextResponse.redirect(new URL('/login', req.url))
     }

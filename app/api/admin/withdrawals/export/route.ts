@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import * as xlsx from 'xlsx'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export async function GET(req: NextRequest) {
   const authUser = await getAuthUser(req)
-  if (!authUser || authUser.role !== 'admin') {
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'withdrawals'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

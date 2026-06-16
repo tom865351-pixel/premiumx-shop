@@ -2,10 +2,11 @@ import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import Link from 'next/link'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminSupportPage({ searchParams }: { searchParams: { status?: string } }) {
   const authUser = await getAuthUser()
-  if (!authUser || (authUser.role !== 'admin' && authUser.role !== 'sub-admin')) redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'support'))) redirect('/login')
 
   const statusFilter = searchParams?.status
   const tickets = await prisma.ticket.findMany({

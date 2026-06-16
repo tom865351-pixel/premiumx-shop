@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 export default async function AdminNotificationComposer() {
   const authUser = await getAuthUser()
-  if (!authUser || authUser.role !== 'admin') redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'notifications'))) redirect('/login')
 
   const users = await prisma.user.findMany({
     orderBy: { username: 'asc' },

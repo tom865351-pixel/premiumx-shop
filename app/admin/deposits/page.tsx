@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function statusBadge(status: string) {
   if (status === 'approved') return 'success'
@@ -10,7 +11,7 @@ function statusBadge(status: string) {
 
 export default async function AdminDeposits() {
   const authUser = await getAuthUser()
-  if (!authUser || authUser.role !== 'admin') redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'deposits'))) redirect('/login')
 
   const deposits = await prisma.topupRequest.findMany({
     orderBy: { createdAt: 'desc' },

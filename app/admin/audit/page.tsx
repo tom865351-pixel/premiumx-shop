@@ -3,6 +3,7 @@ import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function StatusPill({ tone, children }: { tone: 'success' | 'warning' | 'danger' | 'info'; children: React.ReactNode }) {
   return <span className={`badge badge-${tone}`}>{children}</span>
@@ -10,7 +11,7 @@ function StatusPill({ tone, children }: { tone: 'success' | 'warning' | 'danger'
 
 export default async function AdminAuditPage() {
   const user = await getAuthUser()
-  if (!user || user.role !== 'admin') redirect('/login')
+  if (!user || !(await canAccessAdminArea(user.role, 'audit'))) redirect('/login')
 
   const [settings, categories, pendingAccounts, pendingWithdrawals, openTickets, failedTopups] = await Promise.all([
     getSettings(['maintenance_mode', 'bkash_number', 'nagad_number', 'rocket_number', 'payout_min_bdt', 'next_payout_time']),
@@ -59,29 +60,33 @@ export default async function AdminAuditPage() {
     'Forgot password now creates an admin support reset request.',
     'Maintenance mode no longer blocks login/register/forgot-password pages.',
     'Wallet, withdrawal, ZiniPay, activity, risk, global search, support, live sessions, and notification tools are available.',
+    'Sub-admin and stock-manager menus now hide disallowed areas.',
+    'Admin pages and core admin APIs now enforce the same permission map.',
+    'Seller bulk submit and admin result upload support public Sheet/Excel links.',
+    'Login supports username, email, or phone with password.',
   ]
 
   const suggestions = [
-    'Move category/logo/proof uploads to Cloudinary, S3, or Vercel Blob.',
-    'Add batch submission IDs so 100 accounts appear as one seller batch.',
-    'Add admin batch approve/reject with one note and seller notification.',
-    'Add category account mover before deleting categories with old accounts.',
-    'Add password reset token/email or OTP flow instead of admin-only reset.',
-    'Add admin mobile card view for withdrawals, users, and deposits.',
-    'Add admin reveal reason log before showing account password/2FA.',
-    'Add ZiniPay retry/check-status button for pending gateway payments.',
-    'Add payout method verification before large withdrawals.',
-    'Add export history and download audit log.',
-    'Add seller warning/strike automation for fake or repeated bad stock.',
-    'Add weekly top sellers and payout leaderboard.',
-    'Add fraud rule UI instead of JSON-only settings.',
-    'Add rate limiting for login/register/forgot-password.',
-    'Add site health button checker for important links and routes.',
-    'Add maintenance preview message and scheduled maintenance timer.',
-    'Add seller invoice PDF for each payout batch.',
-    'Add dispute/refund timeline on admin reports.',
-    'Add category reorder drag/drop for homepage/rates display.',
-    'Add WhatsApp/Telegram notification integration after approval/payout.',
+    'P1: Add staff action audit log for every approve/reject/reveal/export.',
+    'P1: Add rate limiting for login/register/forgot-password.',
+    'P1: Add admin mobile card view for withdrawals, users, deposits, and reports.',
+    'P1: Add reveal reason log before showing account password/2FA.',
+    'P1: Add payout method verification before large withdrawals.',
+    'P2: Add batch submission IDs so 100 accounts appear as one seller batch.',
+    'P2: Add admin batch approve/reject with one note and seller notification.',
+    'P2: Add export history and download audit log.',
+    'P2: Add seller warning/strike automation for fake or repeated bad stock.',
+    'P2: Add fraud rule UI instead of JSON-only settings.',
+    'P2: Add site health button checker for important links and routes.',
+    'P2: Add ZiniPay retry/check-status button for pending gateway payments.',
+    'P3: Move category/logo/proof uploads to Cloudinary, S3, or Vercel Blob.',
+    'P3: Add seller invoice PDF for each payout batch.',
+    'P3: Add dispute/refund timeline on admin reports.',
+    'P3: Add category reorder drag/drop for homepage/rates display.',
+    'P3: Add maintenance preview message and scheduled maintenance timer.',
+    'P3: Add WhatsApp/Telegram notification integration after approval/payout.',
+    'P3: Add weekly top sellers and payout leaderboard.',
+    'P3: Add password reset token/email or OTP flow instead of admin-only reset.',
   ]
 
   return (

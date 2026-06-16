@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function money(amount = 0) {
   return `BDT ${Number(amount).toLocaleString()}`
@@ -14,7 +15,7 @@ function smallDate(value: Date) {
 
 export default async function AdminSearchPage({ searchParams }: { searchParams: { q?: string } }) {
   const authUser = await getAuthUser()
-  if (!authUser || !['admin', 'sub-admin', 'stock-manager'].includes(authUser.role)) redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'search'))) redirect('/login')
 
   const q = (searchParams.q || '').trim()
   const hasQuery = q.length >= 2

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function validateIcon(icon: string) {
   if (icon.startsWith('data:image/') && icon.length > 500_000) {
@@ -11,7 +12,7 @@ function validateIcon(icon: string) {
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
-  if (!user || user.role !== 'admin') {
+  if (!user || !(await canAccessAdminArea(user.role, 'categories'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

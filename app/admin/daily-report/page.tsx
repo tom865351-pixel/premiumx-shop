@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { canAccessAdminArea } from '@/lib/permissions'
 
 function money(amount = 0) {
   return `BDT ${Number(amount).toLocaleString()}`
@@ -9,7 +10,7 @@ function money(amount = 0) {
 
 export default async function DailyReportPage() {
   const authUser = await getAuthUser()
-  if (!authUser || !['admin', 'sub-admin', 'stock-manager'].includes(authUser.role)) redirect('/login')
+  if (!authUser || !(await canAccessAdminArea(authUser.role, 'dailyReport'))) redirect('/login')
 
   const since = new Date()
   since.setHours(0, 0, 0, 0)
