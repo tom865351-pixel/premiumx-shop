@@ -61,7 +61,35 @@ export default async function AdminWithdrawals() {
         </div>
       )}
 
-      <div className="table-container card">
+      <div className="mobile-card-list" style={{ marginBottom: 18 }}>
+        {withdrawals.map((withdrawal) => (
+          <div className="mobile-data-card" key={`mobile-${withdrawal.id}`}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
+              <strong>@{withdrawal.user.username}</strong>
+              <span className={`badge badge-${statusBadge(withdrawal.status)}`}>{withdrawal.status}</span>
+            </div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Amount</span><span className="mobile-data-value text-gold">BDT {withdrawal.amount.toLocaleString()}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Method</span><span className="mobile-data-value">{withdrawal.method.toUpperCase()}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Wallet</span><span className="mobile-data-value">{withdrawal.accountNumber}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Reference</span><span className="mobile-data-value">{withdrawal.reference || withdrawal.adminNote || '-'}</span></div>
+            {withdrawal.status === 'pending' && (
+              <div style={{ display: 'grid', gap: 8, marginTop: 12 }}>
+                <form action={`/api/admin/withdrawals/${withdrawal.id}/approve`} method="POST" style={{ display: 'grid', gap: 8 }}>
+                  <input name="reference" className="input" placeholder="Payment reference" />
+                  {withdrawal.amount >= 10000 && <input name="verificationNote" className="input" placeholder="Large payout check note" />}
+                  <button className="btn btn-sm btn-gold" type="submit">Mark Paid</button>
+                </form>
+                <form action={`/api/admin/withdrawals/${withdrawal.id}/reject`} method="POST" style={{ display: 'grid', gap: 8 }}>
+                  <input name="adminNote" className="input" placeholder="Reject reason" />
+                  <button className="btn btn-sm btn-outline" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }} type="submit">Reject & Refund</button>
+                </form>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="table-container card mobile-hide-table">
         <table className="table">
           <thead>
             <tr>
@@ -104,6 +132,9 @@ export default async function AdminWithdrawals() {
                       <div style={{ display: 'grid', gap: 10, minWidth: 220 }}>
                         <form action={`/api/admin/withdrawals/${withdrawal.id}/approve`} method="POST" style={{ display: 'grid', gap: 8 }}>
                           <input name="reference" className="input" placeholder="Payment reference" style={{ height: 34, fontSize: 12 }} />
+                          {withdrawal.amount >= 10000 && (
+                            <input name="verificationNote" className="input" placeholder="Large payout check note" style={{ height: 34, fontSize: 12 }} />
+                          )}
                           <button className="btn btn-sm btn-primary" type="submit">Mark Paid</button>
                         </form>
                         <form action={`/api/admin/withdrawals/${withdrawal.id}/reject`} method="POST" style={{ display: 'grid', gap: 8 }}>

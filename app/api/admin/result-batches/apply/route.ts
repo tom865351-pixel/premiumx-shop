@@ -3,6 +3,7 @@ import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 type IncomingRow = {
   accountId?: string
@@ -195,5 +196,6 @@ export async function POST(req: NextRequest) {
     throw error
   }
 
+  await logStaffAction(user, 'result_batch.apply', 'resultBatch', summary.batchId, summary, req)
   return NextResponse.json({ success: true, ...summary })
 }

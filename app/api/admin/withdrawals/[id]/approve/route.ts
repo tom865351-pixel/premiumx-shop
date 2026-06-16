@@ -2,13 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { canAccessAdminArea } from '@/lib/permissions'
-
-async function readFormValue(req: NextRequest, key: string) {
-  const contentType = req.headers.get('content-type') || ''
-  if (!contentType.includes('form')) return ''
-  const formData = await req.formData()
-  return String(formData.get(key) || '').trim()
-}
+import { logStaffAction } from '@/lib/staffAudit'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
@@ -16,10 +10,15 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const reference = await readFormValue(req, 'reference')
+  const formData = req.headers.get('content-type')?.includes('form') ? await req.formData() : null
+  const reference = String(formData?.get('reference') || '').trim()
+  const verificationNote = String(formData?.get('verificationNote') || '').trim()
   const withdrawal = await prisma.withdrawal.findUnique({ where: { id: params.id } })
   if (!withdrawal || withdrawal.status !== 'pending') {
     return NextResponse.json({ error: 'Not found or already processed' }, { status: 400 })
+  }
+  if (withdrawal.amount >= 10000 && (!reference || verificationNote.length < 5)) {
+    return NextResponse.json({ error: 'Large payouts require payment reference and verification note.' }, { status: 400 })
   }
 
   await prisma.$transaction(async (tx) => {
@@ -64,6 +63,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     })
   })
+  await logStaffAction(user, 'withdrawal.approve', 'withdrawal', withdrawal.id, {
+    amount: withdrawal.amount,
+    method: withdrawal.method,
+    reference,
+    verificationNote: verificationNote || null,
+  }, req)
 
   return NextResponse.redirect(new URL('/admin/withdrawals', req.url))
 }

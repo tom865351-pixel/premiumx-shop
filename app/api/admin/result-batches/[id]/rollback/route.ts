@@ -3,6 +3,7 @@ import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
@@ -52,5 +53,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     throw error
   }
 
+  await logStaffAction(user, 'result_batch.rollback', 'resultBatch', batch.id, { rows: batch.rows.length }, req)
   return NextResponse.redirect(new URL('/admin/result-batches', req.url))
 }

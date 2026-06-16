@@ -48,6 +48,7 @@ export async function POST(req: Request) {
     let missingRows = parsed.skippedMissing
     const seen = new Set<string>()
     let duplicateRows = 0
+    const batchId = `PXB-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`
 
     const candidateUsernames = rows.map((row) => row.username).filter(Boolean)
     const existingAccounts = await findExistingAccounts(candidateUsernames, category.id)
@@ -72,6 +73,7 @@ export async function POST(req: Request) {
         recoveryPhone: row.recoveryPhone || null,
         accountAge: row.accountAge || null,
         screenshots: row.proofLink ? JSON.stringify([row.proofLink]) : '[]',
+        extraFields: JSON.stringify({ bulkBatchId: batchId, bulkSource: sheetUrl ? 'sheet-link' : 'file' }),
         price: (category as any).defaultPrice || 0,
         status: 'pending'
       }
@@ -91,7 +93,8 @@ export async function POST(req: Request) {
       count: accountsData.length,
       skippedMissing: missingRows,
       skippedDuplicates: duplicateRows,
-      message: `Imported ${accountsData.length} accounts${sheetUrl ? ' from public Sheet link' : ''}. Skipped ${missingRows} missing rows and ${duplicateRows} duplicate rows.${parsed.headerFound ? '' : ' Used first two columns as username/password.'}`,
+      batchId,
+      message: `Imported ${accountsData.length} accounts${sheetUrl ? ' from public Sheet link' : ''}. Batch ID: ${batchId}. Skipped ${missingRows} missing rows and ${duplicateRows} duplicate rows.${parsed.headerFound ? '' : ' Used first two columns as username/password.'}`,
     })
 
   } catch (error: any) {

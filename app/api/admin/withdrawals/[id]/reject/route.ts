@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 async function readFormValue(req: NextRequest, key: string) {
   const contentType = req.headers.get('content-type') || ''
@@ -63,6 +64,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     })
   })
+  await logStaffAction(user, 'withdrawal.reject', 'withdrawal', withdrawal.id, { amount: withdrawal.amount, method: withdrawal.method, note }, req)
 
   return NextResponse.redirect(new URL('/admin/withdrawals', req.url))
 }

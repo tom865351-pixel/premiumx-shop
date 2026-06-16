@@ -57,7 +57,32 @@ export default async function AdminDeposits() {
         </div>
       </div>
 
-      <div className="table-container card">
+      <div className="mobile-card-list" style={{ marginBottom: 18 }}>
+        {deposits.map((deposit) => (
+          <div className="mobile-data-card" key={`mobile-${deposit.id}`}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
+              <strong>@{deposit.user.username}</strong>
+              <span className={`badge badge-${statusBadge(deposit.status)}`}>{deposit.status}</span>
+            </div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Amount</span><span className="mobile-data-value text-gold">BDT {deposit.amount.toLocaleString()}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Method</span><span className="mobile-data-value">{deposit.method.toUpperCase()}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">TrxID</span><span className="mobile-data-value">{deposit.transactionId || '-'}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Submitted</span><span className="mobile-data-value">{new Date(deposit.createdAt).toLocaleString()}</span></div>
+            {deposit.status === 'pending' && (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+                <form action={`/api/admin/deposits/${deposit.id}/approve`} method="POST">
+                  <button type="submit" className="btn btn-sm btn-gold">Approve</button>
+                </form>
+                <form action={`/api/admin/deposits/${deposit.id}/reject`} method="POST">
+                  <button type="submit" className="btn btn-sm btn-danger">Reject</button>
+                </form>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="table-container card mobile-hide-table">
         <table className="table">
           <thead>
             <tr>

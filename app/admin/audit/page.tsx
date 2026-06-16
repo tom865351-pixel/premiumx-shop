@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
 import { getSettings } from '@/lib/settings'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { getRecentStaffAuditLogs } from '@/lib/staffAudit'
 
 function StatusPill({ tone, children }: { tone: 'success' | 'warning' | 'danger' | 'info'; children: React.ReactNode }) {
   return <span className={`badge badge-${tone}`}>{children}</span>
@@ -13,13 +14,14 @@ export default async function AdminAuditPage() {
   const user = await getAuthUser()
   if (!user || !(await canAccessAdminArea(user.role, 'audit'))) redirect('/login')
 
-  const [settings, categories, pendingAccounts, pendingWithdrawals, openTickets, failedTopups] = await Promise.all([
+  const [settings, categories, pendingAccounts, pendingWithdrawals, openTickets, failedTopups, auditLogs] = await Promise.all([
     getSettings(['maintenance_mode', 'bkash_number', 'nagad_number', 'rocket_number', 'payout_min_bdt', 'next_payout_time']),
     prisma.category.findMany({ include: { _count: { select: { accounts: true } } }, orderBy: { createdAt: 'desc' } }),
     prisma.account.count({ where: { status: 'pending' } }),
     prisma.withdrawal.count({ where: { status: 'pending' } }),
     prisma.ticket.count({ where: { status: { not: 'closed' } } }),
     prisma.topupRequest.count({ where: { status: 'rejected', method: 'zinipay' } }),
+    getRecentStaffAuditLogs(20),
   ])
 
   const largeDataLogos = categories.filter((category) => category.icon?.startsWith('data:image/') && category.icon.length > 500_000)
@@ -125,6 +127,23 @@ export default async function AdminAuditPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="card" style={{ padding: 20, marginBottom: 20 }}>
+        <h2 style={{ fontSize: 18, marginBottom: 14 }}>Staff Action / Export History</h2>
+        <div style={{ display: 'grid', gap: 10 }}>
+          {auditLogs.length === 0 ? (
+            <div style={{ color: 'var(--text-muted)' }}>No staff audit logs yet. New approve/reject/reveal/export actions will appear here.</div>
+          ) : auditLogs.map((log) => (
+            <div key={log.id} style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 12, display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <div>
+                <strong>{log.action}</strong>
+                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{log.targetType}{log.targetId ? `: ${log.targetId}` : ''} - {log.staffRole || 'staff'}</div>
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{new Date(log.createdAt).toLocaleString()}</div>
+            </div>
+          ))}
         </div>
       </section>
 

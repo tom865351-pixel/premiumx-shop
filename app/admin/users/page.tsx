@@ -29,7 +29,23 @@ export default async function AdminUsers() {
         </div>
       </div>
 
-      <div className="table-container card">
+      <div className="mobile-card-list" style={{ marginBottom: 18 }}>
+        {users.map((u) => (
+          <div className="mobile-data-card" key={`mobile-${u.id}`}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
+              <strong>@{u.username}</strong>
+              <span className={`badge badge-${u.isBanned ? 'danger' : 'success'}`}>{u.isBanned ? 'Banned' : 'Active'}</span>
+            </div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Email</span><span className="mobile-data-value">{u.email}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Phone</span><span className="mobile-data-value">{u.phone || 'N/A'}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Role</span><span className="mobile-data-value">{u.role}</span></div>
+            <div className="mobile-data-row"><span className="mobile-data-label">Balance</span><span className="mobile-data-value text-gold">BDT {u.balance.toLocaleString()}</span></div>
+            <div style={{ marginTop: 12 }}><UserActions user={u} /></div>
+          </div>
+        ))}
+      </div>
+
+      <div className="table-container card mobile-hide-table">
         <table className="table">
           <thead>
             <tr>

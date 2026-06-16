@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { hashPassword, signToken } from '@/lib/auth'
+import { rateLimit, requestIp } from '@/lib/rateLimit'
 
 export async function POST(req: Request) {
   try {
     const { email, username, phone, password } = await req.json()
+    const ip = requestIp(req)
+    const limited = rateLimit(`register:${ip}`, 5, 60 * 60 * 1000)
+    if (!limited.ok) {
+      return NextResponse.json({ error: `Too many registrations. Try again in ${limited.retryAfter}s.` }, { status: 429 })
+    }
 
     if (!email || !username || !password || !phone) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 })

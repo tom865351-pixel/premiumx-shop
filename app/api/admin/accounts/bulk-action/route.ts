@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest) {
         })
       }
     })
+    await logStaffAction(user, 'account.bulk_approve', 'account', null, { count: accounts.length, accountIds: accounts.map((account) => account.id), note: adminNote }, req)
 
     return NextResponse.json({ success: true, message: `Successfully approved and paid for ${accounts.length} accounts.` })
   }
@@ -80,6 +82,7 @@ export async function POST(req: NextRequest) {
         })),
       })
     })
+    await logStaffAction(user, 'account.bulk_reject', 'account', null, { count: accounts.length, accountIds: accounts.map((account) => account.id), note: adminNote }, req)
 
     return NextResponse.json({ success: true, message: `Successfully rejected ${accounts.length} accounts.` })
   }

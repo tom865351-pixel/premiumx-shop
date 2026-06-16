@@ -164,9 +164,24 @@ export default function AdminAccountsClient({ accounts, rejectTemplates = '' }: 
     setSelectedIds((prev) => allSelected ? prev.filter((id) => !ids.includes(id)) : Array.from(new Set([...prev, ...ids])))
   }
 
-  const revealAccount = (account: any) => {
-    if (!confirm(`Reveal password for ${account.title}? This should only be used for admin review.`)) return
-    setRevealedIds((prev) => Array.from(new Set([...prev, account.id])))
+  const revealAccount = async (account: any) => {
+    const reason = prompt(`Why are you revealing credentials for ${account.title}?`, 'Review account login details')
+    if (!reason) return
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/accounts/${account.id}/reveal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Reveal log failed')
+      setRevealedIds((prev) => Array.from(new Set([...prev, account.id])))
+    } catch (err: any) {
+      alert(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

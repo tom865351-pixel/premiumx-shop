@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyPassword, signToken } from '@/lib/auth'
+import { rateLimit, requestIp } from '@/lib/rateLimit'
 
 export async function POST(req: Request) {
   try {
     const { email, identifier, password } = await req.json()
     const loginId = String(identifier || email || '').trim()
+    const ip = requestIp(req)
+    const limited = rateLimit(`login:${ip}:${loginId.toLowerCase()}`, 8, 10 * 60 * 1000)
+    if (!limited.ok) {
+      return NextResponse.json({ error: `Too many login attempts. Try again in ${limited.retryAfter}s.` }, { status: 429 })
+    }
 
     if (!loginId || !password) {
       return NextResponse.json({ error: 'Missing username, email, phone or password' }, { status: 400 })

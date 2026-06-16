@@ -3,6 +3,7 @@ import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import * as xlsx from 'xlsx'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
@@ -30,31 +31,36 @@ export async function GET(req: NextRequest) {
   const dateStr = new Date().toISOString().split('T')[0]
   const sellerName = accounts[0]?.seller?.username
 
-  const data = accounts.map((acc, idx) => ({
-    No: idx + 1,
-    Status: acc.status.toUpperCase(),
-    Platform: acc.category.name,
-    Seller_Username: acc.seller.username,
-    Seller_Email: acc.seller.email,
-    Account_Username: acc.username,
-    Password: acc.password,
-    Two_FA_Secret: acc.twoFASecret || '-',
-    Price_BDT: `BDT ${acc.price}`,
-    Submitted_Date: new Date(acc.createdAt).toLocaleDateString('en-BD', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }),
-    Account_ID: acc.id,
-  }))
+  const data = accounts.map((acc, idx) => {
+    let extra: any = {}
+    try { extra = JSON.parse(acc.extraFields || '{}') } catch {}
+    return {
+      No: idx + 1,
+      Batch_ID: extra.bulkBatchId || '',
+      Status: acc.status.toUpperCase(),
+      Platform: acc.category.name,
+      Seller_Username: acc.seller.username,
+      Seller_Email: acc.seller.email,
+      Account_Username: acc.username,
+      Password: acc.password,
+      Two_FA_Secret: acc.twoFASecret || '-',
+      Price_BDT: `BDT ${acc.price}`,
+      Submitted_Date: new Date(acc.createdAt).toLocaleDateString('en-BD', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      Account_ID: acc.id,
+    }
+  })
 
   const sheetTitle = sellerName ? `${sellerName} ${filterStatus}` : `${filterStatus} accounts`
   const sheetName = `${sheetTitle.slice(0, 24)} (${accounts.length})`
   const worksheet = xlsx.utils.json_to_sheet(data)
   worksheet['!cols'] = [
-    { wch: 5 }, { wch: 12 }, { wch: 16 }, { wch: 18 }, { wch: 24 },
+    { wch: 5 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 18 }, { wch: 24 },
     { wch: 28 }, { wch: 22 }, { wch: 22 }, { wch: 14 }, { wch: 22 }, { wch: 30 },
   ]
 
@@ -64,6 +70,7 @@ export async function GET(req: NextRequest) {
 
   const sellerPart = sellerName ? `_${sellerName}` : ''
   const filename = `premiumx${sellerPart}_${filterStatus}_${accounts.length}pcs_${dateStr}.xlsx`
+  await logStaffAction(user, 'export.accounts', 'account', null, { status: filterStatus, sellerId: sellerId || null, count: accounts.length, filename }, req)
 
   return new NextResponse(buffer, {
     status: 200,

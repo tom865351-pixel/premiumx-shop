@@ -3,6 +3,7 @@ import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import * as xlsx from 'xlsx'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req)
@@ -95,6 +96,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
   const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' })
   const safeName = batch.fileName.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 40)
+  await logStaffAction(user, 'export.result_batch', 'resultBatch', batch.id, { format, rows: batch.rows.length, fileName: batch.fileName }, req)
 
   return new NextResponse(buffer, {
     status: 200,

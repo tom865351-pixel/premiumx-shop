@@ -3,6 +3,7 @@ import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import * as xlsx from 'xlsx'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 export async function GET(req: NextRequest) {
   const authUser = await getAuthUser(req)
@@ -42,6 +43,7 @@ export async function GET(req: NextRequest) {
   xlsx.utils.book_append_sheet(workbook, worksheet, `${status} payouts`.slice(0, 31))
   const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' })
   const dateStr = new Date().toISOString().split('T')[0]
+  await logStaffAction(authUser, 'export.withdrawals', 'withdrawal', null, { status, count: withdrawals.length }, req)
 
   return new NextResponse(buffer, {
     status: 200,

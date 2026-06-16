@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const authUser = await getAuthUser(req)
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     })
   })
+  await logStaffAction(authUser, 'deposit.approve', 'deposit', deposit.id, { amount: deposit.amount, method: deposit.method, transactionId: deposit.transactionId }, req)
 
   return NextResponse.redirect(new URL('/admin/deposits', req.url))
 }

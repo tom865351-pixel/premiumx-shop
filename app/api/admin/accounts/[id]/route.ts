@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { logStaffAction } from '@/lib/staffAudit'
 
 export async function DELETE(
   req: NextRequest,
@@ -27,6 +28,7 @@ export async function DELETE(
     }
 
     await prisma.account.delete({ where: { id: params.id } })
+    await logStaffAction(authUser, 'account.delete', 'account', params.id, {}, req)
     return NextResponse.json({ success: true, message: 'Account deleted successfully.' })
   } catch (error) {
     console.error('Delete account error:', error)
