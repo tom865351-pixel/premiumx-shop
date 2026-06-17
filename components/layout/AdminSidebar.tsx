@@ -11,6 +11,7 @@ const navItems = [
   { href: '/admin/risk', icon: '!', label: 'Risk Center', permission: 'risk', urgent: true },
   { href: '/admin/users', icon: 'U', label: 'Users', permission: 'users' },
   { href: '/admin/accounts', icon: '#', label: 'Accounts', permission: 'accounts' },
+  { href: '/admin/account-collections', icon: 'XL', label: 'Collection Reports', permission: 'accounts' },
   { href: '/admin/result-batches', icon: 'R', label: 'Upload Result', permission: 'results' },
   { href: '/admin/add-account', icon: '+', label: 'Add Account', permission: 'addAccount' },
   { href: '/admin/orders', icon: 'O', label: 'Orders', permission: 'orders' },
