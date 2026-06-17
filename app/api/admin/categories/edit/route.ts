@@ -27,6 +27,9 @@ export async function POST(req: NextRequest) {
     const defaultPrice = parseFloat(formData.get('defaultPrice') as string || '0')
     const videoUrl = (formData.get('videoUrl') as string) || ''
     const enabledFields = formData.getAll('enabledFields') as SellerFieldKey[]
+    const labels = Object.fromEntries(
+      DEFAULT_SELLER_FIELDS.map((field) => [field, (formData.get(`fieldLabel_${field}`) as string) || '']),
+    ) as Partial<Record<SellerFieldKey, string>>
 
     if (!id || !name) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -48,6 +51,7 @@ export async function POST(req: NextRequest) {
         fields: stringifyCategoryFieldConfig({
           enabledFields: enabledFields.length ? enabledFields : DEFAULT_SELLER_FIELDS,
           videoUrl,
+          labels,
         }),
       }
     })

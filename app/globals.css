@@ -473,6 +473,15 @@ img {
   background: rgba(212, 175, 55, 0.08);
 }
 
+.category-field-label-editor {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
 .sell-guide-video {
   margin-bottom: 20px;
   border: 1px solid var(--border);
@@ -690,6 +699,10 @@ img {
     max-height: 92dvh;
     padding: 18px;
     border-radius: 12px;
+  }
+  .category-field-grid,
+  .category-field-label-editor {
+    grid-template-columns: 1fr;
   }
   .modal-header {
     gap: 12px;

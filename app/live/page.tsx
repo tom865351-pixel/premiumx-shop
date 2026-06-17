@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import Navbar from '@/components/layout/Navbar'
 import prisma from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
@@ -48,11 +49,14 @@ export default async function LivePage() {
   ])
 
   const visible = notices.filter((notice) => visibleForRole(notice.target, user.role))
-  const resources = rawResources
+  const normalizedResources = rawResources.includes('Instagram account opening class recording')
+    ? 'Instagram class time 10:00 am-12:00 pm\nInstagram class time 7:30pm-9:00 pm'
+    : rawResources
+  const resources = normalizedResources
     .split('\n')
     .map((line) => {
       const [title, href] = line.split('|').map((item) => item?.trim())
-      return title && href ? { title, href } : null
+      return title ? { title, href: href || '' } : null
     })
     .filter(Boolean) as { title: string; href: string }[]
 
@@ -60,6 +64,10 @@ export default async function LivePage() {
     <div className={styles.shell}>
       <Navbar user={user as any} />
       <main className={`container ${styles.main}`}>
+        <Link href="/dashboard" className={styles.backLink}>
+          Back
+        </Link>
+
         <section className={styles.hero}>
           <div className={styles.eyebrow}>Live classes and notices</div>
           <h1 className={styles.title}>Live Sessions</h1>
@@ -111,15 +119,22 @@ export default async function LivePage() {
         {resources.length > 0 && (
           <section className={styles.resources}>
             <div>
-              <div className={styles.eyebrow}>Recordings and resources</div>
-              <h2 className={styles.resourceTitle}>Class Links</h2>
+              <div className={styles.eyebrow}>Class schedule</div>
+              <h2 className={styles.resourceTitle}>Class Time</h2>
             </div>
             <div className={styles.resourceGrid}>
               {resources.map((resource) => (
+                resource.href ? (
                 <a key={`${resource.title}-${resource.href}`} href={resource.href} className={styles.resourceCard}>
                   <span>{resource.title}</span>
                   <strong>Open</strong>
                 </a>
+                ) : (
+                  <div key={resource.title} className={styles.resourceCard}>
+                    <span>{resource.title}</span>
+                    <strong>Scheduled</strong>
+                  </div>
+                )
               ))}
             </div>
           </section>

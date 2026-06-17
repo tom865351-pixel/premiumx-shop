@@ -10,6 +10,7 @@ export type SellerFieldKey =
 export type CategoryFieldConfig = {
   enabledFields: SellerFieldKey[]
   videoUrl?: string
+  labels?: Partial<Record<SellerFieldKey, string>>
 }
 
 export const SELLER_FIELD_OPTIONS: Array<{
@@ -52,6 +53,7 @@ export function parseCategoryFieldConfig(fields?: string | null): CategoryFieldC
       return {
         enabledFields: enabledFields.length ? enabledFields : DEFAULT_SELLER_FIELDS,
         videoUrl: typeof parsed.videoUrl === 'string' ? parsed.videoUrl : '',
+        labels: parsed.labels && typeof parsed.labels === 'object' ? parsed.labels : {},
       }
     }
   } catch {
@@ -65,10 +67,17 @@ export function stringifyCategoryFieldConfig(config: CategoryFieldConfig) {
   const enabledFields = config.enabledFields.filter((field, index, fields) =>
     SELLER_FIELD_OPTIONS.some((option) => option.key === field) && fields.indexOf(field) === index,
   )
+  const labels = Object.fromEntries(
+    SELLER_FIELD_OPTIONS.map((field) => [
+      field.key,
+      config.labels?.[field.key]?.trim() || field.label,
+    ]),
+  )
 
   return JSON.stringify({
     enabledFields: enabledFields.length ? enabledFields : DEFAULT_SELLER_FIELDS,
     videoUrl: config.videoUrl?.trim() || '',
+    labels,
   })
 }
 

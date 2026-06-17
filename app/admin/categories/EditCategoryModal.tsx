@@ -18,6 +18,9 @@ export default function EditCategoryModal({ category }: { category: any }) {
     defaultPrice: category.defaultPrice.toString(),
     videoUrl: categoryConfig.videoUrl || '',
     enabledFields: categoryConfig.enabledFields || DEFAULT_SELLER_FIELDS,
+    fieldLabels: Object.fromEntries(
+      SELLER_FIELD_OPTIONS.map((field) => [field.key, categoryConfig.labels?.[field.key] || field.label]),
+    ) as Record<SellerFieldKey, string>,
   })
 
   const toggleField = (field: SellerFieldKey) => {
@@ -27,6 +30,13 @@ export default function EditCategoryModal({ category }: { category: any }) {
       enabledFields: current.enabledFields.includes(field)
         ? current.enabledFields.filter((item) => item !== field)
         : [...current.enabledFields, field],
+    }))
+  }
+
+  const updateFieldLabel = (field: SellerFieldKey, label: string) => {
+    setForm((current) => ({
+      ...current,
+      fieldLabels: { ...current.fieldLabels, [field]: label },
     }))
   }
 
@@ -52,9 +62,10 @@ export default function EditCategoryModal({ category }: { category: any }) {
     const fd = new FormData()
     fd.append('id', category.id)
     Object.entries(form).forEach(([k, v]) => {
-      if (k !== 'enabledFields') fd.append(k, String(v))
+      if (k !== 'enabledFields' && k !== 'fieldLabels') fd.append(k, String(v))
     })
     form.enabledFields.forEach((field) => fd.append('enabledFields', field))
+    Object.entries(form.fieldLabels).forEach(([field, label]) => fd.append(`fieldLabel_${field}`, label))
 
     await fetch('/api/admin/categories/edit', { method: 'POST', body: fd })
 
@@ -128,6 +139,19 @@ export default function EditCategoryModal({ category }: { category: any }) {
                       </label>
                     )
                   })}
+                </div>
+                <div className="category-field-label-editor">
+                  {SELLER_FIELD_OPTIONS.map((field) => (
+                    <div className="form-group" key={`label-${field.key}`}>
+                      <label className="form-label">{field.label} text</label>
+                      <input
+                        className="input"
+                        value={form.fieldLabels[field.key] || field.label}
+                        onChange={(e) => updateFieldLabel(field.key, e.target.value)}
+                        placeholder={field.label}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
               {isImageIcon(form.icon) && (

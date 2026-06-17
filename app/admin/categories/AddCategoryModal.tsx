@@ -16,6 +16,7 @@ export default function AddCategoryModal() {
     defaultPrice: '0',
     videoUrl: '',
     enabledFields: DEFAULT_SELLER_FIELDS,
+    fieldLabels: Object.fromEntries(SELLER_FIELD_OPTIONS.map((field) => [field.key, field.label])) as Record<SellerFieldKey, string>,
   })
 
   const toggleField = (field: SellerFieldKey) => {
@@ -25,6 +26,13 @@ export default function AddCategoryModal() {
       enabledFields: current.enabledFields.includes(field)
         ? current.enabledFields.filter((item) => item !== field)
         : [...current.enabledFields, field],
+    }))
+  }
+
+  const updateFieldLabel = (field: SellerFieldKey, label: string) => {
+    setForm((current) => ({
+      ...current,
+      fieldLabels: { ...current.fieldLabels, [field]: label },
     }))
   }
 
@@ -49,14 +57,24 @@ export default function AddCategoryModal() {
     setLoading(true)
     const fd = new FormData()
     Object.entries(form).forEach(([k, v]) => {
-      if (k !== 'enabledFields') fd.append(k, String(v))
+      if (k !== 'enabledFields' && k !== 'fieldLabels') fd.append(k, String(v))
     })
     form.enabledFields.forEach((field) => fd.append('enabledFields', field))
+    Object.entries(form.fieldLabels).forEach(([field, label]) => fd.append(`fieldLabel_${field}`, label))
     await fetch('/api/admin/categories/create', { method: 'POST', body: fd })
     setOpen(false)
     router.refresh()
     setLoading(false)
-    setForm({ name: '', icon: 'PX', color: '#9333EA', description: '', defaultPrice: '0', videoUrl: '', enabledFields: DEFAULT_SELLER_FIELDS })
+    setForm({
+      name: '',
+      icon: 'PX',
+      color: '#9333EA',
+      description: '',
+      defaultPrice: '0',
+      videoUrl: '',
+      enabledFields: DEFAULT_SELLER_FIELDS,
+      fieldLabels: Object.fromEntries(SELLER_FIELD_OPTIONS.map((field) => [field.key, field.label])) as Record<SellerFieldKey, string>,
+    })
   }
 
   return (
@@ -124,6 +142,19 @@ export default function AddCategoryModal() {
                       </label>
                     )
                   })}
+                </div>
+                <div className="category-field-label-editor">
+                  {SELLER_FIELD_OPTIONS.map((field) => (
+                    <div className="form-group" key={`label-${field.key}`}>
+                      <label className="form-label">{field.label} text</label>
+                      <input
+                        className="input"
+                        value={form.fieldLabels[field.key] || field.label}
+                        onChange={(e) => updateFieldLabel(field.key, e.target.value)}
+                        placeholder={field.label}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
               {isImageIcon(form.icon) && (

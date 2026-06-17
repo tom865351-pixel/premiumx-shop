@@ -168,7 +168,7 @@ export default function SellForm({ categories }: { categories: Category[] }) {
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {SELLER_FIELD_OPTIONS.filter((field) => enabledFields.has(field.key)).map((field) => (
                 <div className="form-group" key={field.key}>
-                  <label className="form-label">{field.label}{field.required ? '' : ' (Optional)'}</label>
+                  <label className="form-label">{selectedConfig.labels?.[field.key] || field.label}{field.required ? '' : ' (Optional)'}</label>
                   <input
                     type={field.key === 'proofLink' ? 'url' : 'text'}
                     name={field.key}

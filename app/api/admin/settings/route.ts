@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
-import prisma from '@/lib/prisma'
 import { canAccessAdminArea, stringifyPermissions } from '@/lib/permissions'
+import { setSetting } from '@/lib/settings'
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
@@ -29,11 +29,7 @@ export async function POST(req: NextRequest) {
   for (const key of keys) {
     const value = formData.get(key) as string
     if (value !== null) {
-      await prisma.siteSetting.upsert({
-        where: { key },
-        update: { value },
-        create: { key, value },
-      })
+      await setSetting(key, value)
     }
   }
 

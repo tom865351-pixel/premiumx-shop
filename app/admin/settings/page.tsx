@@ -41,6 +41,9 @@ export default async function AdminSettings() {
     'bulk_result_default_reason',
     'bulk_result_allow_color',
   ])
+  const liveResourcesValue = settings.live_resources?.includes('Instagram account opening class recording')
+    ? 'Instagram class time 10:00 am-12:00 pm\nInstagram class time 7:30pm-9:00 pm'
+    : settings.live_resources
 
   return (
     <div>
@@ -235,8 +238,8 @@ export default async function AdminSettings() {
                 <textarea className="input" name="homepage_hero_subtitle" defaultValue={settings.homepage_hero_subtitle} rows={4} />
               </div>
               <div className="form-group">
-                <label className="form-label">Live Resource Links</label>
-                <textarea className="input" name="live_resources" defaultValue={settings.live_resources} rows={4} placeholder="Title|URL, one per line" />
+                <label className="form-label">Live Class Times / Links</label>
+                <textarea className="input" name="live_resources" defaultValue={liveResourcesValue} rows={4} placeholder={'Instagram class time 10:00 am-12:00 pm\nInstagram class time 7:30pm-9:00 pm\nRecording title|https://example.com'} />
               </div>
               <div className="form-group">
                 <label className="form-label">Sub-admin Permissions JSON</label>

@@ -22,7 +22,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   homepage_hero_title: 'Sell Your Digital Accounts',
   homepage_hero_highlight: 'Get Paid After Admin Review',
   homepage_hero_subtitle: 'Submit Instagram, Facebook, Gmail, TikTok and other accounts one by one or by Excel upload. Admin reviews the stock, buys valid accounts, and your wallet balance updates.',
-  live_resources: 'Instagram account opening class recording|/live\nSeller rules and payout guide|/support',
+  live_resources: 'Instagram class time 10:00 am-12:00 pm\nInstagram class time 7:30pm-9:00 pm',
   subadmin_permissions: '{"dashboard":true,"search":true,"activity":true,"risk":false,"users":false,"accounts":true,"results":true,"addAccount":true,"orders":true,"deposits":false,"payments":false,"notifications":true,"dailyReport":true,"audit":false,"permissions":false,"withdrawals":false,"reports":true,"support":true,"categories":true,"announcements":true,"settings":false}',
   stockmanager_permissions: '{"dashboard":true,"search":true,"activity":true,"risk":true,"users":false,"accounts":true,"results":true,"addAccount":true,"orders":false,"deposits":false,"payments":false,"notifications":false,"dailyReport":true,"audit":true,"permissions":false,"withdrawals":false,"reports":true,"support":false,"categories":true,"announcements":false,"settings":false}',
   reject_templates: 'Wrong password\nDuplicate account\nIncomplete recovery info\nInvalid account details',
