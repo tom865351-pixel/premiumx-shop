@@ -18,7 +18,16 @@ type PreviewRow = {
   title: string
 }
 
-export default function ResultBatchUploader({ settings }: { settings: Record<string, string> }) {
+type CollectionBatchOption = {
+  id: string
+  categoryName: string
+  mode: string
+  statusFilter: string
+  accountCount: number
+  createdAt: string | Date
+}
+
+export default function ResultBatchUploader({ settings, collectionBatches = [] }: { settings: Record<string, string>; collectionBatches?: CollectionBatchOption[] }) {
   const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
   const [sheetUrl, setSheetUrl] = useState('')
@@ -32,6 +41,7 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
   const [reasonMode, setReasonMode] = useState(settings.bulk_result_reason_mode || 'same')
   const [defaultReason, setDefaultReason] = useState(settings.bulk_result_default_reason || 'Invalid or not working account')
   const [note, setNote] = useState('')
+  const [collectionBatchId, setCollectionBatchId] = useState('')
   const [unknownStatus, setUnknownStatus] = useState<'review' | 'valid' | 'invalid'>('review')
 
   const updateRow = (index: number, patch: Partial<PreviewRow>) => {
@@ -78,7 +88,7 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
       const res = await fetch('/api/admin/result-batches/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rows, fileName, fileHash, creditMode, reasonMode, defaultReason, note, autoCredit }),
+        body: JSON.stringify({ rows, fileName, fileHash, creditMode, reasonMode, defaultReason, note, autoCredit, collectionBatchId }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Apply failed')
@@ -153,6 +163,17 @@ export default function ResultBatchUploader({ settings }: { settings: Record<str
         </div>
 
         <div className="grid-2">
+          <div className="form-group">
+            <label className="form-label">Related Collection Batch</label>
+            <select className="select" value={collectionBatchId} onChange={(e) => setCollectionBatchId(e.target.value)}>
+              <option value="">No collection batch selected</option>
+              {collectionBatches.map((batch) => (
+                <option key={batch.id} value={batch.id}>
+                  {batch.categoryName} - {batch.accountCount} pcs - {new Date(batch.createdAt).toLocaleString('en-BD')}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="form-group">
             <label className="form-label">Default Reject Reason</label>
             <input className="input" value={defaultReason} onChange={(e) => setDefaultReason(e.target.value)} />

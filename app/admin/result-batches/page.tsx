@@ -5,6 +5,7 @@ import { getSettings } from '@/lib/settings'
 import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 import ResultBatchUploader from './ResultBatchUploader'
 import { canAccessAdminArea } from '@/lib/permissions'
+import { getAccountCollectionBatches } from '@/lib/accountCollections'
 
 export default async function ResultBatchesPage() {
   const user = await getAuthUser()
@@ -13,13 +14,17 @@ export default async function ResultBatchesPage() {
   const settings = await getSettings(['bulk_result_credit_mode', 'bulk_result_reason_mode', 'bulk_result_default_reason', 'bulk_result_allow_color'])
   let setupError = ''
   let batches: any[] = []
+  let collectionBatches: any[] = []
 
   try {
-    batches = await prisma.resultBatch.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 30,
-      include: { admin: { select: { username: true } }, rows: { take: 5 } },
-    })
+    ;[batches, collectionBatches] = await Promise.all([
+      prisma.resultBatch.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 30,
+        include: { admin: { select: { username: true } }, rows: { take: 5 } },
+      }),
+      getAccountCollectionBatches(50),
+    ])
   } catch (error) {
     console.error('Result batch history failed to load', error)
     setupError = isMissingResultBatchTables(error)
@@ -50,7 +55,7 @@ export default async function ResultBatchesPage() {
           </form>
         </section>
       ) : (
-        <ResultBatchUploader settings={settings} />
+        <ResultBatchUploader settings={settings} collectionBatches={collectionBatches} />
       )}
 
       <section className="card" style={{ padding: 20 }}>

@@ -30,19 +30,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid collection request' }, { status: 400 })
   }
 
-  const category = await prisma.category.findUnique({ where: { id: categoryId } })
+  const isAllCategories = categoryId === '__all'
+  const category = isAllCategories
+    ? { id: '__all', name: 'All Categories' }
+    : await prisma.category.findUnique({ where: { id: categoryId } })
   if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 })
 
   const collectedRows = mode === 'new'
-    ? await prisma.$queryRaw<Array<{ accountId: string }>>`
-        SELECT DISTINCT "accountId" FROM "AccountCollectionItem" WHERE "categoryId" = ${categoryId}
-      `
+    ? isAllCategories
+      ? await prisma.$queryRaw<Array<{ accountId: string }>>`
+          SELECT DISTINCT "accountId" FROM "AccountCollectionItem"
+        `
+      : await prisma.$queryRaw<Array<{ accountId: string }>>`
+          SELECT DISTINCT "accountId" FROM "AccountCollectionItem" WHERE "categoryId" = ${categoryId}
+        `
     : []
   const collectedIds = collectedRows.map((row) => row.accountId)
 
   const accounts = await prisma.account.findMany({
     where: {
-      categoryId,
+      ...(isAllCategories ? {} : { categoryId }),
       ...(status === 'all' ? {} : { status }),
       ...(mode === 'new'
         ? {
@@ -65,13 +72,13 @@ export async function POST(req: NextRequest) {
 
   await prisma.$executeRaw`
     INSERT INTO "AccountCollectionBatch" ("id", "adminId", "categoryId", "categoryName", "mode", "statusFilter", "accountCount", "fileName")
-    VALUES (${batchId}, ${user.userId}, ${category.id}, ${category.name}, ${mode}, ${status}, ${accounts.length}, ${fileName})
+      VALUES (${batchId}, ${user.userId}, ${category.id}, ${category.name}, ${mode}, ${status}, ${accounts.length}, ${fileName})
   `
 
   for (const account of accounts) {
     await prisma.$executeRaw`
       INSERT INTO "AccountCollectionItem" ("id", "batchId", "accountId", "categoryId")
-      VALUES (${crypto.randomUUID()}, ${batchId}, ${account.id}, ${category.id})
+      VALUES (${crypto.randomUUID()}, ${batchId}, ${account.id}, ${account.categoryId})
     `
   }
 

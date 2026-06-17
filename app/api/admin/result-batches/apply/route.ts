@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma'
 import { isMissingResultBatchTables, RESULT_BATCH_SETUP_MESSAGE } from '@/lib/prismaErrors'
 import { canAccessAdminArea } from '@/lib/permissions'
 import { logStaffAction } from '@/lib/staffAudit'
+import { getBatch } from '@/lib/accountCollections'
 
 type IncomingRow = {
   accountId?: string
@@ -27,7 +28,12 @@ export async function POST(req: NextRequest) {
   const defaultReason = String(body.defaultReason || 'Invalid or not working account')
   const fileName = String(body.fileName || 'result.xlsx')
   const fileHash = String(body.fileHash || '')
-  const note = String(body.note || '')
+  const collectionBatchId = String(body.collectionBatchId || '')
+  const collectionBatch = collectionBatchId ? await getBatch(collectionBatchId).catch(() => null) : null
+  const noteBase = String(body.note || '')
+  const note = collectionBatch
+    ? `${noteBase}${noteBase ? ' | ' : ''}Collection batch: ${collectionBatch.categoryName} (${collectionBatch.id.slice(0, 8)})`
+    : noteBase
 
   if (!Array.isArray(rows) || rows.length === 0) {
     return NextResponse.json({ error: 'No preview rows to apply' }, { status: 400 })
@@ -196,6 +202,6 @@ export async function POST(req: NextRequest) {
     throw error
   }
 
-  await logStaffAction(user, 'result_batch.apply', 'resultBatch', summary.batchId, summary, req)
+  await logStaffAction(user, 'result_batch.apply', 'resultBatch', summary.batchId, { ...summary, collectionBatchId: collectionBatch?.id || null }, req)
   return NextResponse.json({ success: true, ...summary })
 }

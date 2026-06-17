@@ -66,6 +66,9 @@ export default async function AccountCollectionsPage() {
           <div className="form-group">
             <label className="form-label">Category</label>
             <select className="input" name="categoryId" required>
+              <option value="__all">
+                All Categories - multi-sheet Excel
+              </option>
               {categories.map((category) => {
                 const count = countMap.get(category.id)
                 return (
@@ -98,6 +101,38 @@ export default async function AccountCollectionsPage() {
             Create Batch & Download
           </button>
         </form>
+      </div>
+
+      <div className="card" style={{ padding: 20, borderRadius: 8, marginBottom: 22 }}>
+        <h2 style={{ fontSize: 18, marginBottom: 6 }}>Preview Before Download</h2>
+        <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 14 }}>
+          New-only mode will skip accounts that already appeared in any previous collection batch. All Categories export creates one Excel file with separate sheets per category.
+        </p>
+        <div className="table-container">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>New Pending</th>
+                <th>Total Pending</th>
+                <th>Excel Sheet</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map((category) => {
+                const count = countMap.get(category.id)
+                return (
+                  <tr key={`preview-${category.id}`}>
+                    <td>{category.name}</td>
+                    <td>{count?.newCount || 0}</td>
+                    <td>{count?.totalCount || 0}</td>
+                    <td>{category.name.slice(0, 31)}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="table-container card mobile-hide-table">

@@ -2,6 +2,7 @@ import * as xlsx from 'xlsx'
 
 export type CollectionExportAccount = {
   id: string
+  categoryId: string
   status: string
   username: string
   password: string
@@ -16,8 +17,22 @@ export type CollectionExportAccount = {
   extraFields: string
 }
 
+function safeSheetName(name: string) {
+  return (name || 'Accounts').replace(/[\\/?*[\]:]/g, ' ').slice(0, 31).trim() || 'Accounts'
+}
+
 export function buildCollectionWorkbook(accounts: CollectionExportAccount[], meta: { categoryName: string; mode: string; status: string; batchId: string }) {
-  const rows = accounts.map((account, index) => {
+  const grouped = new Map<string, CollectionExportAccount[]>()
+  for (const account of accounts) {
+    const key = account.category.name || meta.categoryName
+    grouped.set(key, [...(grouped.get(key) || []), account])
+  }
+
+  if (grouped.size === 0) grouped.set(meta.categoryName, [])
+
+  const workbook = xlsx.utils.book_new()
+  for (const [categoryName, categoryAccounts] of Array.from(grouped.entries())) {
+    const rows = categoryAccounts.map((account, index) => {
     let extra: any = {}
     try { extra = JSON.parse(account.extraFields || '{}') } catch {}
     return {
@@ -42,15 +57,14 @@ export function buildCollectionWorkbook(accounts: CollectionExportAccount[], met
     }
   })
 
-  const worksheet = xlsx.utils.json_to_sheet(rows)
-  worksheet['!cols'] = [
-    { wch: 5 }, { wch: 26 }, { wch: 14 }, { wch: 12 }, { wch: 18 }, { wch: 18 },
-    { wch: 24 }, { wch: 18 }, { wch: 28 }, { wch: 22 }, { wch: 24 }, { wch: 24 },
-    { wch: 18 }, { wch: 16 }, { wch: 20 }, { wch: 12 }, { wch: 24 }, { wch: 30 },
-  ]
+    const worksheet = xlsx.utils.json_to_sheet(rows)
+    worksheet['!cols'] = [
+      { wch: 5 }, { wch: 26 }, { wch: 14 }, { wch: 12 }, { wch: 18 }, { wch: 18 },
+      { wch: 24 }, { wch: 18 }, { wch: 28 }, { wch: 22 }, { wch: 24 }, { wch: 24 },
+      { wch: 18 }, { wch: 16 }, { wch: 20 }, { wch: 12 }, { wch: 24 }, { wch: 30 },
+    ]
+    xlsx.utils.book_append_sheet(workbook, worksheet, safeSheetName(`${categoryName} ${categoryAccounts.length}`))
+  }
 
-  const workbook = xlsx.utils.book_new()
-  const sheetName = `${meta.categoryName.slice(0, 20)} ${accounts.length}`.slice(0, 31)
-  xlsx.utils.book_append_sheet(workbook, worksheet, sheetName)
   return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' })
 }
