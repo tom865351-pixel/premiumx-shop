@@ -117,6 +117,28 @@ button:active,
   transform: scale(0.985);
 }
 
+a,
+button,
+.btn,
+[role="button"],
+.mobile-nav-item,
+.sell-category-btn,
+input[type="submit"],
+input[type="button"] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.tap-ack {
+  filter: brightness(1.12);
+  outline: 2px solid rgba(212, 175, 55, 0.28);
+  outline-offset: 2px;
+}
+
+body.is-interacting {
+  cursor: progress;
+}
+
 input, textarea, select {
   font-family: inherit;
   font-size: inherit;
@@ -543,9 +565,89 @@ img {
   animation: spin 0.8s linear infinite;
 }
 
+.interaction-feedback {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top));
+  left: 50%;
+  z-index: 2000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  max-width: min(92vw, 360px);
+  padding: 7px 13px;
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: 999px;
+  background: rgba(10, 15, 30, 0.92);
+  color: var(--gold-light);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 18px rgba(212, 175, 55, 0.16);
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -16px) scale(0.98);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.interaction-feedback::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--blue-light), var(--purple));
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+}
+
+.interaction-feedback.show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.interaction-feedback.show::before {
+  opacity: 1;
+  animation: pageProgress 1.8s ease-in-out infinite;
+}
+
+.interaction-feedback.slow {
+  color: var(--text);
+}
+
+.interaction-feedback-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gold);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
+  animation: softPulse 0.9s ease-in-out infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes pageProgress {
+  0% { transform: scaleX(0.06); opacity: 0.6; }
+  50% { transform: scaleX(0.72); opacity: 1; }
+  100% { transform: scaleX(0.96); opacity: 0.75; }
+}
+
+@keyframes softPulse {
+  0%, 100% { transform: scale(0.86); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
     animation-duration: 2.5s;
+  }
+
+  .interaction-feedback,
+  .interaction-feedback::before,
+  .interaction-feedback-dot,
+  .tap-ack {
+    animation: none !important;
+    transition: none !important;
   }
 }
 

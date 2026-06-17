@@ -7,6 +7,7 @@ import { headers } from 'next/headers'
 import GlobalBanner from '@/components/layout/GlobalBanner'
 import MobileBottomNav from '@/components/layout/MobileBottomNav'
 import FloatingSupport from '@/components/layout/FloatingSupport'
+import InteractionFeedback from '@/components/ui/InteractionFeedback'
 import { getSettings } from '@/lib/settings'
 
 export const dynamic = 'force-dynamic'
@@ -83,6 +84,7 @@ export default async function RootLayout({
         ) : (
           <>
             <GlobalBanner />
+            <InteractionFeedback />
             {children}
             {!authPathAllowed && <FloatingSupport />}
             {!authPathAllowed && <MobileBottomNav user={authUserData} />}
