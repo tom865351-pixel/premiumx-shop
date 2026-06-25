@@ -39,9 +39,9 @@ export default function Login() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
       <div className="card card-glass" style={{ width: '100%', maxWidth: 400 }}>
         <div style={{ textAlign: 'center', marginBottom: 30 }}>
-          <Link href="/" style={{ textDecoration: 'none' }}>
-            <span style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif', fontSize: 24, fontWeight: 700, color: 'var(--gold)' }}>Premium</span>
-            <span style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif', fontSize: 24, fontWeight: 800, color: 'var(--purple)' }}>X</span>
+          <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
+            <span style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif', fontSize: 24, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.02em' }}>Premium</span>
+            <span style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif', fontSize: 24, fontWeight: 700, color: 'var(--gold)', letterSpacing: '-0.02em' }}>X</span>
           </Link>
           <h1 style={{ fontSize: 20, marginTop: 16 }}>Welcome Back</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Sign in to your account</p>

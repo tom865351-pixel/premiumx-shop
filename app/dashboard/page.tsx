@@ -167,7 +167,7 @@ export default async function Dashboard() {
           <div className={styles.statCard}>
             <div className={styles.statTop}>
               <div className={styles.statLabel}>Total Submitted</div>
-              <div className={styles.statIcon} style={{ background: 'rgba(14,165,233,0.12)', color: 'var(--primary)' }}>ALL</div>
+              <div className={styles.statIcon} style={{ background: 'rgba(96,165,250,0.12)', color: 'var(--info)' }}>ALL</div>
             </div>
             <div className={styles.statValue}>{dbUser.listings.length}</div>
           </div>

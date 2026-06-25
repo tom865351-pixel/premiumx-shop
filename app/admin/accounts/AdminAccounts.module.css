@@ -43,7 +43,7 @@
 
 .sellerCard {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--card);
   overflow: hidden;
 }
@@ -70,16 +70,17 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(147,51,234,0.22));
-  color: var(--gold);
-  font-weight: 900;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+  color: #1A1404;
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-weight: 800;
   flex: 0 0 auto;
 }
 
 .sellerName {
   color: var(--text);
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 700;
   margin-bottom: 3px;
 }
 
@@ -125,7 +126,7 @@
   align-items: center;
   padding: 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--bg);
 }
 
@@ -180,7 +181,7 @@
 
 .summaryCard {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--card);
   padding: 14px;
   text-align: center;

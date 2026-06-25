@@ -94,7 +94,7 @@ export default async function OrdersPage() {
           <div className={styles.statCard}>
             <div className={styles.statTop}>
               <div className={styles.statLabel}>All Submitted</div>
-              <div className={styles.statIcon} style={{ background: 'rgba(14,165,233,0.12)', color: 'var(--primary)' }}>ALL</div>
+              <div className={styles.statIcon} style={{ background: 'rgba(96,165,250,0.12)', color: 'var(--info)' }}>ALL</div>
             </div>
             <div className={styles.statValue}>{user.listings.length}</div>
           </div>
@@ -122,7 +122,7 @@ export default async function OrdersPage() {
         </section>
 
         {rejected > 0 && (
-          <div className="alert alert-error" style={{ marginBottom: 18 }}>
+          <div className="alert alert-danger" style={{ marginBottom: 18 }}>
             {rejected} submission{rejected > 1 ? 's' : ''} need correction. Check status details and contact support if needed.
           </div>
         )}

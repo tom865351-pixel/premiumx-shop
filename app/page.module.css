@@ -4,43 +4,27 @@
   flex-direction: column;
 }
 
+/* ===== Hero ===== */
 .hero {
   position: relative;
-  padding: 86px 0 72px;
+  padding: 92px 0 80px;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  background: radial-gradient(ellipse at 50% -20%, rgba(13, 110, 253, 0.12) 0%, transparent 70%),
-              radial-gradient(ellipse at 80% 50%, rgba(212, 175, 55, 0.04) 0%, transparent 50%);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% -5%, rgba(232, 179, 57, 0.08), transparent 60%),
+    radial-gradient(ellipse 40% 40% at 85% 30%, rgba(79, 142, 247, 0.05), transparent 60%);
 }
 
-/* Animated glow orbs */
-.glow1 {
+/* Subtle dot grid instead of noisy particles */
+.particles {
   position: absolute;
-  top: -80px;
-  left: 10%;
-  width: 350px;
-  height: 350px;
-  background: rgba(13, 110, 253, 0.12);
-  filter: blur(80px);
-  border-radius: 50%;
-  animation: floatOrb 8s ease-in-out infinite;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
   z-index: 0;
-}
-.glow2 {
-  position: absolute;
-  top: 20%;
-  right: 10%;
-  width: 250px;
-  height: 250px;
-  background: rgba(212, 175, 55, 0.08);
-  filter: blur(60px);
-  border-radius: 50%;
-  animation: floatOrb 10s ease-in-out infinite reverse;
-  z-index: 0;
-}
-@keyframes floatOrb {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+  opacity: 0.7;
 }
 
 .heroInner {
@@ -50,29 +34,29 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 860px;
+  max-width: 840px;
 }
 
 .title {
-  font-size: 56px;
-  font-weight: 900;
-  line-height: 1.04;
+  font-size: 54px;
+  font-weight: 700;
+  line-height: 1.05;
   margin: 22px 0 18px;
-  letter-spacing: 0;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 .subtitle {
   font-size: 17px;
   color: var(--text-secondary);
-  margin-bottom: 34px;
-  max-width: 640px;
-  line-height: 1.7;
+  margin-bottom: 32px;
+  max-width: 600px;
+  line-height: 1.65;
 }
 
 .actions {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   margin-bottom: 18px;
   flex-wrap: wrap;
   justify-content: center;
@@ -82,25 +66,25 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 42px;
+  gap: 8px;
+  margin-bottom: 44px;
 }
 
 .heroTrust span {
-  padding: 8px 12px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  padding: 7px 14px;
+  border: 1px solid var(--border-light);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface);
   color: var(--text-secondary);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .stats {
   display: flex;
   gap: 12px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-light);
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
   width: 100%;
   justify-content: center;
 }
@@ -110,66 +94,57 @@
   flex-direction: column;
   gap: 4px;
   min-width: 150px;
-  padding: 14px 18px;
+  padding: 16px 20px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.025);
+  border-radius: var(--radius-sm);
+  background: var(--card);
 }
 
 .statValue {
   font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.02em;
 }
 
 .statLabel {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.04em;
 }
 
 .section {
-  padding: 60px 0;
+  padding: 64px 0;
 }
 
+/* ===== Categories ===== */
 .categories {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
 }
 
 .categoryCard {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 22px 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   position: relative;
   overflow: hidden;
 }
 
-.categoryCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  width: 80%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(13,110,253,0.4), transparent);
-}
-
 .categoryCard:hover {
-  border-color: var(--hover-color, var(--blue));
-  background: var(--surface);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(13,110,253,0.12);
+  border-color: var(--hover-color, var(--border-strong));
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
 }
 
 .catIcon {
@@ -181,28 +156,32 @@
   color: var(--text);
 }
 
+/* ===== Tools panel ===== */
 .toolsPanel {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 28px;
+  gap: 32px;
   align-items: center;
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.12), rgba(212, 175, 55, 0.08));
+  background:
+    radial-gradient(ellipse 60% 120% at 100% 50%, rgba(232, 179, 57, 0.06), transparent 60%),
+    var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 28px;
+  border-radius: var(--radius-lg);
+  padding: 36px;
 }
 
 .toolsTitle {
   font-size: 28px;
   line-height: 1.2;
   margin: 14px 0 10px;
+  letter-spacing: -0.02em;
 }
 
 .toolsText {
   color: var(--text-secondary);
   font-size: 15px;
-  line-height: 1.7;
-  max-width: 520px;
+  line-height: 1.65;
+  max-width: 480px;
 }
 
 .toolsGrid {
@@ -212,61 +191,54 @@
 }
 
 .toolItem {
-  min-height: 92px;
+  min-height: 96px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   padding: 18px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgba(3, 7, 18, 0.46);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   color: var(--text);
   text-decoration: none;
-  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  transition: border-color var(--transition), transform var(--transition), background var(--transition);
 }
 
 .toolItem:hover {
-  border-color: var(--gold);
-  background: rgba(13, 110, 253, 0.1);
+  border-color: rgba(232, 179, 57, 0.4);
+  background: rgba(232, 179, 57, 0.05);
   transform: translateY(-2px);
 }
 
 .toolItem span {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
 }
 
 .toolItem strong {
   font-size: 15px;
   line-height: 1.35;
-}
-
-/* Particles */
-.particles {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, rgba(13,110,253,0.08) 1px, transparent 1px);
-  background-size: 40px 40px;
-  z-index: 0;
-  opacity: 0.6;
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
-  .hero { padding: 70px 0 56px; }
-  .title { font-size: 34px; line-height: 1.12; }
+  .hero { padding: 64px 0 56px; }
+  .title { font-size: 34px; line-height: 1.1; }
   .subtitle { font-size: 15px; margin-bottom: 26px; }
   .heroTrust { gap: 8px; margin-bottom: 30px; }
-  .heroTrust span { font-size: 11px; padding: 7px 10px; }
+  .heroTrust span { font-size: 11px; padding: 6px 11px; }
   .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
   .stat { min-width: 0; padding: 12px 8px; }
-  .statValue { font-size: 25px; }
-  .statLabel { font-size: 10px; letter-spacing: 0.4px; }
-  .actions { flex-direction: column; width: 100%; padding: 0 20px; }
+  .statValue { font-size: 23px; }
+  .statLabel { font-size: 10px; letter-spacing: 0.03em; }
+  .actions { flex-direction: column; width: 100%; padding: 0 4px; }
   .categories { grid-template-columns: repeat(2, 1fr); }
-  .toolsPanel { grid-template-columns: 1fr; padding: 20px; }
+  .toolsPanel { grid-template-columns: 1fr; padding: 22px; gap: 22px; }
   .toolsTitle { font-size: 22px; }
   .toolsGrid { grid-template-columns: 1fr; }
+  .section { padding: 48px 0; }
 }

@@ -73,9 +73,9 @@ export default async function Home() {
           <div className={styles.categories}>
             {categories.map((cat) => (
               <Link href="/sell" key={cat.id} className={styles.categoryCard} style={{ '--hover-color': cat.color } as any}>
-                <CategoryLogo icon={cat.icon} name={cat.name} color={cat.color} size={42} radius={12} />
+                <CategoryLogo icon={cat.icon} name={cat.name} color={cat.color} size={44} radius={12} />
                 <span className={styles.catName}>{cat.name}</span>
-                <span style={{ color: 'var(--gold)', fontSize: 13, fontWeight: 800 }}>BDT {cat.defaultPrice}</span>
+                <span style={{ color: 'var(--gold-light)', fontSize: 13, fontWeight: 700 }}>BDT {cat.defaultPrice}</span>
               </Link>
             ))}
           </div>
@@ -84,16 +84,33 @@ export default async function Home() {
 
       <section className={styles.section} style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
-          <h2 className="page-title" style={{ textAlign: 'center', marginBottom: 32 }}>How Selling Works</h2>
-          <div className="grid-3" style={{ gap: 18 }}>
+          <h2 className="page-title" style={{ textAlign: 'center', marginBottom: 8 }}>How Selling Works</h2>
+          <p className="page-subtitle" style={{ textAlign: 'center', marginBottom: 36, maxWidth: 520, margin: '0 auto 36px' }}>
+            Three simple steps from submission to payout.
+          </p>
+          <div className="grid-3" style={{ gap: 16 }}>
             {[
-              { title: '1. Submit Accounts', desc: 'Add username, password, 2FA, or upload an Excel sheet for bulk stock.' },
-              { title: '2. Admin Reviews', desc: 'We check account quality, duplicate stock, category, and fixed rate.' },
-              { title: '3. Get Wallet Balance', desc: 'Approved stock is bought by admin and seller balance is updated.' },
-            ].map((item) => (
+              { title: 'Submit Accounts', desc: 'Add username, password, 2FA, or upload an Excel sheet for bulk stock.' },
+              { title: 'Admin Reviews', desc: 'We check account quality, duplicate stock, category, and fixed rate.' },
+              { title: 'Get Wallet Balance', desc: 'Approved stock is bought by admin and seller balance is updated.' },
+            ].map((item, i) => (
               <div key={item.title} className="card" style={{ padding: 24 }}>
-                <h3 style={{ fontSize: 16, marginBottom: 8 }}>{item.title}</h3>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7 }}>{item.desc}</p>
+                <span style={{
+                  display: 'inline-grid',
+                  placeItems: 'center',
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  background: 'rgba(232, 179, 57, 0.12)',
+                  border: '1px solid rgba(232, 179, 57, 0.25)',
+                  color: 'var(--gold-light)',
+                  fontFamily: 'var(--font-space-grotesk), sans-serif',
+                  fontSize: 15,
+                  fontWeight: 800,
+                  marginBottom: 16,
+                }}>{i + 1}</span>
+                <h3 style={{ fontSize: 17, marginBottom: 8 }}>{item.title}</h3>
+                <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.7 }}>{item.desc}</p>
               </div>
             ))}
           </div>

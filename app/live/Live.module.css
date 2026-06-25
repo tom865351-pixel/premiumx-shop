@@ -18,18 +18,19 @@
   min-height: 38px;
   padding: 8px 14px;
   margin-bottom: 18px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--gold);
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
   text-decoration: none;
+  transition: all var(--transition);
 }
 
 .backLink:hover {
-  border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(232, 179, 57, 0.4);
+  background: rgba(232, 179, 57, 0.06);
 }
 
 .hero {
@@ -39,8 +40,9 @@
 .eyebrow {
   color: var(--gold);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .title {
@@ -64,8 +66,9 @@
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 18px;
+  transition: border-color var(--transition);
 }
 
 .cardTop {
@@ -77,8 +80,9 @@
 }
 
 .cardTitle {
-  font-size: 18px;
-  font-weight: 900;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .meta {
@@ -95,7 +99,7 @@
   padding: 5px 10px;
   color: var(--text-secondary);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .message {
@@ -115,7 +119,7 @@
 .empty {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 34px;
   text-align: center;
   color: var(--text-muted);
@@ -125,13 +129,14 @@
   margin-top: 24px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 18px;
 }
 
 .resourceTitle {
-  font-size: 20px;
+  font-size: 18px;
   margin: 6px 0 14px;
+  letter-spacing: -0.015em;
 }
 
 .resourceGrid {
@@ -148,10 +153,20 @@
   gap: 8px;
   padding: 14px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
   text-decoration: none;
+  transition: all var(--transition);
+}
+
+.resourceCard:hover {
+  border-color: var(--border-strong);
+}
+
+.resourceCard strong {
+  color: var(--gold-light);
+  font-size: 12px;
 }
 
 .resourceCard strong {
