@@ -96,6 +96,68 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ===== LIGHT THEME =====
+   All token overrides live here so the dark base remains the default.
+   Toggled via <html data-theme="light"> from the anti-FOUC script + ThemeProvider. */
+:root[data-theme="light"] {
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --card: #FFFFFF;
+  --card-hover: #F1F2F5;
+  --border: rgba(15, 18, 25, 0.09);
+  --border-light: rgba(15, 18, 25, 0.13);
+  --border-strong: rgba(15, 18, 25, 0.2);
+
+  /* Gold stays the brand primary, slightly deepened for contrast on white */
+  --gold: #B8902A;
+  --gold-light: #A07C1E;
+  --gold-dark: #8C6A18;
+  --gold-glow: rgba(184, 144, 42, 0.18);
+  --gold-glow-strong: rgba(184, 144, 42, 0.32);
+
+  --blue: #2F6BD6;
+  --blue-light: #2F6BD6;
+  --blue-dark: #1E4FA8;
+  --blue-glow: rgba(47, 107, 214, 0.18);
+  --blue-glow-strong: rgba(47, 107, 214, 0.3);
+
+  --purple: #7C5BE0;
+  --purple-dark: #6B49D0;
+  --purple-glow: rgba(124, 91, 224, 0.18);
+  --cyan: #1A9FB0;
+
+  --success: #0F9D6B;
+  --success-bg: rgba(15, 157, 107, 0.1);
+  --warning: #C77E0A;
+  --warning-bg: rgba(199, 126, 10, 0.1);
+  --danger: #D64545;
+  --danger-bg: rgba(214, 69, 69, 0.09);
+  --info: #2F6BD6;
+  --info-bg: rgba(47, 107, 214, 0.09);
+
+  --text: #14161B;
+  --text-secondary: #555A66;
+  --text-muted: #868C99;
+
+  --shadow-sm: 0 1px 2px rgba(15, 18, 25, 0.06);
+  --shadow: 0 1px 2px rgba(15, 18, 25, 0.05), 0 6px 20px rgba(15, 18, 25, 0.07);
+  --shadow-lg: 0 2px 8px rgba(15, 18, 25, 0.06), 0 16px 44px rgba(15, 18, 25, 0.12);
+  --shadow-blue: 0 6px 24px rgba(47, 107, 214, 0.16);
+  --shadow-gold: 0 6px 24px rgba(184, 144, 42, 0.16);
+  --shadow-purple: 0 6px 24px rgba(124, 91, 224, 0.14);
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184, 144, 42, 0.06), transparent 60%),
+    var(--bg);
+}
+
+/* Button text needs dark text on gold in light mode for contrast */
+:root[data-theme="light"] .btn-gold {
+  color: #FFFFFF;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
   font-weight: 600;
@@ -1310,6 +1372,43 @@ img {
     font-size: 16px;
     border-radius: 14px;
   }
+}
+
+/* ===== Theme toggle ===== */
+.theme-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+.theme-toggle.navbar-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+/* Track-style switch (used in settings pages) */
+.theme-toggle-track {
+  display: inline-block;
+}
+.theme-toggle-thumb {
+  display: inline-grid;
+  place-items: center;
+  font-size: 15px;
+  line-height: 1;
 }
 
 /* ===== Role Themes =====

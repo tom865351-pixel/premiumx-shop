@@ -8,6 +8,8 @@ import GlobalBanner from '@/components/layout/GlobalBanner'
 import MobileBottomNav from '@/components/layout/MobileBottomNav'
 import FloatingSupport from '@/components/layout/FloatingSupport'
 import InteractionFeedback from '@/components/ui/InteractionFeedback'
+import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import ServiceWorkerRegistrar from '@/components/theme/ServiceWorkerRegistrar'
 import { getSettings } from '@/lib/settings'
 
 export const dynamic = 'force-dynamic'
@@ -69,27 +71,38 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark">
+      <head>
+        {/* Apply saved theme before paint to avoid a flash of the wrong theme (FOUC). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('premiumx-theme');if(t==='light'||t==='light'){document.documentElement.setAttribute('data-theme','light')}else if(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light')}}catch(e){}`,
+          }}
+        />
+      </head>
       <body className={`${themeClass} ${inter.variable} ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}>
-        {maintenance.maintenance_mode === 'true' && authUserData?.role !== 'admin' && !authPathAllowed ? (
-          <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24, background: 'var(--bg)' }}>
-            <div className="card" style={{ maxWidth: 520, padding: 32, textAlign: 'center' }}>
-              <div className="badge badge-warning" style={{ marginBottom: 16 }}>Maintenance Mode</div>
-              <h1 style={{ fontSize: 30, marginBottom: 12 }}>PremiumX is updating</h1>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-                {maintenance.maintenance_message || 'PremiumX is being updated. Please check again soon.'}
-              </p>
-            </div>
-          </main>
-        ) : (
-          <>
-            <GlobalBanner />
-            <InteractionFeedback />
-            {children}
-            {!authPathAllowed && <FloatingSupport />}
-            {!authPathAllowed && <MobileBottomNav user={authUserData} />}
-          </>
-        )}
+        <ThemeProvider>
+          <ServiceWorkerRegistrar />
+          {maintenance.maintenance_mode === 'true' && authUserData?.role !== 'admin' && !authPathAllowed ? (
+            <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24, background: 'var(--bg)' }}>
+              <div className="card" style={{ maxWidth: 520, padding: 32, textAlign: 'center' }}>
+                <div className="badge badge-warning" style={{ marginBottom: 16 }}>Maintenance Mode</div>
+                <h1 style={{ fontSize: 30, marginBottom: 12 }}>PremiumX is updating</h1>
+                <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+                  {maintenance.maintenance_message || 'PremiumX is being updated. Please check again soon.'}
+                </p>
+              </div>
+            </main>
+          ) : (
+            <>
+              <GlobalBanner />
+              <InteractionFeedback />
+              {children}
+              {!authPathAllowed && <FloatingSupport />}
+              {!authPathAllowed && <MobileBottomNav user={authUserData} />}
+            </>
+          )}
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
+import ThemeToggle from '@/components/theme/ThemeToggle'
 import styles from './Navbar.module.css'
 
 interface NavUser {
@@ -158,6 +159,8 @@ export default function Navbar({ user }: NavbarProps) {
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
+
+          <ThemeToggle />
 
           {user ? (
             <>
